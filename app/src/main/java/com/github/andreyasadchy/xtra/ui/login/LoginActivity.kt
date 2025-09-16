@@ -105,10 +105,12 @@ class LoginActivity : AppCompatActivity() {
             javaScriptEnabled = true
             domStorageEnabled = true
             userAgentString = userAgentString + " XtraKick/Android"
-            if (WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK) && !isLightTheme()) {
-                WebSettingsCompat.setForceDark(this, WebSettingsCompat.FORCE_DARK_ON)
-            } else if (WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK) && isLightTheme()) {
-                WebSettingsCompat.setForceDark(this, WebSettingsCompat.FORCE_DARK_OFF)
+            if (WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK)) {
+                if (this@LoginActivity.isLightTheme) {
+                    WebSettingsCompat.setForceDark(this, WebSettingsCompat.FORCE_DARK_OFF)
+                } else {
+                    WebSettingsCompat.setForceDark(this, WebSettingsCompat.FORCE_DARK_ON)
+                }
             }
         }
         webView.webChromeClient = object : WebChromeClient() {

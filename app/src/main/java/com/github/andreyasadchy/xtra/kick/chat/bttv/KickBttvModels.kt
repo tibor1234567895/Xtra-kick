@@ -48,7 +48,7 @@ data class KickBttvImageSet(
 /**
  * Identifiers accepted by BetterTTV for channel level queries.
  */
-sealed class KickBttvIdentifier internal constructor(
+sealed class KickBttvIdentifier protected constructor(
     internal val segments: List<String>
 ) {
     class KickChannelSlug(slug: String) : KickBttvIdentifier(listOf("kick", slug))
