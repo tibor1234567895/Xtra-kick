@@ -1,4 +1,4 @@
-<i>Xtra for Twitch</i> — клиент <a href='https://en.wikipedia.org/wiki/Twitch_(service)' target='_blank'>Твича</a>, обеспечивающий наилучшее качество просмотра и общения в чате с мобильных устройств:
+<i>Xtra for Kick</i> — клиент <a href='https://kick.com' target='_blank'>Kick</a>, обеспечивающий наилучшее качество просмотра и общения в чате с мобильных устройств:
 
 * Поддержка популярных смайлов из плагинов BetterTTV и FrankerFaceZ
 * Просмотр видеозаписей и клипов с повтором чата

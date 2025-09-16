@@ -18,7 +18,7 @@ import com.github.andreyasadchy.xtra.databinding.FragmentSearchChannelsListItemB
 import com.github.andreyasadchy.xtra.model.ui.User
 import com.github.andreyasadchy.xtra.ui.channel.ChannelPagerFragmentDirections
 import com.github.andreyasadchy.xtra.util.C
-import com.github.andreyasadchy.xtra.util.TwitchApiHelper
+import com.github.andreyasadchy.xtra.util.KickApiHelper
 import com.github.andreyasadchy.xtra.util.gone
 import com.github.andreyasadchy.xtra.util.prefs
 import com.github.andreyasadchy.xtra.util.visible
@@ -91,7 +91,7 @@ class ChannelSearchAdapter(
                     }
                     if (item.followersCount != null) {
                         userFollowers.visible()
-                        userFollowers.text = context.getString(R.string.followers, TwitchApiHelper.formatCount(item.followersCount, context.prefs().getBoolean(C.UI_TRUNCATEVIEWCOUNT, true)))
+                        userFollowers.text = context.getString(R.string.followers, KickApiHelper.formatCount(item.followersCount, context.prefs().getBoolean(C.UI_TRUNCATEVIEWCOUNT, true)))
                     } else {
                         userFollowers.gone()
                     }

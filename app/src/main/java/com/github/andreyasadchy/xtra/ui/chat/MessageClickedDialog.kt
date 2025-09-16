@@ -33,7 +33,7 @@ import com.github.andreyasadchy.xtra.model.chat.ChatMessage
 import com.github.andreyasadchy.xtra.model.ui.User
 import com.github.andreyasadchy.xtra.ui.common.IntegrityDialog
 import com.github.andreyasadchy.xtra.util.C
-import com.github.andreyasadchy.xtra.util.TwitchApiHelper
+import com.github.andreyasadchy.xtra.util.KickApiHelper
 import com.github.andreyasadchy.xtra.util.getAlertDialogBuilder
 import com.github.andreyasadchy.xtra.util.gone
 import com.github.andreyasadchy.xtra.util.prefs
@@ -176,8 +176,8 @@ class MessageClickedDialog : BottomSheetDialogFragment(), IntegrityDialog.Callba
                                 channelLogin = selectedMessage.userLogin,
                                 targetId = if (selectedMessage.userId != targetId) targetId else null,
                                 networkLibrary = requireContext().prefs().getString(C.NETWORK_LIBRARY, "OkHttp"),
-                                gqlHeaders = TwitchApiHelper.getGQLHeaders(requireContext()),
-                                helixHeaders = TwitchApiHelper.getHelixHeaders(requireContext()),
+                                gqlHeaders = KickApiHelper.getGQLHeaders(requireContext()),
+                                helixHeaders = KickApiHelper.getHelixHeaders(requireContext()),
                                 enableIntegrity = requireContext().prefs().getBoolean(C.ENABLE_INTEGRITY, false),
                             )
                             viewLifecycleOwner.lifecycleScope.launch {
@@ -353,7 +353,7 @@ class MessageClickedDialog : BottomSheetDialogFragment(), IntegrityDialog.Callba
             if (user.createdAt != null) {
                 userLayout.visible()
                 userCreated.visible()
-                userCreated.text = requireContext().getString(R.string.created_at, TwitchApiHelper.formatTimeString(requireContext(), user.createdAt))
+                userCreated.text = requireContext().getString(R.string.created_at, KickApiHelper.formatTimeString(requireContext(), user.createdAt))
                 if (user.bannerImageURL != null) {
                     userCreated.setTextColor(Color.LTGRAY)
                     userCreated.setShadowLayer(4f, 0f, 0f, Color.BLACK)
@@ -364,7 +364,7 @@ class MessageClickedDialog : BottomSheetDialogFragment(), IntegrityDialog.Callba
             if (user.followedAt != null) {
                 userLayout.visible()
                 userFollowed.visible()
-                userFollowed.text = requireContext().getString(R.string.followed_at, TwitchApiHelper.formatTimeString(requireContext(), user.followedAt!!))
+                userFollowed.text = requireContext().getString(R.string.followed_at, KickApiHelper.formatTimeString(requireContext(), user.followedAt!!))
                 if (user.bannerImageURL != null) {
                     userFollowed.setTextColor(Color.LTGRAY)
                     userFollowed.setShadowLayer(4f, 0f, 0f, Color.BLACK)
@@ -432,8 +432,8 @@ class MessageClickedDialog : BottomSheetDialogFragment(), IntegrityDialog.Callba
                             channelLogin = userLogin,
                             targetId = if (userId != targetId) targetId else null,
                             networkLibrary = requireContext().prefs().getString(C.NETWORK_LIBRARY, "OkHttp"),
-                            gqlHeaders = TwitchApiHelper.getGQLHeaders(requireContext()),
-                            helixHeaders = TwitchApiHelper.getHelixHeaders(requireContext()),
+                            gqlHeaders = KickApiHelper.getGQLHeaders(requireContext()),
+                            helixHeaders = KickApiHelper.getHelixHeaders(requireContext()),
                             enableIntegrity = requireContext().prefs().getBoolean(C.ENABLE_INTEGRITY, false),
                         )
                     }

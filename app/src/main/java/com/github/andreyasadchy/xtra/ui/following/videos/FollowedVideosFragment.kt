@@ -28,7 +28,7 @@ import com.github.andreyasadchy.xtra.ui.common.VideosAdapter
 import com.github.andreyasadchy.xtra.ui.common.VideosSortDialog
 import com.github.andreyasadchy.xtra.ui.download.DownloadDialog
 import com.github.andreyasadchy.xtra.util.C
-import com.github.andreyasadchy.xtra.util.TwitchApiHelper
+import com.github.andreyasadchy.xtra.util.KickApiHelper
 import com.github.andreyasadchy.xtra.util.gone
 import com.github.andreyasadchy.xtra.util.prefs
 import com.github.andreyasadchy.xtra.util.visible
@@ -73,8 +73,8 @@ class FollowedVideosFragment : PagedListFragment(), Scrollable, Sortable, Videos
                 requireContext().filesDir.path,
                 it,
                 requireContext().prefs().getString(C.NETWORK_LIBRARY, "OkHttp"),
-                TwitchApiHelper.getGQLHeaders(requireContext()),
-                TwitchApiHelper.getHelixHeaders(requireContext()),
+                KickApiHelper.getGQLHeaders(requireContext()),
+                KickApiHelper.getHelixHeaders(requireContext()),
             )
         })
         setAdapter(binding.recyclerView, pagingAdapter)

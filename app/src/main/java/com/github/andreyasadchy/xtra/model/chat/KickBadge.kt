@@ -1,6 +1,6 @@
 package com.github.andreyasadchy.xtra.model.chat
 
-class TwitchBadge(
+data class KickBadge(
     val setId: String,
     val version: String,
     val localData: Pair<Long, Int>? = null,

@@ -28,7 +28,7 @@ import com.github.andreyasadchy.xtra.ui.common.VideosSortDialog
 import com.github.andreyasadchy.xtra.ui.game.GamePagerFragmentArgs
 import com.github.andreyasadchy.xtra.util.C
 import com.github.andreyasadchy.xtra.util.HttpEngineUtils
-import com.github.andreyasadchy.xtra.util.TwitchApiHelper
+import com.github.andreyasadchy.xtra.util.KickApiHelper
 import com.github.andreyasadchy.xtra.util.getByteArrayCronetCallback
 import com.github.andreyasadchy.xtra.util.prefs
 import dagger.Lazy
@@ -141,12 +141,12 @@ class GameVideosViewModel @Inject constructor(
                     VideosSortDialog.SORT_VIEWS -> "views"
                     else -> "views"
                 },
-                gqlHeaders = TwitchApiHelper.getGQLHeaders(applicationContext),
+                gqlHeaders = KickApiHelper.getGQLHeaders(applicationContext),
                 graphQLRepository = graphQLRepository,
-                helixHeaders = TwitchApiHelper.getHelixHeaders(applicationContext),
+                helixHeaders = KickApiHelper.getHelixHeaders(applicationContext),
                 helixRepository = helixRepository,
                 enableIntegrity = applicationContext.prefs().getBoolean(C.ENABLE_INTEGRITY, false),
-                apiPref = applicationContext.prefs().getString(C.API_PREFS_GAME_VIDEOS, null)?.split(',') ?: TwitchApiHelper.gameVideosApiDefaults,
+                apiPref = applicationContext.prefs().getString(C.API_PREFS_GAME_VIDEOS, null)?.split(',') ?: KickApiHelper.gameVideosApiDefaults,
                 networkLibrary = applicationContext.prefs().getString(C.NETWORK_LIBRARY, "OkHttp"),
             )
         }.flow

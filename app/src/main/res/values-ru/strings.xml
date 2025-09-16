@@ -168,7 +168,7 @@
     <string name="chat_first">Первый раз в чате</string>
     <string name="chat_reward">Списание баллов канала</string>
     <string name="always">Всегда</string>
-    <string name="twitch">Твич</string>
+    <string name="kick">Kick</string>
     <string name="local">Локально</string>
     <string name="days">д</string>
     <string name="seconds">с</string>
@@ -210,12 +210,12 @@
     <string name="irc_notice_already_subs_off">Эта комната не в режиме только для подписчиков.</string>
     <string name="irc_notice_already_subs_on">Эта комната уже в режиме только для подписчиков.</string>
     <string name="irc_notice_autohost_receive">%1$s теперь автоматически хостит вас для более чем %2$s зрителей.</string>
-    <string name="irc_notice_bad_ban_admin">Вы не можете заблокировать администратора %s. Пожалуйста, напишите на электронную почту support@twitch.tv, если администратор ведёт себя оскорбительно.</string>
+    <string name="irc_notice_bad_ban_admin">Вы не можете заблокировать администратора %s. Пожалуйста, напишите на электронную почту support.com если администратор ведёт себя оскорбительно.</string>
     <string name="irc_notice_bad_ban_anon">Вы не можете заблокировать анонимных участников.</string>
     <string name="irc_notice_bad_ban_broadcaster">Вы не можете заблокировать стримера.</string>
     <string name="irc_notice_bad_ban_mod">Вы не можете заблокировать модератора %s, если вы не являетесь владельцем этого канала.</string>
     <string name="irc_notice_bad_ban_self">Вы не можете заблокировать самого себя.</string>
-    <string name="irc_notice_bad_ban_staff">Вы не можете заблокировать сотрудника %s. Пожалуйста, напишите на электронную почту support@twitch.tv, если сотрудник персонала ведёт себя оскорбительно.</string>
+    <string name="irc_notice_bad_ban_staff">Вы не можете заблокировать сотрудника %s. Пожалуйста, напишите на электронную почту support.com если сотрудник персонала ведёт себя оскорбительно.</string>
     <string name="irc_notice_bad_commercial_error">Не удалось запустить рекламный ролик.</string>
     <string name="irc_notice_bad_delete_message_broadcaster">Вы не можете удалять сообщения стримера.</string>
     <string name="irc_notice_bad_delete_message_mod">Вы не можете удалять сообщения от другого модератора %s.</string>
@@ -227,13 +227,13 @@
     <string name="irc_notice_bad_mod_banned">%s заблокирован на этом канале. Вы должны снять блокировку этого пользователя перед предоставлением ему статуса мода.</string>
     <string name="irc_notice_bad_mod_mod">%s уже является модератором этого канала.</string>
     <string name="irc_notice_bad_slow_duration">Вы не можете установить задержку медленного режима более чем на %s секунд.</string>
-    <string name="irc_notice_bad_timeout_admin">Вы не можете временно заблокировать администратора %s. Пожалуйста, напишите на электронную почту support@twitch.tv, если администратор ведёт себя оскорбительно.</string>
+    <string name="irc_notice_bad_timeout_admin">Вы не можете временно заблокировать администратора %s. Пожалуйста, напишите на электронную почту support.com если администратор ведёт себя оскорбительно.</string>
     <string name="irc_notice_bad_timeout_anon">Вы не можете временно заблокировать анонимных пользователей.</string>
     <string name="irc_notice_bad_timeout_broadcaster">Вы не можете временно заблокировать стримера.</string>
     <string name="irc_notice_bad_timeout_duration">Вы не можете временно заблокировать пользователя более чем на %s.</string>
     <string name="irc_notice_bad_timeout_mod">Вы не можете временно заблокировать модератора %s, если вы не являетесь владельцем этого канала.</string>
     <string name="irc_notice_bad_timeout_self">Вы не можете временно заблокировать самого себя.</string>
-    <string name="irc_notice_bad_timeout_staff">Вы не можете временно заблокировать сотрудника персонала %s. Пожалуйста, напишите по электронной почте support@twitch.tv, если сотрудник ведёт себя оскорбительно.</string>
+    <string name="irc_notice_bad_timeout_staff">Вы не можете временно заблокировать сотрудника персонала %s. Пожалуйста, напишите по электронной почте support.com если сотрудник ведёт себя оскорбительно.</string>
     <string name="irc_notice_bad_unban_no_ban">%s не заблокирован на этом канале.</string>
     <string name="irc_notice_bad_unhost_error">Возникла проблема при выходе из режима хоста. Пожалуйста, повторите попытку через минуту.</string>
     <string name="irc_notice_bad_unmod_mod">%s не является модератором этого канала.</string>
@@ -243,11 +243,11 @@
     <string name="irc_notice_bad_vip_achievement_incomplete">Не удалось добавить VIP-пользователя. Посетите страницу достижений на своей панели управления, чтобы узнать, как разблокировать эту функцию.</string>
     <string name="irc_notice_bad_unvip_grantee_not_vip">%s не является VIP-пользователем этого канала.</string>
     <string name="irc_notice_ban_success">%s теперь заблокирован на этом канале.</string>
-    <string name="irc_notice_cmds_available">Команды, доступные вам в этой комнате (используйте /help для подробностей): %s Расширенная справка: https://help.twitch.tv/s/article/chat-commands.</string>
+    <string name="irc_notice_cmds_available">Команды, доступные вам в этой комнате (используйте /help для подробностей): %s Расширенная справка: https://help.kick.com.</string>
     <string name="irc_notice_color_changed">Ваш цвет был изменён.</string>
     <string name="irc_notice_commercial_success">Запускается рекламная пауза на %s с. Имейте в виду, что ваш стрим ещё активен и не все увидят рекламу.</string>
     <string name="irc_notice_delete_message_success">Сообщение от %s теперь удалено.</string>
-    <string name="irc_notice_delete_staff_message_success">Вы удалили сообщение от сотрудника персонала %s. Пожалуйста, напишите на электронную почту support@twitch.tv, если сотрудник ведёт себя оскорбительно.</string>
+    <string name="irc_notice_delete_staff_message_success">Вы удалили сообщение от сотрудника персонала %s. Пожалуйста, напишите на электронную почту support.com если сотрудник ведёт себя оскорбительно.</string>
     <string name="irc_notice_emote_only_off">Эта комната больше не в режиме только для смайлов.</string>
     <string name="irc_notice_emote_only_on">Эта комната теперь в режиме только для смайлов.</string>
     <string name="irc_notice_followers_off">Эта комната больше не в режиме только для отслеживающих.</string>
@@ -275,10 +275,10 @@
     <string name="irc_notice_msg_rejected">Ваше сообщение проверяется модераторами и не было отправлено.</string>
     <string name="irc_notice_msg_rejected_mandatory">Ваше сообщение не было опубликовано из-за конфликтов с настройками модерации канала.</string>
     <string name="irc_notice_msg_slowmode">Эта комната в медленном режиме, и вы отправляете сообщения слишком быстро. Вы сможете снова отправить через %s секунд.</string>
-    <string name="irc_notice_msg_subsonly">Эта комната в режиме только для подписчиков. Чтобы общаться в чате, приобрети подписку на канал в https://www.twitch.tv/products/%s/ticket?ref=subscriber_only_mode_chat.</string>
+    <string name="irc_notice_msg_subsonly">Эта комната в режиме только для подписчиков. Чтобы общаться в чате, приобрети подписку на канал в https://kick.com</string>
     <string name="irc_notice_msg_suspended">У вас нет прав для выполнения этого действия.</string>
     <string name="irc_notice_msg_timedout">Вас отстранили ещё на %s секунд.</string>
-    <string name="irc_notice_msg_verified_email">Для общения в чате этой комнаты требуется подтверждённая учётная запись. Пожалуйста, подтвердите ваш аккаунт в https://www.twitch.tv/settings/security.</string>
+    <string name="irc_notice_msg_verified_email">Для общения в чате этой комнаты требуется подтверждённая учётная запись. Пожалуйста, подтвердите ваш аккаунт в https://kick.com</string>
     <string name="irc_notice_no_help">Справка недоступна.</string>
     <string name="irc_notice_no_mods">На этом канале нет модераторов.</string>
     <string name="irc_notice_no_vips">На этом канале нет VIP-пользователей.</string>
@@ -317,7 +317,7 @@
     <string name="irc_notice_usage_color">Использование: \"/color &lt;color&gt;\" - Сменить цвет вашего имени. Цвет должен быть в шестнадцатеричном формате (#000000) или одним из следующих: %s.</string>
     <string name="irc_notice_usage_commercial">Использование: \"/commercial [length]\" - Запускает рекламу. Длительность в секундах (необязательно) должна быть положительным числом.</string>
     <string name="irc_notice_usage_disconnect">Использование: \"/disconnect\" - Переподключиться к чату.</string>
-    <string name="irc_notice_usage_delete">Использование: \"/delete &lt;msg id&gt;\" - Удаляет указанное сообщение. ДЛя подробностей посетите https://dev.twitch.tv/docs/irc/commands/#clearmsg-twitch-commands.</string>
+    <string name="irc_notice_usage_delete">Использование: \"/delete &lt;msg id&gt;\" - Удаляет указанное сообщение. ДЛя подробностей посетите https://docs.kick.com</string>
     <string name="irc_notice_usage_emote_only_off">Использование: \"/emoteonlyoff\" - Отключает режим только смайлы.</string>
     <string name="irc_notice_usage_emote_only_on">Использование: \"/emoteonly\" - Включает режим только смайлы (в чате можно использовать только смайлы). Используйте \"/emoteonlyoff\" для отключения.</string>
     <string name="irc_notice_usage_followers_off">Использование: \"/followersoff\" - Отключает режим только отслеживающие.</string>
@@ -437,7 +437,7 @@
     <string name="restart_player">Перезапустить проигрыватель</string>
     <string name="sub_only_summary">Только для содержимого подписчиков</string>
     <string name="follow_button">Кнопка отслеживания</string>
-    <string name="follow_account">Следить через учётную запись Твича</string>
+    <string name="follow_account">Следить через учётную запись Kick</string>
     <string name="follow_local">Отслеживать локально</string>
     <string name="hide">Скрыть</string>
     <string name="chat_ssl">Подключение через SSL</string>

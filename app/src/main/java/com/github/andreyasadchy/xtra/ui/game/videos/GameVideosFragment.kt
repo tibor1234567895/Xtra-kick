@@ -31,7 +31,7 @@ import com.github.andreyasadchy.xtra.ui.common.VideosSortDialog
 import com.github.andreyasadchy.xtra.ui.download.DownloadDialog
 import com.github.andreyasadchy.xtra.ui.game.GamePagerFragmentArgs
 import com.github.andreyasadchy.xtra.util.C
-import com.github.andreyasadchy.xtra.util.TwitchApiHelper
+import com.github.andreyasadchy.xtra.util.KickApiHelper
 import com.github.andreyasadchy.xtra.util.gone
 import com.github.andreyasadchy.xtra.util.prefs
 import com.github.andreyasadchy.xtra.util.visible
@@ -77,8 +77,8 @@ class GameVideosFragment : PagedListFragment(), Scrollable, Sortable, VideosSort
                 requireContext().filesDir.path,
                 it,
                 requireContext().prefs().getString(C.NETWORK_LIBRARY, "OkHttp"),
-                TwitchApiHelper.getGQLHeaders(requireContext()),
-                TwitchApiHelper.getHelixHeaders(requireContext()),
+                KickApiHelper.getGQLHeaders(requireContext()),
+                KickApiHelper.getHelixHeaders(requireContext()),
             )
         }, showGame = false)
         setAdapter(binding.recyclerView, pagingAdapter)
@@ -99,7 +99,7 @@ class GameVideosFragment : PagedListFragment(), Scrollable, Sortable, VideosSort
                 } ?: viewModel.getSortGame("default")
                 viewModel.setFilter(
                     sort = sortValues?.videoSort,
-                    period = if (!TwitchApiHelper.getHelixHeaders(requireContext())[C.HEADER_TOKEN].isNullOrBlank()) {
+                    period = if (!KickApiHelper.getHelixHeaders(requireContext())[C.HEADER_TOKEN].isNullOrBlank()) {
                         sortValues?.videoPeriod
                     } else null,
                     type = sortValues?.videoType,
@@ -185,7 +185,7 @@ class GameVideosFragment : PagedListFragment(), Scrollable, Sortable, VideosSort
                         sortValues.apply {
                             this.saveSort = true
                             videoSort = sort
-                            if (!TwitchApiHelper.getHelixHeaders(requireContext())[C.HEADER_TOKEN].isNullOrBlank()) {
+                            if (!KickApiHelper.getHelixHeaders(requireContext())[C.HEADER_TOKEN].isNullOrBlank()) {
                                 videoPeriod = period
                             }
                             videoType = type
@@ -197,7 +197,7 @@ class GameVideosFragment : PagedListFragment(), Scrollable, Sortable, VideosSort
                                 id = it,
                                 saveSort = true,
                                 videoSort = sort,
-                                videoPeriod = if (!TwitchApiHelper.getHelixHeaders(requireContext())[C.HEADER_TOKEN].isNullOrBlank()) period else null,
+                                videoPeriod = if (!KickApiHelper.getHelixHeaders(requireContext())[C.HEADER_TOKEN].isNullOrBlank()) period else null,
                                 videoType = type,
                                 videoLanguageIndex = languageIndex
                             )
@@ -225,7 +225,7 @@ class GameVideosFragment : PagedListFragment(), Scrollable, Sortable, VideosSort
                     if (sortDefaults != null) {
                         sortDefaults.apply {
                             videoSort = sort
-                            if (!TwitchApiHelper.getHelixHeaders(requireContext())[C.HEADER_TOKEN].isNullOrBlank()) {
+                            if (!KickApiHelper.getHelixHeaders(requireContext())[C.HEADER_TOKEN].isNullOrBlank()) {
                                 videoPeriod = period
                             }
                             videoType = type
@@ -235,7 +235,7 @@ class GameVideosFragment : PagedListFragment(), Scrollable, Sortable, VideosSort
                         SortGame(
                             id = "default",
                             videoSort = sort,
-                            videoPeriod = if (!TwitchApiHelper.getHelixHeaders(requireContext())[C.HEADER_TOKEN].isNullOrBlank()) period else null,
+                            videoPeriod = if (!KickApiHelper.getHelixHeaders(requireContext())[C.HEADER_TOKEN].isNullOrBlank()) period else null,
                             videoType = type,
                             videoLanguageIndex = languageIndex
                         )

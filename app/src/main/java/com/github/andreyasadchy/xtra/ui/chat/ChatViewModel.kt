@@ -24,14 +24,14 @@ import com.github.andreyasadchy.xtra.model.chat.Raid
 import com.github.andreyasadchy.xtra.model.chat.RecentEmote
 import com.github.andreyasadchy.xtra.model.chat.RoomState
 import com.github.andreyasadchy.xtra.model.chat.StvBadge
-import com.github.andreyasadchy.xtra.model.chat.TwitchBadge
-import com.github.andreyasadchy.xtra.model.chat.TwitchEmote
+import com.github.andreyasadchy.xtra.model.chat.KickBadge
+import com.github.andreyasadchy.xtra.model.chat.KickEmote
 import com.github.andreyasadchy.xtra.repository.GraphQLRepository
 import com.github.andreyasadchy.xtra.repository.HelixRepository
 import com.github.andreyasadchy.xtra.repository.PlayerRepository
 import com.github.andreyasadchy.xtra.repository.TranslateAllMessagesUsersRepository
 import com.github.andreyasadchy.xtra.util.C
-import com.github.andreyasadchy.xtra.util.TwitchApiHelper
+import com.github.andreyasadchy.xtra.util.KickApiHelper
 import com.github.andreyasadchy.xtra.util.chat.ChatReadIRC
 import com.github.andreyasadchy.xtra.util.chat.ChatReadWebSocket
 import com.github.andreyasadchy.xtra.util.chat.ChatUtils
@@ -105,8 +105,8 @@ class ChatViewModel @Inject constructor(
     private var loadedUserEmotes = false
     private val _userPersonalEmoteSet = MutableStateFlow<Pair<String, List<Emote>>?>(null)
     val userPersonalEmoteSet: StateFlow<Pair<String, List<Emote>>?> = _userPersonalEmoteSet
-    private val _localTwitchEmotes = MutableStateFlow<List<TwitchEmote>?>(null)
-    val localTwitchEmotes: StateFlow<List<TwitchEmote>?> = _localTwitchEmotes
+    private val _localKickEmotes = MutableStateFlow<List<KickEmote>?>(null)
+    val localKickEmotes: StateFlow<List<KickEmote>?> = _localKickEmotes
     private val _globalStvEmotes = MutableStateFlow<List<Emote>?>(null)
     val globalStvEmotes: StateFlow<List<Emote>?> = _globalStvEmotes
     private val _channelStvEmotes = MutableStateFlow<List<Emote>?>(null)
@@ -119,10 +119,10 @@ class ChatViewModel @Inject constructor(
     val globalFfzEmotes: StateFlow<List<Emote>?> = _globalFfzEmotes
     private val _channelFfzEmotes = MutableStateFlow<List<Emote>?>(null)
     val channelFfzEmotes: StateFlow<List<Emote>?> = _channelFfzEmotes
-    private val _globalBadges = MutableStateFlow<List<TwitchBadge>?>(null)
-    val globalBadges: StateFlow<List<TwitchBadge>?> = _globalBadges
-    private val _channelBadges = MutableStateFlow<List<TwitchBadge>?>(null)
-    val channelBadges: StateFlow<List<TwitchBadge>?> = _channelBadges
+    private val _globalBadges = MutableStateFlow<List<KickBadge>?>(null)
+    val globalBadges: StateFlow<List<KickBadge>?> = _globalBadges
+    private val _channelBadges = MutableStateFlow<List<KickBadge>?>(null)
+    val channelBadges: StateFlow<List<KickBadge>?> = _channelBadges
     private val _cheerEmotes = MutableStateFlow<List<CheerEmote>?>(null)
     val cheerEmotes: StateFlow<List<CheerEmote>?> = _cheerEmotes
 
@@ -183,8 +183,8 @@ class ChatViewModel @Inject constructor(
                 loadRecentMessages(networkLibrary, channelLogin)
             }
             val isLoggedIn = !applicationContext.tokenPrefs().getString(C.USERNAME, null).isNullOrBlank() &&
-                    (!TwitchApiHelper.getGQLHeaders(applicationContext, true)[C.HEADER_TOKEN].isNullOrBlank() ||
-                            !TwitchApiHelper.getHelixHeaders(applicationContext)[C.HEADER_TOKEN].isNullOrBlank())
+                    (!KickApiHelper.getGQLHeaders(applicationContext, true)[C.HEADER_TOKEN].isNullOrBlank() ||
+                            !KickApiHelper.getHelixHeaders(applicationContext)[C.HEADER_TOKEN].isNullOrBlank())
             if (isLoggedIn) {
                 loadUserEmotes(channelId)
             }
@@ -229,8 +229,8 @@ class ChatViewModel @Inject constructor(
 
     private fun loadEmotes(channelId: String?, channelLogin: String?) {
         val networkLibrary = applicationContext.prefs().getString(C.NETWORK_LIBRARY, "OkHttp")
-        val helixHeaders = TwitchApiHelper.getHelixHeaders(applicationContext)
-        val gqlHeaders = TwitchApiHelper.getGQLHeaders(applicationContext, true)
+        val helixHeaders = KickApiHelper.getHelixHeaders(applicationContext)
+        val gqlHeaders = KickApiHelper.getGQLHeaders(applicationContext, true)
         val emoteQuality = applicationContext.prefs().getString(C.CHAT_IMAGE_QUALITY, "4") ?: "4"
         val animateGifs = applicationContext.prefs().getBoolean(C.ANIMATED_EMOTES, true)
         val useWebp = applicationContext.prefs().getBoolean(C.CHAT_USE_WEBP, true)
@@ -462,8 +462,8 @@ class ChatViewModel @Inject constructor(
                     )
                 }
             } else {
-                val helixHeaders = TwitchApiHelper.getHelixHeaders(applicationContext)
-                val gqlHeaders = TwitchApiHelper.getGQLHeaders(applicationContext, true)
+                val helixHeaders = KickApiHelper.getHelixHeaders(applicationContext)
+                val gqlHeaders = KickApiHelper.getGQLHeaders(applicationContext, true)
                 if (!gqlHeaders[C.HEADER_TOKEN].isNullOrBlank() || !helixHeaders[C.HEADER_TOKEN].isNullOrBlank()) {
                     viewModelScope.launch {
                         try {
@@ -615,7 +615,7 @@ class ChatViewModel @Inject constructor(
             userName = deletedMessage?.userName,
             systemMsg = message,
             emotes = deletedMessage?.emotes?.map {
-                TwitchEmote(
+                KickEmote(
                     id = it.id,
                     begin = it.begin + messageIndex,
                     end = it.end + messageIndex
@@ -633,8 +633,8 @@ class ChatViewModel @Inject constructor(
 
     fun startLiveChat(channelId: String?, channelLogin: String) {
         stopLiveChat()
-        val gqlHeaders = TwitchApiHelper.getGQLHeaders(applicationContext, true)
-        val helixHeaders = TwitchApiHelper.getHelixHeaders(applicationContext)
+        val gqlHeaders = KickApiHelper.getGQLHeaders(applicationContext, true)
+        val helixHeaders = KickApiHelper.getHelixHeaders(applicationContext)
         val networkLibrary = applicationContext.prefs().getString(C.NETWORK_LIBRARY, "OkHttp")
         val enableIntegrity = applicationContext.prefs().getBoolean(C.ENABLE_INTEGRITY, false)
         val accountId = applicationContext.tokenPrefs().getString(C.USER_ID, null)
@@ -1243,13 +1243,13 @@ class ChatViewModel @Inject constructor(
     }
 
     private fun loadEmoteSets(channelId: String?) {
-        val helixHeaders = TwitchApiHelper.getHelixHeaders(applicationContext)
+        val helixHeaders = KickApiHelper.getHelixHeaders(applicationContext)
         if (!savedEmoteSets.isNullOrEmpty() && !helixHeaders[C.HEADER_CLIENT_ID].isNullOrBlank() && !helixHeaders[C.HEADER_TOKEN].isNullOrBlank()) {
             viewModelScope.launch {
                 try {
                     val networkLibrary = applicationContext.prefs().getString(C.NETWORK_LIBRARY, "OkHttp")
                     val animateGifs =  applicationContext.prefs().getBoolean(C.ANIMATED_EMOTES, true)
-                    val emotes = mutableListOf<TwitchEmote>()
+                    val emotes = mutableListOf<KickEmote>()
                     savedEmoteSets?.chunked(25)?.forEach { list ->
                         playerRepository.loadEmotesFromSet(networkLibrary, helixHeaders, list, animateGifs).let { emotes.addAll(it) }
                     }
@@ -2029,7 +2029,7 @@ class ChatViewModel @Inject constructor(
             if (!videoId.isNullOrBlank()) {
                 chatReplayManager = ChatReplayManager(
                     networkLibrary = applicationContext.prefs().getString(C.NETWORK_LIBRARY, "OkHttp"),
-                    gqlHeaders = TwitchApiHelper.getGQLHeaders(applicationContext, true),
+                    gqlHeaders = KickApiHelper.getGQLHeaders(applicationContext, true),
                     graphQLRepository = graphQLRepository,
                     enableIntegrity = applicationContext.prefs().getBoolean(C.ENABLE_INTEGRITY, false),
                     videoId = videoId,
@@ -2067,8 +2067,8 @@ class ChatViewModel @Inject constructor(
                 val nameDisplay = applicationContext.prefs().getString(C.UI_NAME_DISPLAY, "0")
                 val messages = mutableListOf<ChatMessage>()
                 var startTimeMs = 0L
-                val twitchEmotes = mutableListOf<TwitchEmote>()
-                val twitchBadges = mutableListOf<TwitchBadge>()
+                val twitchEmotes = mutableListOf<KickEmote>()
+                val twitchBadges = mutableListOf<KickBadge>()
                 val cheerEmotesList = mutableListOf<CheerEmote>()
                 val emotes = mutableListOf<Emote>()
                 if (url.toUri().scheme == ContentResolver.SCHEME_CONTENT) {
@@ -2090,7 +2090,7 @@ class ChatViewModel @Inject constructor(
                                         when (reader.peek()) {
                                             JsonToken.NAME -> {
                                                 when (reader.nextName().also { position += it.length + 3 }) {
-                                                    "liveStartTime" -> { TwitchApiHelper.parseIso8601DateUTC(reader.nextString().also { position += it.length + 2 })?.let { startTimeMs = it } }
+                                                    "liveStartTime" -> { KickApiHelper.parseIso8601DateUTC(reader.nextString().also { position += it.length + 2 })?.let { startTimeMs = it } }
                                                     "liveComments" -> {
                                                         reader.beginArray().also { position += 1 }
                                                         while (reader.hasNext()) {
@@ -2142,7 +2142,7 @@ class ChatViewModel @Inject constructor(
                                                             var userLogin: String? = null
                                                             var userName: String? = null
                                                             var color: String? = null
-                                                            val emotesList = mutableListOf<TwitchEmote>()
+                                                            val emotesList = mutableListOf<KickEmote>()
                                                             val badgesList = mutableListOf<Badge>()
                                                             while (reader.hasNext()) {
                                                                 when (reader.nextName().also { position += it.length + 3 }) {
@@ -2201,7 +2201,7 @@ class ChatViewModel @Inject constructor(
                                                                                             }
                                                                                         }
                                                                                         if (fragmentText != null && !emoteId.isNullOrBlank()) {
-                                                                                            emotesList.add(TwitchEmote(
+                                                                                            emotesList.add(KickEmote(
                                                                                                 id = emoteId,
                                                                                                 begin = message.codePointCount(0, message.length),
                                                                                                 end = message.codePointCount(0, message.length) + fragmentText.lastIndex
@@ -2303,7 +2303,7 @@ class ChatViewModel @Inject constructor(
                                                                 }
                                                             }
                                                             if (!id.isNullOrBlank() && data != null) {
-                                                                twitchEmotes.add(TwitchEmote(
+                                                                twitchEmotes.add(KickEmote(
                                                                     id = id,
                                                                     localData = data
                                                                 ))
@@ -2339,7 +2339,7 @@ class ChatViewModel @Inject constructor(
                                                                 }
                                                             }
                                                             if (!setId.isNullOrBlank() && !version.isNullOrBlank() && data != null) {
-                                                                twitchBadges.add(TwitchBadge(
+                                                                twitchBadges.add(KickBadge(
                                                                     setId = setId,
                                                                     version = version,
                                                                     localData = data
@@ -2451,7 +2451,7 @@ class ChatViewModel @Inject constructor(
                         } while (token != JsonToken.END_DOCUMENT)
                     }
                 }
-                _localTwitchEmotes.value = twitchEmotes
+                _localKickEmotes.value = twitchEmotes
                 _channelBadges.value = twitchBadges
                 _cheerEmotes.value = cheerEmotesList
                 _channelStvEmotes.value = emotes
@@ -2518,8 +2518,8 @@ class ChatViewModel @Inject constructor(
         private const val TAG = "ChatViewModel"
 
         private var savedEmoteSets: List<String>? = null
-        private var savedUserEmotes: List<TwitchEmote>? = null
-        private var savedGlobalBadges: List<TwitchBadge>? = null
+        private var savedUserEmotes: List<KickEmote>? = null
+        private var savedGlobalBadges: List<KickBadge>? = null
         private var savedGlobalStvEmotes: List<Emote>? = null
         private var savedGlobalBttvEmotes: List<Emote>? = null
         private var savedGlobalFfzEmotes: List<Emote>? = null

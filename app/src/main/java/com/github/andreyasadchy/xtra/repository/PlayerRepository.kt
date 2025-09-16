@@ -13,8 +13,8 @@ import com.github.andreyasadchy.xtra.model.VideoPosition
 import com.github.andreyasadchy.xtra.model.chat.CheerEmote
 import com.github.andreyasadchy.xtra.model.chat.Emote
 import com.github.andreyasadchy.xtra.model.chat.RecentEmote
-import com.github.andreyasadchy.xtra.model.chat.TwitchBadge
-import com.github.andreyasadchy.xtra.model.chat.TwitchEmote
+import com.github.andreyasadchy.xtra.model.chat.KickBadge
+import com.github.andreyasadchy.xtra.model.chat.KickEmote
 import com.github.andreyasadchy.xtra.model.gql.playlist.PlaybackAccessTokenResponse
 import com.github.andreyasadchy.xtra.model.misc.BttvResponse
 import com.github.andreyasadchy.xtra.model.misc.FfzChannelResponse
@@ -862,7 +862,7 @@ class PlayerRepository @Inject constructor(
         }
     }
 
-    suspend fun loadGlobalBadges(networkLibrary: String?, helixHeaders: Map<String, String>, gqlHeaders: Map<String, String>, emoteQuality: String, enableIntegrity: Boolean): List<TwitchBadge> = withContext(Dispatchers.IO) {
+    suspend fun loadGlobalBadges(networkLibrary: String?, helixHeaders: Map<String, String>, gqlHeaders: Map<String, String>, emoteQuality: String, enableIntegrity: Boolean): List<KickBadge> = withContext(Dispatchers.IO) {
         try {
             val response = graphQLRepository.loadQueryBadges(networkLibrary, gqlHeaders,
                 when (emoteQuality) {
@@ -879,7 +879,7 @@ class PlayerRepository @Inject constructor(
                 it?.setID?.let { setId ->
                     it.version?.let { version ->
                         it.imageURL?.let { url ->
-                            TwitchBadge(
+                            KickBadge(
                                 setId = setId,
                                 version = version,
                                 url1x = url,
@@ -902,7 +902,7 @@ class PlayerRepository @Inject constructor(
                 response.data!!.badges?.mapNotNull {
                     it.setID?.let { setId ->
                         it.version?.let { version ->
-                            TwitchBadge(
+                            KickBadge(
                                 setId = setId,
                                 version = version,
                                 url1x = it.image1x,
@@ -921,7 +921,7 @@ class PlayerRepository @Inject constructor(
                     set.setId?.let { setId ->
                         set.versions?.mapNotNull {
                             it.id?.let { version ->
-                                TwitchBadge(
+                                KickBadge(
                                     setId = setId,
                                     version = version,
                                     url1x = it.url1x,
@@ -937,7 +937,7 @@ class PlayerRepository @Inject constructor(
         }
     }
 
-    suspend fun loadChannelBadges(networkLibrary: String?, helixHeaders: Map<String, String>, gqlHeaders: Map<String, String>, channelId: String?, channelLogin: String?, emoteQuality: String, enableIntegrity: Boolean): List<TwitchBadge> = withContext(Dispatchers.IO) {
+    suspend fun loadChannelBadges(networkLibrary: String?, helixHeaders: Map<String, String>, gqlHeaders: Map<String, String>, channelId: String?, channelLogin: String?, emoteQuality: String, enableIntegrity: Boolean): List<KickBadge> = withContext(Dispatchers.IO) {
         try {
             val response = graphQLRepository.loadQueryUserBadges(networkLibrary, gqlHeaders, channelId, channelLogin.takeIf { channelId.isNullOrBlank() },
                 when (emoteQuality) {
@@ -954,7 +954,7 @@ class PlayerRepository @Inject constructor(
                 it?.setID?.let { setId ->
                     it.version?.let { version ->
                         it.imageURL?.let { url ->
-                            TwitchBadge(
+                            KickBadge(
                                 setId = setId,
                                 version = version,
                                 url1x = url,
@@ -977,7 +977,7 @@ class PlayerRepository @Inject constructor(
                 response.data!!.badges?.mapNotNull {
                     it.setID?.let { setId ->
                         it.version?.let { version ->
-                            TwitchBadge(
+                            KickBadge(
                                 setId = setId,
                                 version = version,
                                 url1x = it.image1x,
@@ -996,7 +996,7 @@ class PlayerRepository @Inject constructor(
                     set.setId?.let { setId ->
                         set.versions?.mapNotNull {
                             it.id?.let { version ->
-                                TwitchBadge(
+                                KickBadge(
                                     setId = setId,
                                     version = version,
                                     url1x = it.url1x,
@@ -1183,10 +1183,10 @@ class PlayerRepository @Inject constructor(
         }
     }
 
-    suspend fun loadUserEmotes(networkLibrary: String?, helixHeaders: Map<String, String>, gqlHeaders: Map<String, String>, channelId: String?, userId: String?, animateGifs: Boolean, enableIntegrity: Boolean): List<TwitchEmote> = withContext(Dispatchers.IO) {
+    suspend fun loadUserEmotes(networkLibrary: String?, helixHeaders: Map<String, String>, gqlHeaders: Map<String, String>, channelId: String?, userId: String?, animateGifs: Boolean, enableIntegrity: Boolean): List<KickEmote> = withContext(Dispatchers.IO) {
         try {
             if (gqlHeaders[C.HEADER_TOKEN].isNullOrBlank()) throw Exception()
-            val emotes = mutableListOf<TwitchEmote>()
+            val emotes = mutableListOf<KickEmote>()
             var offset: String? = null
             do {
                 val response = graphQLRepository.loadUserEmotes(networkLibrary, gqlHeaders, channelId, offset)
@@ -1199,7 +1199,7 @@ class PlayerRepository @Inject constructor(
                     item.node.let { set ->
                         set.emotes.mapNotNull { emote ->
                             emote.token?.let { token ->
-                                TwitchEmote(
+                                KickEmote(
                                     id = emote.id,
                                     name = if (emote.type == "SMILIES") {
                                         token.replace("\\", "").replace("?", "")
@@ -1228,7 +1228,7 @@ class PlayerRepository @Inject constructor(
                 response.data!!.user?.emoteSets?.mapNotNull { set ->
                     set.emotes?.mapNotNull { emote ->
                         if (emote?.token != null && (!emote.type?.toString().equals("follower", true) || (emote.owner?.id == null || emote.owner.id == channelId))) {
-                            TwitchEmote(
+                            KickEmote(
                                 id = emote.id,
                                 name = if (emote.type == EmoteType.SMILIES) {
                                     emote.token.replace("\\", "").replace("?", "")
@@ -1245,7 +1245,7 @@ class PlayerRepository @Inject constructor(
             } catch (e: Exception) {
                 if (e.message == "failed integrity check") throw e
                 if (helixHeaders[C.HEADER_TOKEN].isNullOrBlank()) throw Exception()
-                val emotes = mutableListOf<TwitchEmote>()
+                val emotes = mutableListOf<KickEmote>()
                 var offset: String? = null
                 do {
                     val response = helixRepository.getUserEmotes(networkLibrary, helixHeaders, userId, channelId, offset)
@@ -1265,7 +1265,7 @@ class PlayerRepository @Inject constructor(
                                     .replaceFirst("{{id}}", id)
                                     .replaceFirst("{{format}}", format)
                                     .replaceFirst("{{theme_mode}}", theme)
-                                TwitchEmote(
+                                KickEmote(
                                     name = if (emote.type == "smilies") {
                                         name.replace("\\", "").replace("?", "")
                                             .replace("&lt;", "<").replace("&gt;", ">")
@@ -1290,7 +1290,7 @@ class PlayerRepository @Inject constructor(
         }
     }
 
-    suspend fun loadEmotesFromSet(networkLibrary: String?, helixHeaders: Map<String, String>, setIds: List<String>, animateGifs: Boolean): List<TwitchEmote> = withContext(Dispatchers.IO) {
+    suspend fun loadEmotesFromSet(networkLibrary: String?, helixHeaders: Map<String, String>, setIds: List<String>, animateGifs: Boolean): List<KickEmote> = withContext(Dispatchers.IO) {
         val response = helixRepository.getEmotesFromSet(networkLibrary, helixHeaders, setIds)
         response.data.mapNotNull { emote ->
             emote.name?.let { name ->
@@ -1308,7 +1308,7 @@ class PlayerRepository @Inject constructor(
                         .replaceFirst("{{id}}", id)
                         .replaceFirst("{{format}}", format)
                         .replaceFirst("{{theme_mode}}", theme)
-                    TwitchEmote(
+                    KickEmote(
                         name = if (emote.type == "smilies") {
                             name.replace("\\", "").replace("?", "")
                                 .replace("&lt;", "<").replace("&gt;", ">")

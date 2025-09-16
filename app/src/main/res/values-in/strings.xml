@@ -167,7 +167,7 @@
     <string name="chat_first">Chat pertama kali</string>
     <string name="chat_reward">Penukaran channel poin</string>
     <string name="always">Selalu</string>
-    <string name="twitch">Twitch</string>
+    <string name="kick">Kick</string>
     <string name="local">Lokal</string>
     <string name="days">d</string>
     <string name="seconds">s</string>
@@ -209,12 +209,12 @@
     <string name="irc_notice_already_subs_off">Ruang ini tidak dalam mode khusus subscriber.</string>
     <string name="irc_notice_already_subs_on">Ruang ini sudah dalam mode khusus subscriber.</string>
     <string name="irc_notice_autohost_receive">%1$s sekarang menghosting anda secara otomatis hingga %2$s pemirsa.</string>
-    <string name="irc_notice_bad_ban_admin">"Anda tidak dapat memban admin %s. Silakan kirim email ke support@twitch.tv jika ada admin yang kasar.\n "</string>
+    <string name="irc_notice_bad_ban_admin">"Anda tidak dapat memban admin %s. Silakan kirim email ke support.com jika ada admin yang kasar.\n "</string>
     <string name="irc_notice_bad_ban_anon">Anda tidak dapat memban pengguna anonim.</string>
     <string name="irc_notice_bad_ban_broadcaster">Anda tidak dapat memban penyiar.</string>
     <string name="irc_notice_bad_ban_mod">Anda tidak dapat memban moderator %s kecuali anda adalah pemilik channel ini.</string>
     <string name="irc_notice_bad_ban_self">Anda tidak dapat memban diri sendiri.</string>
-    <string name="irc_notice_bad_ban_staff">Anda tidak dapat memban staf %s. Silakan kirim email ke support@twitch.tv jika ada anggota staf yang kasar.</string>
+    <string name="irc_notice_bad_ban_staff">Anda tidak dapat memban staf %s. Silakan kirim email ke support.com jika ada anggota staf yang kasar.</string>
     <string name="irc_notice_bad_commercial_error">Gagal memulai iklan.</string>
     <string name="irc_notice_bad_delete_message_broadcaster">Anda tidak dapat menghapus pesan penyiar.</string>
     <string name="irc_notice_bad_delete_message_mod">Anda tidak dapat menghapus pesan dari moderator lain %s.</string>
@@ -226,13 +226,13 @@
     <string name="irc_notice_bad_mod_banned">%s diban di channel ini. Anda harus membatalkan ban pengguna ini sebelum memberikan status mod.</string>
     <string name="irc_notice_bad_mod_mod">%s sudah menjadi moderator channel ini.</string>
     <string name="irc_notice_bad_slow_duration">Anda tidak dapat menyetel penundaan lambat lebih dari %s detik.</string>
-    <string name="irc_notice_bad_timeout_admin">Anda tidak dapat men-timeout admin %s. Silakan kirim email ke support@twitch.tv jika ada admin yang kasar.</string>
+    <string name="irc_notice_bad_timeout_admin">Anda tidak dapat men-timeout admin %s. Silakan kirim email ke support.com jika ada admin yang kasar.</string>
     <string name="irc_notice_bad_timeout_anon">Anda tidak dapat men-timeout pengguna anonim.</string>
     <string name="irc_notice_bad_timeout_broadcaster">Anda tidak dapat men-timeout penyiar.</string>
     <string name="irc_notice_bad_timeout_duration">Anda tidak dapat men-timeout pengguna lebih dari %s.</string>
     <string name="irc_notice_bad_timeout_mod">Anda tidak dapat men-timeout moderator %s kecuali anda adalah pemilik channel ini.</string>
     <string name="irc_notice_bad_timeout_self">Anda tidak bisa men-timeout diri sendiri.</string>
-    <string name="irc_notice_bad_timeout_staff">Anda tidak dapat men-timeout staf %s. Silakan kirim email ke support@twitch.tv jika ada anggota staf yang kasar.</string>
+    <string name="irc_notice_bad_timeout_staff">Anda tidak dapat men-timeout staf %s. Silakan kirim email ke support.com jika ada anggota staf yang kasar.</string>
     <string name="irc_notice_bad_unban_no_ban">%s tidak diban dari channel ini.</string>
     <string name="irc_notice_bad_unhost_error">Terjadi masalah saat keluar dari mode host. Silakan coba lagi dalam satu menit.</string>
     <string name="irc_notice_bad_unmod_mod">%s bukan moderator channel ini.</string>
@@ -242,11 +242,11 @@
     <string name="irc_notice_bad_vip_achievement_incomplete">Tidak dapat menambahkan VIP. Kunjungi halaman Pencapaian di dasbor Anda untuk mempelajari cara membuka kunci fitur ini.</string>
     <string name="irc_notice_bad_unvip_grantee_not_vip">%s bukan VIP channel ini.</string>
     <string name="irc_notice_ban_success">%s sekarang diban dari channel ini.</string>
-    <string name="irc_notice_cmds_available">Perintah tersedia untuk anda di ruangan ini (gunakan /help untuk detail): %s Bantuan lainnya: https://help.twitch.tv/s/article/chat-commands.</string>
+    <string name="irc_notice_cmds_available">Perintah tersedia untuk anda di ruangan ini (gunakan /help untuk detail): %s Bantuan lainnya: https://help.kick.com.</string>
     <string name="irc_notice_color_changed">Warna Anda telah diubah.</string>
     <string name="irc_notice_commercial_success">Memulai jeda iklan %s detik. Ingat bahwa stream anda masih tayang dan tidak semua orang akan mendapatkan iklan.</string>
     <string name="irc_notice_delete_message_success">Pesan dari %s telah dihapus.</string>
-    <string name="irc_notice_delete_staff_message_success">Anda menghapus pesan dari staf %s. Silakan kirim email kesupport@twitch.tv jika ada anggota staf yang kasar.</string>
+    <string name="irc_notice_delete_staff_message_success">Anda menghapus pesan dari staf %s. Silakan kirim email kesupport.com jika ada anggota staf yang kasar.</string>
     <string name="irc_notice_emote_only_off">Ruangan ini tidak lagi dalam mode emote saja.</string>
     <string name="irc_notice_emote_only_on">Ruangan ini sekarang dalam mode emote saja.</string>
     <string name="irc_notice_followers_off">Ruang ini tidak lagi dalam mode khusus pengikut.</string>
@@ -274,10 +274,10 @@
     <string name="irc_notice_msg_rejected">Hai! Pesan Anda sedang diperiksa oleh mod dan belum dikirim.</string>
     <string name="irc_notice_msg_rejected_mandatory">Pesan Anda tidak dikirim karena bentrok dengan setelan moderasi channel.</string>
     <string name="irc_notice_msg_slowmode">Ruangan ini dalam mode lambat dan anda mengirim pesan terlalu cepat. Anda akan dapat berbicara lagi dalam %s detik.</string>
-    <string name="irc_notice_msg_subsonly">Ruangan ini dalam mode khusus subscriber. Untuk berbicara, beli subscribsi di https://www.twitch.tv/products/%s/ticket?ref=subscriber_only_mode_chat.</string>
+    <string name="irc_notice_msg_subsonly">Ruangan ini dalam mode khusus subscriber. Untuk berbicara, beli subscribsi di https://kick.com</string>
     <string name="irc_notice_msg_suspended">Anda tidak memiliki izin untuk melakukan aksi tersebut.</string>
     <string name="irc_notice_msg_timedout">Anda di-timeout selama %s detik.</string>
-    <string name="irc_notice_msg_verified_email">Ruangan ini membutuhkan akun terverifikasi untuk mengobrol. Harap verifikasi akun anda di https://www.twitch.tv/settings/security.</string>
+    <string name="irc_notice_msg_verified_email">Ruangan ini membutuhkan akun terverifikasi untuk mengobrol. Harap verifikasi akun anda di https://kick.com</string>
     <string name="irc_notice_no_help">Tidak ada bantuan yang tersedia.</string>
     <string name="irc_notice_no_mods">Tidak ada moderator di channel ini.</string>
     <string name="irc_notice_no_vips">Channel ini tidak memiliki VIP.</string>
@@ -316,7 +316,7 @@
     <string name="irc_notice_usage_color">Penggunaan: \"/color &lt;color&gt;\" - Ubah warna nama pengguna Anda. Warna harus dalam hex (#000000) atau salah satu dari berikut ini: %s.</string>
     <string name="irc_notice_usage_commercial">Penggunaan: \"/commercial [length]\" - Memicu iklan. Panjang (opsional) harus berupa angka positif dalam detik.</string>
     <string name="irc_notice_usage_disconnect">Penggunaan: \"/disconnect\" - Menghubungkan kembali ke chat.</string>
-    <string name="irc_notice_usage_delete">Penggunaan: \"/delete &lt;msg id&gt;\" - Menghapus pesan yang ditentukan. Untuk informasi lebih lanjut, see https://dev.twitch.tv/docs/irc/commands/#clearmsg-twitch-commands.</string>
+    <string name="irc_notice_usage_delete">Penggunaan: \"/delete &lt;msg id&gt;\" - Menghapus pesan yang ditentukan. Untuk informasi lebih lanjut, see https://docs.kick.com</string>
     <string name="irc_notice_usage_emote_only_off">Penggunaan: \"/emoteonlyoff\" - Menonaktifkan mode emote saja.</string>
     <string name="irc_notice_usage_emote_only_on">Penggunaan: \"/emoteonly\" - Mengaktifkan mode emote saja (hanya emotikon yang dapat digunakan dalam obrolan). Gunakan \"/emoteonlyoff\" untuk menonaktifkan.</string>
     <string name="irc_notice_usage_followers_off">Penggunaan: \"/followersoff\" - Nonaktifkan mode khusus pengikut.</string>
@@ -436,7 +436,7 @@
     <string name="restart_player">Mulai ulang pemutar</string>
     <string name="sub_only_summary">Konten untuk sub saja</string>
     <string name="follow_button">Tombol ikuti</string>
-    <string name="follow_account">Ikuti menggunakan akun twitch</string>
+    <string name="follow_account">Ikuti menggunakan akun Kick</string>
     <string name="follow_local">Ikuti secara lokal</string>
     <string name="hide">Sembunyikan</string>
     <string name="chat_ssl">Terhubung menggunakan SSL</string>

@@ -68,7 +68,7 @@ class ChatWriteIRC(
     }
 
     private fun connect() {
-        Log.d(TAG, "Connecting to Twitch IRC - SSL $useSSL")
+        Log.d(TAG, "Connecting to Kick IRC - SSL $useSSL")
         try {
             socketOut = if (useSSL) {
                 SSLSocketFactory.getDefault().createSocket("irc.twitch.tv", 6697)
@@ -85,7 +85,7 @@ class ChatWriteIRC(
             writerOut.flush()
             Log.d(TAG, "Successfully connected to - $hashChannelName")
         } catch (e: IOException) {
-            Log.e(TAG, "Error connecting to Twitch IRC", e)
+            Log.e(TAG, "Error connecting to Kick IRC", e)
             throw e
         }
     }

@@ -57,7 +57,7 @@ import com.github.andreyasadchy.xtra.ui.main.MainActivity
 import com.github.andreyasadchy.xtra.ui.player.PlayerFragment
 import com.github.andreyasadchy.xtra.ui.view.SlidingLayout
 import com.github.andreyasadchy.xtra.util.C
-import com.github.andreyasadchy.xtra.util.TwitchApiHelper
+import com.github.andreyasadchy.xtra.util.KickApiHelper
 import com.github.andreyasadchy.xtra.util.convertDpToPixels
 import com.github.andreyasadchy.xtra.util.getAlertDialogBuilder
 import com.github.andreyasadchy.xtra.util.gone
@@ -144,8 +144,8 @@ class ChatFragment : BaseNetworkFragment(), MessageClickedDialog.OnButtonClickLi
                 val isLive = args.getBoolean(KEY_IS_LIVE)
                 val accountLogin = requireContext().tokenPrefs().getString(C.USERNAME, null)
                 val isLoggedIn = !accountLogin.isNullOrBlank() &&
-                        (!TwitchApiHelper.getGQLHeaders(requireContext(), true)[C.HEADER_TOKEN].isNullOrBlank() ||
-                                !TwitchApiHelper.getHelixHeaders(requireContext())[C.HEADER_TOKEN].isNullOrBlank())
+                        (!KickApiHelper.getGQLHeaders(requireContext(), true)[C.HEADER_TOKEN].isNullOrBlank() ||
+                                !KickApiHelper.getHelixHeaders(requireContext())[C.HEADER_TOKEN].isNullOrBlank())
                 val chatUrl = args.getString(KEY_CHAT_URL)
                 if (isLive || (args.getString(KEY_VIDEO_ID) != null && args.getInt(KEY_START_TIME) != -1) || chatUrl != null) {
                     val sizeModifier = (requireContext().prefs().getInt(C.CHAT_SIZE_MODIFIER, 100).toFloat() / 100f)
@@ -338,7 +338,7 @@ class ChatFragment : BaseNetworkFragment(), MessageClickedDialog.OnButtonClickLi
                         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
                             tab.text = when (position) {
                                 0 -> requireContext().getString(R.string.recent_emotes)
-                                1 -> "Twitch"
+                                1 -> requireContext().getString(R.string.kick)
                                 else -> "7TV/BTTV/FFZ"
                             }
                         }.attach()
@@ -435,10 +435,10 @@ class ChatFragment : BaseNetworkFragment(), MessageClickedDialog.OnButtonClickLi
                     }
                     viewLifecycleOwner.lifecycleScope.launch {
                         repeatOnLifecycle(Lifecycle.State.STARTED) {
-                            viewModel.localTwitchEmotes.collectLatest {
-                                adapter.localTwitchEmotes = it
-                                messageDialog?.adapter?.localTwitchEmotes = it
-                                replyDialog?.adapter?.localTwitchEmotes = it
+                            viewModel.localKickEmotes.collectLatest {
+                                adapter.localKickEmotes = it
+                                messageDialog?.adapter?.localKickEmotes = it
+                                replyDialog?.adapter?.localKickEmotes = it
                             }
                         }
                     }
@@ -547,7 +547,7 @@ class ChatFragment : BaseNetworkFragment(), MessageClickedDialog.OnButtonClickLi
                                             else -> {
                                                 textFollowers.text = requireContext().getString(
                                                     R.string.room_followers_min,
-                                                    TwitchApiHelper.getDurationFromSeconds(requireContext(), (roomState.followers.toInt() * 60).toString())
+                                                    KickApiHelper.getDurationFromSeconds(requireContext(), (roomState.followers.toInt() * 60).toString())
                                                 )
                                                 textFollowers.visible()
                                             }
@@ -563,7 +563,7 @@ class ChatFragment : BaseNetworkFragment(), MessageClickedDialog.OnButtonClickLi
                                             else -> {
                                                 textSlow.text = requireContext().getString(
                                                     R.string.room_slow,
-                                                    TwitchApiHelper.getDurationFromSeconds(requireContext(), roomState.slow)
+                                                    KickApiHelper.getDurationFromSeconds(requireContext(), roomState.slow)
                                                 )
                                                 textSlow.visible()
                                             }
@@ -1215,8 +1215,8 @@ class ChatFragment : BaseNetworkFragment(), MessageClickedDialog.OnButtonClickLi
                     message = text,
                     replyId = replyId,
                     networkLibrary = requireContext().prefs().getString(C.NETWORK_LIBRARY, "OkHttp"),
-                    gqlHeaders = TwitchApiHelper.getGQLHeaders(requireContext(), true),
-                    helixHeaders = TwitchApiHelper.getHelixHeaders(requireContext()),
+                    gqlHeaders = KickApiHelper.getGQLHeaders(requireContext(), true),
+                    helixHeaders = KickApiHelper.getHelixHeaders(requireContext()),
                     accountId = requireContext().tokenPrefs().getString(C.USER_ID, null),
                     channelId = requireArguments().getString(KEY_CHANNEL_ID),
                     channelLogin = requireArguments().getString(KEY_CHANNEL_LOGIN),

@@ -7,6 +7,12 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import com.github.andreyasadchy.xtra.R
 import com.github.andreyasadchy.xtra.XtraApp
+import com.github.andreyasadchy.xtra.kick.config.KickEnvironment
+import com.github.andreyasadchy.xtra.kick.storage.KickTokenProvider
+import dagger.hilt.EntryPoint
+import dagger.hilt.InstallIn
+import dagger.hilt.android.EntryPointAccessors
+import dagger.hilt.components.SingletonComponent
 import org.json.JSONObject
 import java.lang.Integer.parseInt
 import java.text.ParseException
@@ -24,18 +30,31 @@ import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 
-object TwitchApiHelper {
+object KickApiHelper {
+
+    @EntryPoint
+    @InstallIn(SingletonComponent::class)
+    internal interface KickHelperEntryPoint {
+        fun kickEnvironment(): KickEnvironment
+        fun kickTokenProvider(): KickTokenProvider
+    }
+
+    private fun Context.kickEntryPoint(): KickHelperEntryPoint {
+        return EntryPointAccessors.fromApplication(applicationContext, KickHelperEntryPoint::class.java)
+    }
+
+    private fun KickTokenProvider.authorizationHeader(): String? {
+        val token = accessToken?.takeIf { it.isNotBlank() } ?: return null
+        val tokenType = tokenType?.takeIf { it.isNotBlank() } ?: "Bearer"
+        return "$tokenType $token"
+    }
 
     var checkedValidation = false
     var checkedUpdates = false
 
     fun getTemplateUrl(url: String?, type: String): String? {
-        if (url.isNullOrBlank() || url.startsWith("https://vod-secure.twitch.tv/_404/404_processing")) {
-            return when (type) {
-                "game" -> "https://static-cdn.jtvnw.net/ttv-static/404_boxart.jpg"
-                "video" -> "https://vod-secure.twitch.tv/_404/404_processing_320x180.png"
-                else -> null
-            }
+        if (url.isNullOrBlank()) {
+            return null
         }
         val width = when (type) {
             "game" -> "285"
@@ -53,7 +72,8 @@ object TwitchApiHelper {
             type == "clip" -> url.replace(Regex("-\\d+x\\d+."), ".")
             url.contains("%{width}") -> url.replace("%{width}", width).replace("%{height}", height)
             url.contains("{width}") -> url.replace("{width}", width).replace("{height}", height)
-            else -> url.replace(Regex("-\\d+x\\d+."), "-${width}x${height}.")
+            width.isNotBlank() && height.isNotBlank() -> url.replace(Regex("-\\d+x\\d+."), "-${width}x${height}.")
+            else -> url
         }
     }
 
@@ -305,7 +325,7 @@ object TwitchApiHelper {
         return if (hasDecimal) "${truncated / 10.0}$suffix" else "${truncated / 10}$suffix"
     }
 
-    fun addTokenPrefixGQL(token: String) = "OAuth $token"
+    fun addTokenPrefixGQL(token: String) = "Bearer $token"
     fun addTokenPrefixHelix(token: String) = "Bearer $token"
 
     fun getGQLHeaders(context: Context, includeToken: Boolean = false): Map<String, String> {
@@ -317,19 +337,22 @@ object TwitchApiHelper {
                         json.keys().forEach { key ->
                             put(key, json.optString(key))
                         }
-                    } catch (e: Exception) {
-
+                    } catch (_: Exception) {
                     }
                 }
             } else {
-                context.prefs().getString(C.GQL_CLIENT_ID2, "kd1unb4b3q4t58fwlpcbzcbnm76a8fp")?.let {
-                    if (it.isNotBlank()) {
-                        put(C.HEADER_CLIENT_ID, it)
-                    }
+                val entryPoint = context.kickEntryPoint()
+                val clientId = context.prefs().getString(C.GQL_CLIENT_ID2, null)?.takeIf { it.isNotBlank() }
+                    ?: entryPoint.kickEnvironment().clientId.takeIf { it.isNotBlank() }
+                if (!clientId.isNullOrBlank()) {
+                    put(C.HEADER_CLIENT_ID, clientId)
                 }
                 if (includeToken) {
-                    context.tokenPrefs().getString(C.GQL_TOKEN2, null)?.let {
-                        if (it.isNotBlank()) {
+                    entryPoint.kickTokenProvider().authorizationHeader()?.let {
+                        put(C.HEADER_TOKEN, it)
+                    }
+                    if (get(C.HEADER_TOKEN).isNullOrBlank()) {
+                        context.tokenPrefs().getString(C.GQL_TOKEN2, null)?.takeIf { it.isNotBlank() }?.let {
                             put(C.HEADER_TOKEN, addTokenPrefixGQL(it))
                         }
                     }
@@ -340,13 +363,17 @@ object TwitchApiHelper {
 
     fun getHelixHeaders(context: Context): Map<String, String> {
         return mutableMapOf<String, String>().apply {
-            context.prefs().getString(C.HELIX_CLIENT_ID, "ilfexgv3nnljz3isbm257gzwrzr7bi")?.let {
-                if (it.isNotBlank()) {
-                    put(C.HEADER_CLIENT_ID, it)
-                }
+            val entryPoint = context.kickEntryPoint()
+            val clientId = context.prefs().getString(C.HELIX_CLIENT_ID, null)?.takeIf { it.isNotBlank() }
+                ?: entryPoint.kickEnvironment().clientId.takeIf { it.isNotBlank() }
+            if (!clientId.isNullOrBlank()) {
+                put(C.HEADER_CLIENT_ID, clientId)
             }
-            context.tokenPrefs().getString(C.TOKEN, null)?.let {
-                if (it.isNotBlank()) {
+            entryPoint.kickTokenProvider().authorizationHeader()?.let {
+                put(C.HEADER_TOKEN, it)
+            }
+            if (get(C.HEADER_TOKEN).isNullOrBlank()) {
+                context.tokenPrefs().getString(C.TOKEN, null)?.takeIf { it.isNotBlank() }?.let {
                     put(C.HEADER_TOKEN, addTokenPrefixHelix(it))
                 }
             }
@@ -516,8 +543,8 @@ object TwitchApiHelper {
                 "msg_duplicate" -> ContextCompat.getString(context, R.string.irc_notice_msg_duplicate)
                 "msg_emoteonly" -> ContextCompat.getString(context, R.string.irc_notice_msg_emoteonly)
                 "msg_followersonly" -> ContextCompat.getString(context, R.string.irc_notice_msg_followersonly).format(
-                    message?.substringAfter("This room is in ", "")?.substringBefore(" followers-only mode", "") ?: "").format(
-                    message?.substringAfter("Follow ", "")?.substringBefore(" to join", "") ?: "")
+                    message?.substringAfter(". Follow ", "")?.substringBefore(" to join the", "") ?: "").format(
+                    message?.substringAfter("following for ", "")?.substringBefore(". Continue", "") ?: "")
                 "msg_followersonly_followed" -> ContextCompat.getString(context, R.string.irc_notice_msg_followersonly_followed).format(
                     message?.substringAfter("This room is in ", "")?.substringBefore(" followers-only mode", "") ?: "").format(
                     message?.substringAfter("following for ", "")?.substringBefore(". Continue", "") ?: "")

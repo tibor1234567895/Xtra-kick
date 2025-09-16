@@ -169,7 +169,7 @@
     <string name="chat_first">İlk kez sohbet</string>
     <string name="chat_reward">Kanal puanı kullanımı</string>
     <string name="always">Her zaman</string>
-    <string name="twitch">Twitch</string>
+    <string name="kick">Kick</string>
     <string name="local">Yerel</string>
     <string name="days">g</string>
     <string name="seconds">s</string>
@@ -211,12 +211,12 @@
     <string name="irc_notice_already_subs_off">Bu oda sadece-abone modunda değil.</string>
     <string name="irc_notice_already_subs_on">Bu oda zaten sadece-abone modunda.</string>
     <string name="irc_notice_autohost_receive">%1$s şimdi sizi %2$s izleyiciye kadar otomatik olarak yayınlıyor.</string>
-    <string name="irc_notice_bad_ban_admin">Yönetici %s kullanıcısını yasaklayamazsınız. Bir yönetici kötüye kullanım yapıyorsa lütfen support@twitch.tv adresine e-posta gönderin.</string>
+    <string name="irc_notice_bad_ban_admin">Yönetici %s kullanıcısını yasaklayamazsınız. Bir yönetici kötüye kullanım yapıyorsa lütfen support.com adresine e-posta gönderin.</string>
     <string name="irc_notice_bad_ban_anon">Anonim kullanıcıları yasaklayamazsınız.</string>
     <string name="irc_notice_bad_ban_broadcaster">Yayıncıyı yasaklayamazsınız.</string>
     <string name="irc_notice_bad_ban_mod">Bu kanalın sahibi değilseniz, moderatör %s kullanıcısını yasaklayamazsınız.</string>
     <string name="irc_notice_bad_ban_self">Kendinizi yasaklayamazsınız.</string>
-    <string name="irc_notice_bad_ban_staff">Çalışan %s kullanıcısını yasaklayamazsınız. Bir çalışan kötüye kullanım yapıyorsa lütfen support@twitch.tv adresine e-posta gönderin.</string>
+    <string name="irc_notice_bad_ban_staff">Çalışan %s kullanıcısını yasaklayamazsınız. Bir çalışan kötüye kullanım yapıyorsa lütfen support.com adresine e-posta gönderin.</string>
     <string name="irc_notice_bad_commercial_error">Reklam başlatılamadı.</string>
     <string name="irc_notice_bad_delete_message_broadcaster">Yayıncının mesajlarını silemezsiniz.</string>
     <string name="irc_notice_bad_delete_message_mod">Başka bir moderatörün (%s) mesajlarını silemezsiniz.</string>
@@ -228,13 +228,13 @@
     <string name="irc_notice_bad_mod_banned">%s bu kanalda yasaklı. Moderatör statüsü vermeden önce bu kullanıcının yasağını kaldırmalısınız.</string>
     <string name="irc_notice_bad_mod_mod">%s zaten bu kanalın bir moderatörü.</string>
     <string name="irc_notice_bad_slow_duration">Yavaş mod gecikmesini %s saniyeden fazla ayarlayamazsınız.</string>
-    <string name="irc_notice_bad_timeout_admin">Yönetici %s kullanıcısını zaman aşımına uğratamazsınız. Bir yönetici kötüye kullanım yapıyorsa lütfen support@twitch.tv adresine e-posta gönderin.</string>
+    <string name="irc_notice_bad_timeout_admin">Yönetici %s kullanıcısını zaman aşımına uğratamazsınız. Bir yönetici kötüye kullanım yapıyorsa lütfen support.com adresine e-posta gönderin.</string>
     <string name="irc_notice_bad_timeout_anon">Anonim kullanıcıları zaman aşımına uğratamazsınız.</string>
     <string name="irc_notice_bad_timeout_broadcaster">Yayıncıyı zaman aşımına uğratamazsınız.</string>
     <string name="irc_notice_bad_timeout_duration">Bir kullanıcıyı %s süresinden daha uzun süre zaman aşımına uğratamazsınız.</string>
     <string name="irc_notice_bad_timeout_mod">Bu kanalın sahibi değilseniz, moderatör %s kullanıcısını zaman aşımına uğratamazsınız.</string>
     <string name="irc_notice_bad_timeout_self">Kendinizi zaman aşımına uğratamazsınız.</string>
-    <string name="irc_notice_bad_timeout_staff">Çalışan %s kullanıcısını zaman aşımına uğratamazsınız. Bir çalışan kötüye kullanım yapıyorsa lütfen support@twitch.tv adresine e-posta gönderin.</string>
+    <string name="irc_notice_bad_timeout_staff">Çalışan %s kullanıcısını zaman aşımına uğratamazsınız. Bir çalışan kötüye kullanım yapıyorsa lütfen support.com adresine e-posta gönderin.</string>
     <string name="irc_notice_bad_unban_no_ban">%s bu kanaldan yasaklı değil.</string>
     <string name="irc_notice_bad_unhost_error">Yayın modundan çıkarken bir sorun oluştu. Lütfen bir dakika içinde tekrar deneyin.</string>
     <string name="irc_notice_bad_unmod_mod">%s bu kanalın bir moderatörü değil.</string>
@@ -244,11 +244,11 @@
     <string name="irc_notice_bad_vip_achievement_incomplete">VIP eklenemiyor. Bu özelliğin kilidini nasıl açacağınızı öğrenmek için panelinizdeki Başarılar sayfasını ziyaret edin.</string>
     <string name="irc_notice_bad_unvip_grantee_not_vip">%s bu kanalın bir VIP\'si değil.</string>
     <string name="irc_notice_ban_success">%s artık bu kanaldan yasaklandı.</string>
-    <string name="irc_notice_cmds_available">Bu odada kullanabileceğiniz komutlar (detaylar için /help kullanın): %s Daha fazla yardım: https://help.twitch.tv/s/article/chat-commands.</string>
+    <string name="irc_notice_cmds_available">Bu odada kullanabileceğiniz komutlar (detaylar için /help kullanın): %s Daha fazla yardım: https://help.kick.com.</string>
     <string name="irc_notice_color_changed">Renginiz değiştirildi.</string>
     <string name="irc_notice_commercial_success">%s saniyelik reklam arası başlatılıyor. Yayınınızın hala canlı olduğunu ve herkesin reklam görmeyeceğini unutmayın.</string>
     <string name="irc_notice_delete_message_success">%s kullanıcısının mesajı şimdi silindi.</string>
-    <string name="irc_notice_delete_staff_message_success">Çalışan %s kullanıcısının bir mesajını sildiniz. Bir çalışan kötüye kullanım yapıyorsa lütfen support@twitch.tv adresine e-posta gönderin.</string>
+    <string name="irc_notice_delete_staff_message_success">Çalışan %s kullanıcısının bir mesajını sildiniz. Bir çalışan kötüye kullanım yapıyorsa lütfen support.com adresine e-posta gönderin.</string>
     <string name="irc_notice_emote_only_off">Bu oda artık sadece-ifade modunda değil.</string>
     <string name="irc_notice_emote_only_on">Bu oda artık sadece-ifade modunda.</string>
     <string name="irc_notice_followers_off">Bu oda artık sadece-takipçi modunda değil.</string>
@@ -276,10 +276,10 @@
     <string name="irc_notice_msg_rejected">Hey! Mesajınız moderatörler tarafından kontrol ediliyor ve henüz gönderilmedi.</string>
     <string name="irc_notice_msg_rejected_mandatory">Mesajınız, kanalın moderasyon ayarlarıyla çakıştığı için gönderilmedi.</string>
     <string name="irc_notice_msg_slowmode">Bu oda yavaş moddadır ve çok hızlı mesaj gönderiyorsunuz. %s saniye sonra tekrar konuşabileceksiniz.</string>
-    <string name="irc_notice_msg_subsonly">Bu oda sadece abone modundadır. Konuşmak için https://www.twitch.tv/products/%s/ticket?ref=subscriber_only_mode_chat adresinden bir kanal aboneliği satın alın.</string>
+    <string name="irc_notice_msg_subsonly">Bu oda sadece abone modundadır. Konuşmak için https://kick.com</string>
     <string name="irc_notice_msg_suspended">Bu eylemi gerçekleştirme izniniz yok.</string>
     <string name="irc_notice_msg_timedout">%s saniye daha zaman aşımına uğradınız.</string>
-    <string name="irc_notice_msg_verified_email">Bu odada sohbet etmek için doğrulanmış bir hesap gereklidir. Lütfen hesabınızı https://www.twitch.tv/settings/security adresinden doğrulayın.</string>
+    <string name="irc_notice_msg_verified_email">Bu odada sohbet etmek için doğrulanmış bir hesap gereklidir. Lütfen hesabınızı https://kick.com</string>
     <string name="irc_notice_no_help">Yardım mevcut değil.</string>
     <string name="irc_notice_no_mods">Bu kanalın moderatörü yok.</string>
     <string name="irc_notice_no_vips">Bu kanalın VIP\'si yok.</string>
@@ -318,7 +318,7 @@
     <string name="irc_notice_usage_color">Kullanım: \"/color &lt;renk&gt;\" - Kullanıcı adınızın rengini değiştirir. Renk onaltılık (#000000) veya şunlardan biri olmalıdır: %s.</string>
     <string name="irc_notice_usage_commercial">Kullanım: \"/commercial [süre]\" - Bir reklam tetikler. Süre (isteğe bağlı) pozitif bir saniye sayısı olmalıdır.</string>
     <string name="irc_notice_usage_disconnect">Kullanım: \"/disconnect\" - Sohbete yeniden bağlanır.</string>
-    <string name="irc_notice_usage_delete">Kullanım: \"/delete &lt;mesaj kimliği&gt;\" - Belirtilen mesajı siler. Daha fazla bilgi için bkz. https://dev.twitch.tv/docs/irc/commands/#clearmsg-twitch-commands.</string>
+    <string name="irc_notice_usage_delete">Kullanım: \"/delete &lt;mesaj kimliği&gt;\" - Belirtilen mesajı siler. Daha fazla bilgi için bkz. https://docs.kick.com</string>
     <string name="irc_notice_usage_emote_only_off">Kullanım: \"/emoteonlyoff\" - Sadece-ifade modunu devre dışı bırakır.</string>
     <string name="irc_notice_usage_emote_only_on">Kullanım: \"/emoteonly\" - Sadece-ifade modunu etkinleştirir (sohbette sadece ifadeler kullanılabilir). Devre dışı bırakmak için \"/emoteonlyoff\" kullanın.</string>
     <string name="irc_notice_usage_followers_off">Kullanım: \"/followersoff\" - Sadece-takipçi modunu devre dışı bırakır.</string>
@@ -438,7 +438,7 @@
     <string name="restart_player">Oynatıcıyı yeniden başlat</string>
     <string name="sub_only_summary">Sadece abonelere özel içerikler için</string>
     <string name="follow_button">Takip et düğmesi</string>
-    <string name="follow_account">Twitch hesabıyla takip et</string>
+    <string name="follow_account">Kick hesabıyla takip et</string>
     <string name="follow_local">Yerel olarak takip et</string>
     <string name="hide">Gizle</string>
     <string name="chat_ssl">SSL kullanarak bağlan</string>

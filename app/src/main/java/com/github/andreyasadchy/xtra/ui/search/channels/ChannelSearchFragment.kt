@@ -22,7 +22,7 @@ import com.github.andreyasadchy.xtra.ui.common.IntegrityDialog
 import com.github.andreyasadchy.xtra.ui.common.PagedListFragment
 import com.github.andreyasadchy.xtra.ui.search.Searchable
 import com.github.andreyasadchy.xtra.util.C
-import com.github.andreyasadchy.xtra.util.TwitchApiHelper
+import com.github.andreyasadchy.xtra.util.KickApiHelper
 import com.github.andreyasadchy.xtra.util.prefs
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -82,7 +82,7 @@ class ChannelSearchFragment : PagedListFragment(), Searchable {
         }
         if (requireContext().prefs().getBoolean(C.ENABLE_INTEGRITY, false) &&
             requireContext().prefs().getBoolean(C.USE_WEBVIEW_INTEGRITY, true) &&
-            TwitchApiHelper.isIntegrityTokenExpired(requireContext())
+            KickApiHelper.isIntegrityTokenExpired(requireContext())
         ) {
             IntegrityDialog.show(childFragmentManager, "refresh")
         }

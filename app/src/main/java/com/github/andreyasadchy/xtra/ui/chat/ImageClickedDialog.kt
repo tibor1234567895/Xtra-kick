@@ -25,7 +25,7 @@ import com.github.andreyasadchy.xtra.R
 import com.github.andreyasadchy.xtra.databinding.DialogChatImageClickBinding
 import com.github.andreyasadchy.xtra.ui.common.IntegrityDialog
 import com.github.andreyasadchy.xtra.util.C
-import com.github.andreyasadchy.xtra.util.TwitchApiHelper
+import com.github.andreyasadchy.xtra.util.KickApiHelper
 import com.github.andreyasadchy.xtra.util.prefs
 import com.github.andreyasadchy.xtra.util.visible
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -156,7 +156,7 @@ class ImageClickedDialog : BottomSheetDialogFragment(), IntegrityDialog.Callback
                 viewModel.loadEmoteCard(
                     it,
                     requireContext().prefs().getString(C.NETWORK_LIBRARY, "OkHttp"),
-                    TwitchApiHelper.getGQLHeaders(requireContext()),
+                    KickApiHelper.getGQLHeaders(requireContext()),
                     requireContext().prefs().getBoolean(C.ENABLE_INTEGRITY, false),
                 )
                 viewLifecycleOwner.lifecycleScope.launch {
@@ -209,7 +209,7 @@ class ImageClickedDialog : BottomSheetDialogFragment(), IntegrityDialog.Callback
                         viewModel.loadEmoteCard(
                             it,
                             requireContext().prefs().getString(C.NETWORK_LIBRARY, "OkHttp"),
-                            TwitchApiHelper.getGQLHeaders(requireContext()),
+                            KickApiHelper.getGQLHeaders(requireContext()),
                             requireContext().prefs().getBoolean(C.ENABLE_INTEGRITY, false),
                         )
                     }

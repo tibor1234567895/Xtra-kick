@@ -26,7 +26,7 @@ import com.github.andreyasadchy.xtra.ui.game.GameMediaFragmentDirections
 import com.github.andreyasadchy.xtra.ui.game.GamePagerFragmentDirections
 import com.github.andreyasadchy.xtra.ui.main.MainActivity
 import com.github.andreyasadchy.xtra.util.C
-import com.github.andreyasadchy.xtra.util.TwitchApiHelper
+import com.github.andreyasadchy.xtra.util.KickApiHelper
 import com.github.andreyasadchy.xtra.util.gone
 import com.github.andreyasadchy.xtra.util.prefs
 import com.github.andreyasadchy.xtra.util.visible
@@ -78,7 +78,7 @@ class ClipsAdapter(
                         }.build()
                     )
                     if (item.uploadDate != null) {
-                        val text = item.uploadDate.let { TwitchApiHelper.formatTimeString(context, it) }
+                        val text = item.uploadDate.let { KickApiHelper.formatTimeString(context, it) }
                         if (text != null) {
                             date.visible()
                             date.text = text
@@ -90,7 +90,7 @@ class ClipsAdapter(
                     }
                     if (item.viewCount != null) {
                         views.visible()
-                        views.text = TwitchApiHelper.formatViewsCount(context, item.viewCount, context.prefs().getBoolean(C.UI_TRUNCATEVIEWCOUNT, true))
+                        views.text = KickApiHelper.formatViewsCount(context, item.viewCount, context.prefs().getBoolean(C.UI_TRUNCATEVIEWCOUNT, true))
                     } else {
                         views.gone()
                     }

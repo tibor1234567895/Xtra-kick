@@ -13,7 +13,7 @@ import coil3.request.target
 import com.github.andreyasadchy.xtra.R
 import com.github.andreyasadchy.xtra.databinding.FragmentGamesListItemBinding
 import com.github.andreyasadchy.xtra.model.ui.Game
-import com.github.andreyasadchy.xtra.util.TwitchApiHelper
+import com.github.andreyasadchy.xtra.util.KickApiHelper
 import com.github.andreyasadchy.xtra.util.gone
 import com.github.andreyasadchy.xtra.util.visible
 
@@ -67,14 +67,14 @@ class PlayerGamesDialogAdapter(
                 } else {
                     gameName.gone()
                 }
-                val position = item?.vodPosition?.div(1000)?.toString()?.let { TwitchApiHelper.getDurationFromSeconds(context, it, true) }
+                val position = item?.vodPosition?.div(1000)?.toString()?.let { KickApiHelper.getDurationFromSeconds(context, it, true) }
                 if (!position.isNullOrBlank()) {
                     viewers.visible()
                     viewers.text = context.getString(R.string.position, position)
                 } else {
                     viewers.gone()
                 }
-                val duration = item?.vodDuration?.div(1000)?.toString()?.let { TwitchApiHelper.getDurationFromSeconds(context, it, true) }
+                val duration = item?.vodDuration?.div(1000)?.toString()?.let { KickApiHelper.getDurationFromSeconds(context, it, true) }
                 if (!duration.isNullOrBlank()) {
                     broadcastersCount.visible()
                     broadcastersCount.text = context.getString(R.string.duration, duration)

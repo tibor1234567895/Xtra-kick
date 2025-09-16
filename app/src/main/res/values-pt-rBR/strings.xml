@@ -168,7 +168,7 @@
     <string name="chat_first">No chat pela primeira vez</string>
     <string name="chat_reward">Resgate pontos do canal</string>
     <string name="always">Sempre</string>
-    <string name="twitch">Twitch</string>
+    <string name="kick">Kick</string>
     <string name="local">Local</string>
     <string name="days">d</string>
     <string name="seconds">s</string>
@@ -210,12 +210,12 @@
     <string name="irc_notice_already_subs_off">Esta sala não está no modo somente assinantes.</string>
     <string name="irc_notice_already_subs_on">Esta sala já está no modo somente assinantes.</string>
     <string name="irc_notice_autohost_receive">%1$s agora está hospedando você automaticamente mais de %2$s espectadores.</string>
-    <string name="irc_notice_bad_ban_admin">Você não pode banir o administrador %s. Por favor, envie um email para support@twitch.tv se um administrador estiver sendo abusivo.</string>
+    <string name="irc_notice_bad_ban_admin">Você não pode banir o administrador %s. Por favor, envie um email para support.com se um administrador estiver sendo abusivo.</string>
     <string name="irc_notice_bad_ban_anon">Você não pode banir usuários anônimos.</string>
     <string name="irc_notice_bad_ban_broadcaster">Você não pode banir o apresentador.</string>
     <string name="irc_notice_bad_ban_mod">Você não pode banir o moderador %s a menos que você seja o dono deste canal.</string>
     <string name="irc_notice_bad_ban_self">Você não pode se banir.</string>
-    <string name="irc_notice_bad_ban_staff">Você não pode banir o funcionário %s. Por favor, envie um email para support@twitch.tv se o funcionário estiver sendo abusivo.</string>
+    <string name="irc_notice_bad_ban_staff">Você não pode banir o funcionário %s. Por favor, envie um email para support.com se o funcionário estiver sendo abusivo.</string>
     <string name="irc_notice_bad_commercial_error">Falha ao iniciar o comercial.</string>
     <string name="irc_notice_bad_delete_message_broadcaster">Você não pode excluir as mensagens do apresentador.</string>
     <string name="irc_notice_bad_delete_message_mod">Você não pode excluir mensagens do moderador %s.</string>
@@ -227,13 +227,13 @@
     <string name="irc_notice_bad_mod_banned">%s está banido neste canal. Você deve desbloquear este usuário antes de conceder o status de moderador.</string>
     <string name="irc_notice_bad_mod_mod">%s já é um moderador deste canal.</string>
     <string name="irc_notice_bad_slow_duration">Você não pode definir o tempo de espera para mais de %s segundos.</string>
-    <string name="irc_notice_bad_timeout_admin">Você não pode colocar o administrador %s em tempo de espera. Por favor, envie um email para support@twitch.tv se um administrador estiver sendo abusivo.</string>
+    <string name="irc_notice_bad_timeout_admin">Você não pode colocar o administrador %s em tempo de espera. Por favor, envie um email para support.com se um administrador estiver sendo abusivo.</string>
     <string name="irc_notice_bad_timeout_anon">Você não pode colocar usuários anônimos em tempo de espera.</string>
     <string name="irc_notice_bad_timeout_broadcaster">Você não pode colocar o apresentador em tempo de espera.</string>
     <string name="irc_notice_bad_timeout_duration">Você não pode colocar um usuário em tempo de espera por mais de %s.</string>
     <string name="irc_notice_bad_timeout_mod">Você não pode colocar o moderador %s em tempo de espera a menos que você seja o dono deste canal.</string>
     <string name="irc_notice_bad_timeout_self">Você não pode se colocar em tempo de espera.</string>
-    <string name="irc_notice_bad_timeout_staff">Você não pode colocar o membro da equipe %s em tempo de espera. Por favor, envie um email para support@twitch.tv se um membro da equipe estiver sendo abusivo.</string>
+    <string name="irc_notice_bad_timeout_staff">Você não pode colocar o membro da equipe %s em tempo de espera. Por favor, envie um email para support.com se um membro da equipe estiver sendo abusivo.</string>
     <string name="irc_notice_bad_unban_no_ban">%s não está banido deste canal.</string>
     <string name="irc_notice_bad_unhost_error">Houve um problema ao sair do modo de host. Por favor, tente novamente em um minuto.</string>
     <string name="irc_notice_bad_unmod_mod">%s não é um moderador deste canal.</string>
@@ -243,11 +243,11 @@
     <string name="irc_notice_bad_vip_achievement_incomplete">Não foi possível adicionar VIP. Visite a página de Conquistas no seu painel para saber como desbloquear este recurso.</string>
     <string name="irc_notice_bad_unvip_grantee_not_vip">%s não é um VIP deste canal.</string>
     <string name="irc_notice_ban_success">%s agora está banido deste canal.</string>
-    <string name="irc_notice_cmds_available">Comandos disponíveis para você nesta sala (use /help para detalhes): %s Mais ajuda: https://help.twitch.tv/s/article/chat-commands.</string>
+    <string name="irc_notice_cmds_available">Comandos disponíveis para você nesta sala (use /help para detalhes): %s Mais ajuda: https://help.kick.com.</string>
     <string name="irc_notice_color_changed">Sua cor foi alterada.</string>
     <string name="irc_notice_commercial_success">Iniciando um comercial de %s segundos. Lembre-se de que sua transmissão ainda está ao vivo e nem todos receberão um comercial.</string>
     <string name="irc_notice_delete_message_success">A mensagem de %s foi deletada.</string>
-    <string name="irc_notice_delete_staff_message_success">Você deletou uma mensagem do funcioário %s. Por favor, envie um email para support@twitch.tv se o funcionário estiver sendo abusivo.</string>
+    <string name="irc_notice_delete_staff_message_success">Você deletou uma mensagem do funcioário %s. Por favor, envie um email para support.com se o funcionário estiver sendo abusivo.</string>
     <string name="irc_notice_emote_only_off">Esta sala não está mais no modo somente emote.</string>
     <string name="irc_notice_emote_only_on">Esta sala agora está no modo somente emote.</string>
     <string name="irc_notice_followers_off">Esta sala não está mais no modo apenas para seguidores.</string>
@@ -275,10 +275,10 @@
     <string name="irc_notice_msg_rejected">Ei! Sua mensagem está sendo verificada pelos moderadores e não foi enviada.</string>
     <string name="irc_notice_msg_rejected_mandatory">Sua mensagem não foi postada devido a conflitos com as configurações de moderação do canal.</string>
     <string name="irc_notice_msg_slowmode">Esta sala está no modo lento e você está enviando mensagens muito rapidamente. Você poderá falar novamente em %s segundos.</string>
-    <string name="irc_notice_msg_subsonly">Esta sala está no modo somente assinantes. Para falar, compre uma assinatura do canal em https://www.twitch.tv/products/%s/ticket?ref=subscriber_only_mode_chat.</string>
+    <string name="irc_notice_msg_subsonly">Esta sala está no modo somente assinantes. Para falar, compre uma assinatura do canal em https://kick.com</string>
     <string name="irc_notice_msg_suspended">Você não tem permissão para realizar essa ação.</string>
     <string name="irc_notice_msg_timedout">Você está em tempo de espera por mais %s segundos.</string>
-    <string name="irc_notice_msg_verified_email">Esta sala requer uma conta verificada para conversar. Por favor, verifique sua conta em https://www.twitch.tv/settings/security.</string>
+    <string name="irc_notice_msg_verified_email">Esta sala requer uma conta verificada para conversar. Por favor, verifique sua conta em https://kick.com</string>
     <string name="irc_notice_no_help">Não há ajuda disponível.</string>
     <string name="irc_notice_no_mods">Não há moderadores deste canal.</string>
     <string name="irc_notice_no_vips">Este canal não tem VIPs.</string>
@@ -317,7 +317,7 @@
     <string name="irc_notice_usage_color">Use: \"/color &lt;color&gt;\" - Altera a cor do seu nome de usuário. A cor deve estar em hex (#000000) ou ser uma das seguintes: %s.</string>
     <string name="irc_notice_usage_commercial">Use: \"/commercial [length]\" - Aciona um comercial. A duração (opcional) deve ser um número positivo de segundos.</string>
     <string name="irc_notice_usage_disconnect">Use: \"/disconnect\" - Reconecta ao chat.</string>
-    <string name="irc_notice_usage_delete">Use: \"/delete &lt;msg id&gt;\" - Exclui a mensagem especificada. Para mais informações, veja https://dev.twitch.tv/docs/irc/commands/#clearmsg-twitch-commands.</string>
+    <string name="irc_notice_usage_delete">Use: \"/delete &lt;msg id&gt;\" - Exclui a mensagem especificada. Para mais informações, veja https://docs.kick.com</string>
     <string name="irc_notice_usage_emote_only_off">Use: \"/emoteonlyoff\" - Desativa o modo somente emote.</string>
     <string name="irc_notice_usage_emote_only_on">Use: \"/emoteonly\" - Ativa o modo somente emote (apenas emote podem ser usados no chat). Use \"/emoteonlyoff\" para desativa.</string>
     <string name="irc_notice_usage_followers_off">Use: \"/followersoff\" - Desaivta o modo somente seguidores.</string>
@@ -437,7 +437,7 @@
     <string name="restart_player">Reiniciar player</string>
     <string name="sub_only_summary">Conteúdo somente para assinantes</string>
     <string name="follow_button">Botão seguir</string>
-    <string name="follow_account">Seguir usando a conta da twitch</string>
+    <string name="follow_account">Seguir usando a conta da Kick</string>
     <string name="follow_local">Seguir localmente</string>
     <string name="hide">Ocultar</string>
     <string name="chat_ssl">Conecte-se usando SSL</string>

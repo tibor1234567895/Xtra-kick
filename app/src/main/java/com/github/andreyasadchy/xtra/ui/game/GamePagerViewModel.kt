@@ -12,7 +12,7 @@ import com.github.andreyasadchy.xtra.repository.HelixRepository
 import com.github.andreyasadchy.xtra.repository.LocalFollowGameRepository
 import com.github.andreyasadchy.xtra.util.C
 import com.github.andreyasadchy.xtra.util.HttpEngineUtils
-import com.github.andreyasadchy.xtra.util.TwitchApiHelper
+import com.github.andreyasadchy.xtra.util.KickApiHelper
 import com.github.andreyasadchy.xtra.util.getByteArrayCronetCallback
 import dagger.Lazy
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -106,7 +106,7 @@ class GamePagerViewModel @Inject constructor(
                                             ids = listOf(gameId)
                                         ).data.firstOrNull()?.boxArtUrl
                                     } else null
-                                }.takeIf { !it.isNullOrBlank() }?.let { TwitchApiHelper.getTemplateUrl(it, "game") }?.let {
+                                }.takeIf { !it.isNullOrBlank() }?.let { KickApiHelper.getTemplateUrl(it, "game") }?.let {
                                     when {
                                         networkLibrary == "HttpEngine" && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && SdkExtensions.getExtensionVersion(Build.VERSION_CODES.S) >= 7 && httpEngine != null -> {
                                             val response = suspendCoroutine<Pair<UrlResponseInfo, ByteArray>> { continuation ->
@@ -215,7 +215,7 @@ class GamePagerViewModel @Inject constructor(
                                         ids = listOf(gameId)
                                     ).data.firstOrNull()?.boxArtUrl
                                 } else null
-                            }.takeIf { !it.isNullOrBlank() }?.let { TwitchApiHelper.getTemplateUrl(it, "game") }?.let {
+                            }.takeIf { !it.isNullOrBlank() }?.let { KickApiHelper.getTemplateUrl(it, "game") }?.let {
                                 when {
                                     networkLibrary == "HttpEngine" && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && SdkExtensions.getExtensionVersion(Build.VERSION_CODES.S) >= 7 && httpEngine != null -> {
                                         val response = suspendCoroutine<Pair<UrlResponseInfo, ByteArray>> { continuation ->

@@ -1,1 +1,1 @@
-bir Twitch oynatıcısı ve tarayıcısı
+bir Kick oynatıcısı ve tarayıcısı

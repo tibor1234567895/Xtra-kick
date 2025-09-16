@@ -10,7 +10,7 @@ import com.github.andreyasadchy.xtra.repository.GraphQLRepository
 import com.github.andreyasadchy.xtra.repository.HelixRepository
 import com.github.andreyasadchy.xtra.repository.datasource.SearchGamesDataSource
 import com.github.andreyasadchy.xtra.util.C
-import com.github.andreyasadchy.xtra.util.TwitchApiHelper
+import com.github.andreyasadchy.xtra.util.KickApiHelper
 import com.github.andreyasadchy.xtra.util.prefs
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -37,12 +37,12 @@ class GameSearchViewModel @Inject constructor(
         ) {
             SearchGamesDataSource(
                 query = query,
-                helixHeaders = TwitchApiHelper.getHelixHeaders(applicationContext),
+                helixHeaders = KickApiHelper.getHelixHeaders(applicationContext),
                 helixRepository = helixRepository,
-                gqlHeaders = TwitchApiHelper.getGQLHeaders(applicationContext),
+                gqlHeaders = KickApiHelper.getGQLHeaders(applicationContext),
                 graphQLRepository = graphQLRepository,
                 enableIntegrity = applicationContext.prefs().getBoolean(C.ENABLE_INTEGRITY, false),
-                apiPref = applicationContext.prefs().getString(C.API_PREFS_SEARCH_GAMES, null)?.split(',') ?: TwitchApiHelper.searchGamesApiDefaults,
+                apiPref = applicationContext.prefs().getString(C.API_PREFS_SEARCH_GAMES, null)?.split(',') ?: KickApiHelper.searchGamesApiDefaults,
                 networkLibrary = applicationContext.prefs().getString(C.NETWORK_LIBRARY, "OkHttp"),
             )
         }.flow

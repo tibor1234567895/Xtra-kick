@@ -16,7 +16,7 @@ import com.github.andreyasadchy.xtra.ui.following.videos.FollowedVideosFragment
 import com.github.andreyasadchy.xtra.ui.game.clips.GameClipsFragment
 import com.github.andreyasadchy.xtra.ui.game.videos.GameVideosFragment
 import com.github.andreyasadchy.xtra.util.C
-import com.github.andreyasadchy.xtra.util.TwitchApiHelper
+import com.github.andreyasadchy.xtra.util.KickApiHelper
 import com.github.andreyasadchy.xtra.util.gone
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -111,7 +111,7 @@ class VideosSortDialog : BottomSheetDialogFragment(), RadioButtonDialogFragment.
                     saveSort.gone()
                 }
                 is GameVideosFragment -> {
-                    if (TwitchApiHelper.getHelixHeaders(requireContext())[C.HEADER_TOKEN].isNullOrBlank()) {
+                    if (KickApiHelper.getHelixHeaders(requireContext())[C.HEADER_TOKEN].isNullOrBlank()) {
                         period.gone()
                     }
                     saveSort.text = requireContext().getString(R.string.save_sort_game)

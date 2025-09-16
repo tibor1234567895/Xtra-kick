@@ -168,7 +168,7 @@
     <string name="chat_first">初めてのチャット</string>
     <string name="chat_reward">チャンネルポイントの引き換え</string>
     <string name="always">常に</string>
-    <string name="twitch">Twitch</string>
+    <string name="kick">Kick</string>
     <string name="local">ローカル</string>
     <string name="days">日</string>
     <string name="seconds">秒</string>
@@ -210,12 +210,12 @@
     <string name="irc_notice_already_subs_off">このルームのサブスクライバー限定モードを解除しました。</string>
     <string name="irc_notice_already_subs_on">このルームはサブスクライバー限定モードになりました。</string>
     <string name="irc_notice_autohost_receive">%1$s は %2$s 視聴者にあなたを自動ホスト中です。</string>
-    <string name="irc_notice_bad_ban_admin">管理者 %s は追放できません。管理者が悪用された場合は support@twitch.tv までお問い合わせください。</string>
+    <string name="irc_notice_bad_ban_admin">管理者 %s は追放できません。管理者が悪用された場合は support.com までお問い合わせください。</string>
     <string name="irc_notice_bad_ban_anon">匿名のユーザーは追放できません。</string>
     <string name="irc_notice_bad_ban_broadcaster">配信者は追放できません。</string>
     <string name="irc_notice_bad_ban_mod">あなたがこのチャンネルのオーナーでない限り、モデレーター %s は追放できません。</string>
     <string name="irc_notice_bad_ban_self">自分は追放できません。</string>
-    <string name="irc_notice_bad_ban_staff">スタッフ %s は追放できません。スタッフが悪用された場合は support@twitch.tv までお問い合わせください。</string>
+    <string name="irc_notice_bad_ban_staff">スタッフ %s は追放できません。スタッフが悪用された場合は support.com までお問い合わせください。</string>
     <string name="irc_notice_bad_commercial_error">コマーシャルの開始に失敗しました。</string>
     <string name="irc_notice_bad_delete_message_broadcaster">配信者のメッセージは削除できません。</string>
     <string name="irc_notice_bad_delete_message_mod">モデレーター %s のメッセージは削除できません。</string>
@@ -227,13 +227,13 @@
     <string name="irc_notice_bad_mod_banned">%s はこのチャンネルを追放されています。モデレーター権限を与える前に、このユーザーの追放を解除する必要があります。</string>
     <string name="irc_notice_bad_mod_mod">%s はすでにこのチャンネルのモデレーターです。</string>
     <string name="irc_notice_bad_slow_duration">スローディレイは %s 秒以上に設定できません。</string>
-    <string name="irc_notice_bad_timeout_admin">管理者 %s は一時的に追放できません。管理者が悪用された場合は support@twitch.tv までお問い合わせください。</string>
+    <string name="irc_notice_bad_timeout_admin">管理者 %s は一時的に追放できません。管理者が悪用された場合は support.com までお問い合わせください。</string>
     <string name="irc_notice_bad_timeout_anon">匿名のユーザーは一時的に追放できません。</string>
     <string name="irc_notice_bad_timeout_broadcaster">配信者は一時的に追放できません。</string>
     <string name="irc_notice_bad_timeout_duration">ユーザーは %s 以上一時的に追放できません。</string>
     <string name="irc_notice_bad_timeout_mod">あなたがこのチャンネルのオーナーでない限り、モデレーター %s は一時的に追放できません。</string>
     <string name="irc_notice_bad_timeout_self">自分は一時的に追放できません。</string>
-    <string name="irc_notice_bad_timeout_staff">スタッフ %s は一時的に追放できません。スタッフが悪用された場合は support@twitch.tv までお問い合わせください。</string>
+    <string name="irc_notice_bad_timeout_staff">スタッフ %s は一時的に追放できません。スタッフが悪用された場合は support.com までお問い合わせください。</string>
     <string name="irc_notice_bad_unban_no_ban">%s はこのチャンネルから追放されていません。</string>
     <string name="irc_notice_bad_unhost_error">ホストの終了に問題が発生しました。少し経ってからもう一度お試しください。</string>
     <string name="irc_notice_bad_unmod_mod">%s はこのチャンネルのモデレーターではありません。</string>
@@ -243,11 +243,11 @@
     <string name="irc_notice_bad_vip_achievement_incomplete">VIPを追加できません。この機能を解除する方法については、ダッシュボードのアチーブメントページをご覧ください。</string>
     <string name="irc_notice_bad_unvip_grantee_not_vip">%s はこのチャネルのVIPではありません。</string>
     <string name="irc_notice_ban_success">%s はこのチャンネルから無期限に追放されました。</string>
-    <string name="irc_notice_cmds_available">このルームで使用できるコマンド (詳細は /help を使用): %s. その他のヘルプ: https://help.twitch.tv/s/article/chat-commands.</string>
+    <string name="irc_notice_cmds_available">このルームで使用できるコマンド (詳細は /help を使用): %s. その他のヘルプ: https://help.kick.com.</string>
     <string name="irc_notice_color_changed">色を変更しました。</string>
     <string name="irc_notice_commercial_success">コマーシャルを %s 秒再生します。すべての人にコマーシャルが再生されるわけではありません。あなたは配信に留意してください。</string>
     <string name="irc_notice_delete_message_success">%s からのメッセージは削除されました。</string>
-    <string name="irc_notice_delete_staff_message_success">スタッフ %s からのメッセージを削除しました。スタッフが暴言を使用している場合は support@twitch.tv までお問い合わせください。</string>
+    <string name="irc_notice_delete_staff_message_success">スタッフ %s からのメッセージを削除しました。スタッフが暴言を使用している場合は support.com までお問い合わせください。</string>
     <string name="irc_notice_emote_only_off">このチャットルームのスタンプ限定モードが解除されました。</string>
     <string name="irc_notice_emote_only_on">このチャットルームはスタンプ限定モードになりました。</string>
     <string name="irc_notice_followers_off">このチャットルームのフォロワー限定モードが解除されました。</string>
@@ -275,10 +275,10 @@
     <string name="irc_notice_msg_rejected">ヘイ! あなたのメッセージはモデレーターによってチェックされ、送信されていません。</string>
     <string name="irc_notice_msg_rejected_mandatory">チャンネルのモデレーションの設定により、あなたのメッセージは投稿できませんでした。</string>
     <string name="irc_notice_msg_slowmode">このルームはスローモードです。発言が早すぎます。次の発言はあと %s 秒お待ちください。</string>
-    <string name="irc_notice_msg_subsonly">このルームはサブスクライバー限定モードです。 このチャットルームで発言するには、 https://www.twitch.tv/products/%s/ticket?ref=subscriber_only_mode_chat でチャンネル購読を購入してください。</string>
+    <string name="irc_notice_msg_subsonly">このルームはサブスクライバー限定モードです。 このチャットルームで発言するには、 https://kick.com</string>
     <string name="irc_notice_msg_suspended">その操作を実行する権限がありません。</string>
     <string name="irc_notice_msg_timedout">さらに %s 秒間一時的に追放しました。</string>
-    <string name="irc_notice_msg_verified_email">このルームで発言するには、アカウントの認証が必要です。 https://www.twitch.tv/settings/security でアカウントの認証を行ってください。</string>
+    <string name="irc_notice_msg_verified_email">このルームで発言するには、アカウントの認証が必要です。 https://kick.com</string>
     <string name="irc_notice_no_help">ヘルプはありません。</string>
     <string name="irc_notice_no_mods">このチャンネルにはモデレーターはいません。</string>
     <string name="irc_notice_no_vips">このチャンネルにはVIPはいません。</string>
@@ -317,7 +317,7 @@
     <string name="irc_notice_usage_color">例: \"/color &lt;color&gt;\" - ユーザー名の色を変更します。色は16進数 (#000000) または以下のいずれかを指定してください。: %s.</string>
     <string name="irc_notice_usage_commercial">例: \"/commercial [length]\" - コマーシャルの起動する条件。長さ (オプション) は正の秒数である必要があります。</string>
     <string name="irc_notice_usage_disconnect">例: \"/disconnect\" - チャットに再接続します。</string>
-    <string name="irc_notice_usage_delete">例: \"/delete &lt;msg id&gt;\" - 指定されたメッセージを削除します。詳細は https://dev.twitch.tv/docs/irc/commands/#clearmsg-twitch-commands を参照してください。</string>
+    <string name="irc_notice_usage_delete">例: \"/delete &lt;msg id&gt;\" - 指定されたメッセージを削除します。詳細は https://docs.kick.com</string>
     <string name="irc_notice_usage_emote_only_off">例: \"/emoteonlyoff\" - スタンプ限定モードを無効にします。</string>
     <string name="irc_notice_usage_emote_only_on">例: \"/emoteonly\" - スタンプ限定モード (チャットでスタンプのみ使用可能) を有効にします。無効にするには \"/emoteonlyoff\" を使用してください。</string>
     <string name="irc_notice_usage_followers_off">例: \"/followersoff\" - フォロワー限定モードを無効にします。</string>
@@ -437,7 +437,7 @@
     <string name="restart_player">プレーヤーを再起動</string>
     <string name="sub_only_summary">サブスクライバー限定コンテンツ向け</string>
     <string name="follow_button">フォローボタン</string>
-    <string name="follow_account">Twitch アカウントでフォロー</string>
+    <string name="follow_account">Kick アカウントでフォロー</string>
     <string name="follow_local">ローカルでフォロー</string>
     <string name="hide">非表示</string>
     <string name="chat_ssl">SSL を使用して接続</string>
