@@ -23,6 +23,7 @@ import androidx.webkit.WebViewFeature
 import com.github.andreyasadchy.xtra.R
 import com.github.andreyasadchy.xtra.databinding.ActivityLoginBinding
 import com.github.andreyasadchy.xtra.kick.auth.KickOAuthClient
+import com.github.andreyasadchy.xtra.kick.auth.KickTokenRefreshScheduler
 import com.github.andreyasadchy.xtra.kick.config.KickEnvironment
 import com.github.andreyasadchy.xtra.kick.storage.KickTokenStore
 import com.github.andreyasadchy.xtra.util.applyTheme
@@ -49,6 +50,9 @@ class LoginActivity : AppCompatActivity() {
 
     @Inject
     lateinit var environment: KickEnvironment
+
+    @Inject
+    lateinit var kickTokenRefreshScheduler: KickTokenRefreshScheduler
 
     private lateinit var binding: ActivityLoginBinding
 
@@ -210,6 +214,7 @@ class LoginActivity : AppCompatActivity() {
                     kickOAuthClient.exchangeAuthorizationCode(code, verifier)
                 }
                 kickTokenStore.update(response)
+                kickTokenRefreshScheduler.schedule()
                 setResult(RESULT_OK)
                 finish()
             } catch (t: Throwable) {

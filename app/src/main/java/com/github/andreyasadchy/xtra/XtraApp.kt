@@ -19,6 +19,7 @@ import coil3.network.NetworkResponse
 import coil3.network.NetworkResponseBody
 import coil3.network.okhttp.OkHttpNetworkFetcherFactory
 import coil3.util.DebugLogger
+import com.github.andreyasadchy.xtra.kick.auth.KickTokenRefreshScheduler
 import com.github.andreyasadchy.xtra.util.C
 import com.github.andreyasadchy.xtra.util.HttpEngineUtils
 import com.github.andreyasadchy.xtra.util.coil.CacheControlCacheStrategy
@@ -49,6 +50,7 @@ class XtraApp : Application(), Configuration.Provider, SingletonImageLoader.Fact
     override fun onCreate() {
         super.onCreate()
         INSTANCE = this
+        kickTokenRefreshScheduler.schedule()
     }
 
     @Inject
@@ -72,6 +74,9 @@ class XtraApp : Application(), Configuration.Provider, SingletonImageLoader.Fact
 
     @Inject
     lateinit var okHttpClient: OkHttpClient
+
+    @Inject
+    lateinit var kickTokenRefreshScheduler: KickTokenRefreshScheduler
 
     @OptIn(ExperimentalCoilApi::class)
     override fun newImageLoader(context: PlatformContext): ImageLoader {
