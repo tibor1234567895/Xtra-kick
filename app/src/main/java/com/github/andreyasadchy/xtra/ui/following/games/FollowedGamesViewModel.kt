@@ -10,7 +10,7 @@ import com.github.andreyasadchy.xtra.repository.GraphQLRepository
 import com.github.andreyasadchy.xtra.repository.LocalFollowGameRepository
 import com.github.andreyasadchy.xtra.repository.datasource.FollowedGamesDataSource
 import com.github.andreyasadchy.xtra.util.C
-import com.github.andreyasadchy.xtra.util.TwitchApiHelper
+import com.github.andreyasadchy.xtra.util.KickApiHelper
 import com.github.andreyasadchy.xtra.util.prefs
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -28,10 +28,10 @@ class FollowedGamesViewModel @Inject constructor(
     ) {
         FollowedGamesDataSource(
             localFollowsGame = localFollowsGame,
-            gqlHeaders = TwitchApiHelper.getGQLHeaders(applicationContext, true),
+            gqlHeaders = KickApiHelper.getGQLHeaders(applicationContext, true),
             graphQLRepository = graphQLRepository,
             enableIntegrity = applicationContext.prefs().getBoolean(C.ENABLE_INTEGRITY, false),
-            apiPref = applicationContext.prefs().getString(C.API_PREFS_FOLLOWED_GAMES, null)?.split(',') ?: TwitchApiHelper.followedGamesApiDefaults,
+            apiPref = applicationContext.prefs().getString(C.API_PREFS_FOLLOWED_GAMES, null)?.split(',') ?: KickApiHelper.followedGamesApiDefaults,
             networkLibrary = applicationContext.prefs().getString(C.NETWORK_LIBRARY, "OkHttp"),
         )
     }.flow.cachedIn(viewModelScope)

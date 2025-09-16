@@ -22,8 +22,8 @@ import com.github.andreyasadchy.xtra.model.chat.CheerEmote
 import com.github.andreyasadchy.xtra.model.chat.Emote
 import com.github.andreyasadchy.xtra.model.chat.NamePaint
 import com.github.andreyasadchy.xtra.model.chat.StvBadge
-import com.github.andreyasadchy.xtra.model.chat.TwitchBadge
-import com.github.andreyasadchy.xtra.model.chat.TwitchEmote
+import com.github.andreyasadchy.xtra.model.chat.KickBadge
+import com.github.andreyasadchy.xtra.model.chat.KickEmote
 import com.github.andreyasadchy.xtra.ui.view.NamePaintImageSpan
 import com.github.andreyasadchy.xtra.util.chat.ChatAdapterUtils
 import java.util.Random
@@ -81,15 +81,15 @@ class ChatAdapter(
     private val userColors = HashMap<String, Int>()
     private val savedColors = HashMap<String, Int>()
     var loggedInUser: String? = null
-    var localTwitchEmotes: List<TwitchEmote>? = null
+    var localKickEmotes: List<KickEmote>? = null
     var globalStvEmotes: List<Emote>? = null
     var channelStvEmotes: List<Emote>? = null
     var globalBttvEmotes: List<Emote>? = null
     var channelBttvEmotes: List<Emote>? = null
     var globalFfzEmotes: List<Emote>? = null
     var channelFfzEmotes: List<Emote>? = null
-    var globalBadges: List<TwitchBadge>? = null
-    var channelBadges: List<TwitchBadge>? = null
+    var globalBadges: List<KickBadge>? = null
+    var channelBadges: List<KickBadge>? = null
     var cheerEmotes: List<CheerEmote>? = null
     val namePaints: MutableList<NamePaint>? = namePaintsList?.toMutableList()
     val paintUsers: MutableMap<String, String>? = paintUsersMap?.toMutableMap()
@@ -98,7 +98,7 @@ class ChatAdapter(
     val personalEmoteSets: MutableMap<String, List<Emote>>? = personalEmoteSetsMap?.toMutableMap()
     val personalEmoteSetUsers: MutableMap<String, String>? = personalEmoteSetUsersMap?.toMutableMap()
     var translateAllMessages = false
-    private val savedLocalTwitchEmotes = mutableMapOf<String, ByteArray>()
+    private val savedLocalKickEmotes = mutableMapOf<String, ByteArray>()
     private val savedLocalBadges = mutableMapOf<String, ByteArray>()
     private val savedLocalCheerEmotes = mutableMapOf<String, ByteArray>()
     private val savedLocalEmotes = mutableMapOf<String, ByteArray>()
@@ -119,8 +119,8 @@ class ChatAdapter(
             rewardChatMsg, replyMessage, null, useRandomColors, random, useReadableColors, isLightTheme, nameDisplay, useBoldNames, showNamePaints,
             namePaints, paintUsers, showStvBadges, stvBadges, stvBadgeUsers, showPersonalEmotes, personalEmoteSets, personalEmoteSetUsers, enableOverlayEmotes,
             showSystemMessageEmotes, loggedInUser, chatUrl, getEmoteBytes, userColors, savedColors, translateAllMessages, translateMessage,
-            showLanguageDownloadDialog, true, localTwitchEmotes, globalStvEmotes, channelStvEmotes, globalBttvEmotes, channelBttvEmotes, globalFfzEmotes,
-            channelFfzEmotes, globalBadges, channelBadges, cheerEmotes, savedLocalTwitchEmotes, savedLocalBadges, savedLocalCheerEmotes, savedLocalEmotes
+            showLanguageDownloadDialog, true, localKickEmotes, globalStvEmotes, channelStvEmotes, globalBttvEmotes, channelBttvEmotes, globalFfzEmotes,
+            channelFfzEmotes, globalBadges, channelBadges, cheerEmotes, savedLocalKickEmotes, savedLocalBadges, savedLocalCheerEmotes, savedLocalEmotes
         )
         holder.bind(chatMessage, result.builder)
         ChatAdapterUtils.loadImages(
@@ -155,7 +155,7 @@ class ChatAdapter(
             useRandomColors, useReadableColors, isLightTheme, nameDisplay, useBoldNames, showNamePaints, namePaints, paintUsers, showStvBadges,
             stvBadges, stvBadgeUsers, showPersonalEmotes, personalEmoteSets, personalEmoteSetUsers, showSystemMessageEmotes, chatUrl, getEmoteBytes,
             fragment, dialogBackgroundColor, imageLibrary, messageTextSize, emoteSize, badgeSize, emoteQuality, animateGifs, enableOverlayEmotes,
-            translateAllMessages, translateMessage, showLanguageDownloadDialog, messages, userColors, savedColors, loggedInUser, localTwitchEmotes,
+            translateAllMessages, translateMessage, showLanguageDownloadDialog, messages, userColors, savedColors, loggedInUser, localKickEmotes,
             globalStvEmotes, channelStvEmotes, globalBttvEmotes, channelBttvEmotes, globalFfzEmotes, channelFfzEmotes, globalBadges, channelBadges,
             cheerEmotes, selectedMessage
         )
@@ -168,7 +168,7 @@ class ChatAdapter(
             useRandomColors, useReadableColors, isLightTheme, nameDisplay, useBoldNames, showNamePaints, namePaints, paintUsers, showStvBadges,
             stvBadges, stvBadgeUsers, showPersonalEmotes, personalEmoteSets, personalEmoteSetUsers, showSystemMessageEmotes, chatUrl, getEmoteBytes,
             fragment, dialogBackgroundColor, imageLibrary, messageTextSize, emoteSize, badgeSize, emoteQuality, animateGifs, enableOverlayEmotes,
-            translateAllMessages, translateMessage, showLanguageDownloadDialog, messages, userColors, savedColors, loggedInUser, localTwitchEmotes,
+            translateAllMessages, translateMessage, showLanguageDownloadDialog, messages, userColors, savedColors, loggedInUser, localKickEmotes,
             globalStvEmotes, channelStvEmotes, globalBttvEmotes, channelBttvEmotes, globalFfzEmotes, channelFfzEmotes, globalBadges, channelBadges,
             cheerEmotes, selectedMessage
         )

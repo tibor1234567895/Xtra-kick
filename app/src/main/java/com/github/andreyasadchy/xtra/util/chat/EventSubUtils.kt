@@ -7,8 +7,8 @@ import com.github.andreyasadchy.xtra.model.chat.Badge
 import com.github.andreyasadchy.xtra.model.chat.ChannelPointReward
 import com.github.andreyasadchy.xtra.model.chat.ChatMessage
 import com.github.andreyasadchy.xtra.model.chat.RoomState
-import com.github.andreyasadchy.xtra.model.chat.TwitchEmote
-import com.github.andreyasadchy.xtra.util.TwitchApiHelper
+import com.github.andreyasadchy.xtra.model.chat.KickEmote
+import com.github.andreyasadchy.xtra.util.KickApiHelper
 import org.json.JSONObject
 
 object EventSubUtils {
@@ -16,7 +16,7 @@ object EventSubUtils {
         val message = StringBuilder()
         val messageObj = json.optJSONObject("message")
         val messageText = if (messageObj?.isNull("text") == false) messageObj.optString("text").takeIf { it.isNotBlank() } else null
-        val emotesList = mutableListOf<TwitchEmote>()
+        val emotesList = mutableListOf<KickEmote>()
         val fragments = messageObj?.optJSONArray("fragments")
         if (fragments != null) {
             for (i in 0 until fragments.length()) {
@@ -28,7 +28,7 @@ object EventSubUtils {
                         val emote = fragment?.optJSONObject("emote")
                         val id = if (emote?.isNull("id") == false) emote.optString("id").takeIf { it.isNotBlank() } else null
                         if (!id.isNullOrBlank()) {
-                            emotesList.add(TwitchEmote(
+                            emotesList.add(KickEmote(
                                 id = id,
                                 begin = message.codePointCount(0, message.length),
                                 end = message.codePointCount(0, message.length) + fragmentText.lastIndex,
@@ -66,7 +66,7 @@ object EventSubUtils {
             bits = json.optJSONObject("cheer")?.let { cheer -> if (!cheer.isNull("bits")) cheer.optInt("bits").takeIf { it > 0 } else null },
             msgId = if (!json.isNull("message_type")) json.optString("message_type").takeIf { it.isNotBlank() && !it.equals("text", true) } else null,
             reward = if (!json.isNull("channel_points_custom_reward_id")) json.optString("channel_points_custom_reward_id").takeIf { it.isNotBlank() }?.let { ChannelPointReward(id = it) } else null,
-            timestamp = timestamp?.let { TwitchApiHelper.parseIso8601DateUTC(it) },
+            timestamp = timestamp?.let { KickApiHelper.parseIso8601DateUTC(it) },
             fullMsg = json.toString()
         )
     }
@@ -77,7 +77,7 @@ object EventSubUtils {
         val messageText = if (messageObj?.isNull("text") == false) messageObj.optString("text").takeIf { it.isNotBlank() } else null
         val systemMsg = if (!json.isNull("system_message")) json.optString("system_message").takeIf { it.isNotBlank() } else null
         return if (messageText != null) {
-            val emotesList = mutableListOf<TwitchEmote>()
+            val emotesList = mutableListOf<KickEmote>()
             val fragments = messageObj?.optJSONArray("fragments")
             if (fragments != null) {
                 for (i in 0 until fragments.length()) {
@@ -89,7 +89,7 @@ object EventSubUtils {
                             val emote = fragment?.optJSONObject("emote")
                             val id = if (emote?.isNull("id") == false) emote.optString("id").takeIf { it.isNotBlank() } else null
                             if (!id.isNullOrBlank()) {
-                                emotesList.add(TwitchEmote(
+                                emotesList.add(KickEmote(
                                     id = id,
                                     begin = message.codePointCount(0, message.length),
                                     end = message.codePointCount(0, message.length) + fragmentText.lastIndex,
@@ -126,7 +126,7 @@ object EventSubUtils {
                 isAction = messageText.startsWith(ChatUtils.ACTION),
                 systemMsg = systemMsg,
                 msgId = if (!json.isNull("notice_type")) json.optString("notice_type").takeIf { it.isNotBlank() } else null,
-                timestamp = timestamp?.let { TwitchApiHelper.parseIso8601DateUTC(it) },
+                timestamp = timestamp?.let { KickApiHelper.parseIso8601DateUTC(it) },
                 fullMsg = json.toString()
             )
         } else {
@@ -135,7 +135,7 @@ object EventSubUtils {
                 userLogin = if (!json.isNull("chatter_user_login")) json.optString("chatter_user_login").takeIf { it.isNotBlank() } else null,
                 userName = if (!json.isNull("chatter_user_name")) json.optString("chatter_user_name").takeIf { it.isNotBlank() } else null,
                 systemMsg = systemMsg,
-                timestamp = timestamp?.let { TwitchApiHelper.parseIso8601DateUTC(it) },
+                timestamp = timestamp?.let { KickApiHelper.parseIso8601DateUTC(it) },
                 fullMsg = json.toString()
             )
         }
@@ -144,7 +144,7 @@ object EventSubUtils {
     fun parseClearChat(context: Context, json: JSONObject, timestamp: String?): ChatMessage {
         return ChatMessage(
             systemMsg = ContextCompat.getString(context, R.string.chat_clear),
-            timestamp = timestamp?.let { TwitchApiHelper.parseIso8601DateUTC(it) },
+            timestamp = timestamp?.let { KickApiHelper.parseIso8601DateUTC(it) },
             fullMsg = json.toString()
         )
     }

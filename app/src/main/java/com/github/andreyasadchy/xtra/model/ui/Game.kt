@@ -1,7 +1,7 @@
 package com.github.andreyasadchy.xtra.model.ui
 
 import android.os.Parcelable
-import com.github.andreyasadchy.xtra.util.TwitchApiHelper
+import com.github.andreyasadchy.xtra.util.KickApiHelper
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
@@ -22,5 +22,5 @@ class Game(
 ) : Parcelable {
 
     val boxArt: String?
-        get() = TwitchApiHelper.getTemplateUrl(boxArtUrl, "game")
+        get() = KickApiHelper.getTemplateUrl(boxArtUrl, "game")
 }

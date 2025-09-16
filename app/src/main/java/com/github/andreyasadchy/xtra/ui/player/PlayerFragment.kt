@@ -79,7 +79,7 @@ import com.github.andreyasadchy.xtra.ui.game.GamePagerFragmentDirections
 import com.github.andreyasadchy.xtra.ui.main.MainActivity
 import com.github.andreyasadchy.xtra.ui.view.SlidingLayout
 import com.github.andreyasadchy.xtra.util.C
-import com.github.andreyasadchy.xtra.util.TwitchApiHelper
+import com.github.andreyasadchy.xtra.util.KickApiHelper
 import com.github.andreyasadchy.xtra.util.disable
 import com.github.andreyasadchy.xtra.util.enable
 import com.github.andreyasadchy.xtra.util.getAlertDialogBuilder
@@ -434,8 +434,8 @@ class PlayerFragment : BaseNetworkFragment(), SlidingLayout.Listener, PlayerGame
                     }
                 }
                 if (!requireContext().tokenPrefs().getString(C.USERNAME, null).isNullOrBlank() &&
-                    (!TwitchApiHelper.getGQLHeaders(requireContext(), true)[C.HEADER_TOKEN].isNullOrBlank() ||
-                            !TwitchApiHelper.getHelixHeaders(requireContext())[C.HEADER_TOKEN].isNullOrBlank())
+                    (!KickApiHelper.getGQLHeaders(requireContext(), true)[C.HEADER_TOKEN].isNullOrBlank() ||
+                            !KickApiHelper.getHelixHeaders(requireContext())[C.HEADER_TOKEN].isNullOrBlank())
                 ) {
                     if (prefs.getBoolean(C.PLAYER_CHATBARTOGGLE, false) && !prefs.getBoolean(C.CHAT_DISABLE, false)) {
                         view.findViewById<ImageButton>(R.id.playerChatBarToggle)?.apply {
@@ -488,7 +488,7 @@ class PlayerFragment : BaseNetworkFragment(), SlidingLayout.Listener, PlayerGame
                                     requireView().findViewById<LinearLayout>(R.id.playerUptime)?.isVisible == false
                                 ) {
                                     stream.startedAt?.let { date ->
-                                        TwitchApiHelper.parseIso8601DateUTC(date)?.let { startedAtMs ->
+                                        KickApiHelper.parseIso8601DateUTC(date)?.let { startedAtMs ->
                                             updateUptime(startedAtMs)
                                         }
                                     }
@@ -516,7 +516,7 @@ class PlayerFragment : BaseNetworkFragment(), SlidingLayout.Listener, PlayerGame
                 }
                 if (prefs.getBoolean(C.PLAYER_SHOW_UPTIME, true)) {
                     requireArguments().getString(KEY_STARTED_AT)?.let {
-                        TwitchApiHelper.parseIso8601DateUTC(it)?.let { startedAtMs ->
+                        KickApiHelper.parseIso8601DateUTC(it)?.let { startedAtMs ->
                             updateUptime(startedAtMs)
                         }
                     }
@@ -612,7 +612,7 @@ class PlayerFragment : BaseNetworkFragment(), SlidingLayout.Listener, PlayerGame
                                 val urls = map.ifEmpty {
                                     val thumbnailUrl = requireArguments().getString(KEY_THUMBNAIL_URL)
                                     if ((prefs.getString(C.TOKEN_SKIP_CLIP_ACCESS_TOKEN, "2")?.toIntOrNull() ?: 2) == 2 && !thumbnailUrl.isNullOrBlank()) {
-                                        TwitchApiHelper.getClipUrlMapFromPreview(thumbnailUrl)
+                                        KickApiHelper.getClipUrlMapFromPreview(thumbnailUrl)
                                     } else {
                                         emptyMap()
                                     }
@@ -784,7 +784,7 @@ class PlayerFragment : BaseNetworkFragment(), SlidingLayout.Listener, PlayerGame
                                             requireArguments().getString(KEY_CHANNEL_ID),
                                             setting,
                                             requireContext().prefs().getString(C.NETWORK_LIBRARY, "OkHttp"),
-                                            TwitchApiHelper.getGQLHeaders(requireContext(), true),
+                                            KickApiHelper.getGQLHeaders(requireContext(), true),
                                             requireContext().prefs().getBoolean(C.ENABLE_INTEGRITY, false),
                                         )
                                     }
@@ -799,7 +799,7 @@ class PlayerFragment : BaseNetworkFragment(), SlidingLayout.Listener, PlayerGame
                                     requireContext().prefs().getBoolean(C.LIVE_NOTIFICATIONS_ENABLED, false),
                                     requireArguments().getString(KEY_STARTED_AT),
                                     requireContext().prefs().getString(C.NETWORK_LIBRARY, "OkHttp"),
-                                    TwitchApiHelper.getGQLHeaders(requireContext(), true),
+                                    KickApiHelper.getGQLHeaders(requireContext(), true),
                                     requireContext().prefs().getBoolean(C.ENABLE_INTEGRITY, false),
                                 )
                             }
@@ -977,7 +977,7 @@ class PlayerFragment : BaseNetworkFragment(), SlidingLayout.Listener, PlayerGame
                     .setMinute(savedValue % 60)
                     .build()
                 picker.addOnPositiveButtonClickListener {
-                    val minutes = TwitchApiHelper.getMinutesLeft(picker.hour, picker.minute)
+                    val minutes = KickApiHelper.getMinutesLeft(picker.hour, picker.minute)
                     onSleepTimerChanged(minutes * 60_000L, minutes / 60, minutes % 60, requireContext().prefs().getBoolean(C.SLEEP_TIMER_LOCK, false))
                     requireContext().prefs().edit {
                         putInt(C.SLEEP_TIMER_TIME, picker.hour * 60 + picker.minute)
@@ -1145,7 +1145,7 @@ class PlayerFragment : BaseNetworkFragment(), SlidingLayout.Listener, PlayerGame
         val viewers = requireView().findViewById<TextView>(R.id.playerViewersText)
         val viewerIcon = requireView().findViewById<ImageView>(R.id.playerViewersIcon)
         if (viewerCount != null) {
-            viewers?.text = TwitchApiHelper.formatCount(viewerCount, requireContext().prefs().getBoolean(C.UI_TRUNCATEVIEWCOUNT, true))
+            viewers?.text = KickApiHelper.formatCount(viewerCount, requireContext().prefs().getBoolean(C.UI_TRUNCATEVIEWCOUNT, true))
             if (prefs.getBoolean(C.PLAYER_VIEWERICON, true)) {
                 viewerIcon?.visible()
             }
@@ -1288,8 +1288,8 @@ class PlayerFragment : BaseNetworkFragment(), SlidingLayout.Listener, PlayerGame
         viewModel.saveBookmark(
             filesDir = requireContext().filesDir.path,
             networkLibrary = requireContext().prefs().getString(C.NETWORK_LIBRARY, "OkHttp"),
-            helixHeaders = TwitchApiHelper.getHelixHeaders(requireContext()),
-            gqlHeaders = TwitchApiHelper.getGQLHeaders(requireContext()),
+            helixHeaders = KickApiHelper.getHelixHeaders(requireContext()),
+            gqlHeaders = KickApiHelper.getGQLHeaders(requireContext()),
             videoId = requireArguments().getString(KEY_VIDEO_ID),
             title = requireArguments().getString(KEY_TITLE),
             uploadDate = requireArguments().getString(KEY_UPLOAD_DATE),
@@ -1957,8 +1957,8 @@ class PlayerFragment : BaseNetworkFragment(), SlidingLayout.Listener, PlayerGame
                 requireArguments().getString(KEY_CHANNEL_LOGIN),
                 prefs.getString(C.UI_FOLLOW_BUTTON, "0")?.toIntOrNull() ?: 0,
                 requireContext().prefs().getString(C.NETWORK_LIBRARY, "OkHttp"),
-                TwitchApiHelper.getGQLHeaders(requireContext(), true),
-                TwitchApiHelper.getHelixHeaders(requireContext()),
+                KickApiHelper.getGQLHeaders(requireContext(), true),
+                KickApiHelper.getHelixHeaders(requireContext()),
             )
             if (videoType == VIDEO) {
                 val videoId = requireArguments().getString(KEY_VIDEO_ID)
@@ -1966,7 +1966,7 @@ class PlayerFragment : BaseNetworkFragment(), SlidingLayout.Listener, PlayerGame
                     viewModel.loadGamesList(
                         videoId,
                         prefs.getString(C.NETWORK_LIBRARY, "OkHttp"),
-                        TwitchApiHelper.getGQLHeaders(requireContext()),
+                        KickApiHelper.getGQLHeaders(requireContext()),
                         prefs.getBoolean(C.ENABLE_INTEGRITY, false),
                     )
                 }
@@ -1988,10 +1988,10 @@ class PlayerFragment : BaseNetworkFragment(), SlidingLayout.Listener, PlayerGame
                             !requireContext().prefs().getBoolean(C.CHAT_PUBSUB_ENABLED, true) ||
                             (requireContext().prefs().getBoolean(C.CHAT_POINTS_COLLECT, true) &&
                                     !requireContext().tokenPrefs().getString(C.USER_ID, null).isNullOrBlank() &&
-                                    !TwitchApiHelper.getGQLHeaders(requireContext(), true)[C.HEADER_TOKEN].isNullOrBlank()),
+                                    !KickApiHelper.getGQLHeaders(requireContext(), true)[C.HEADER_TOKEN].isNullOrBlank()),
                     networkLibrary = requireContext().prefs().getString(C.NETWORK_LIBRARY, "OkHttp"),
-                    helixHeaders = TwitchApiHelper.getHelixHeaders(requireContext()),
-                    gqlHeaders = TwitchApiHelper.getGQLHeaders(requireContext()),
+                    helixHeaders = KickApiHelper.getHelixHeaders(requireContext()),
+                    gqlHeaders = KickApiHelper.getGQLHeaders(requireContext()),
                     enableIntegrity = requireContext().prefs().getBoolean(C.ENABLE_INTEGRITY, false),
                 )
             }
@@ -2019,12 +2019,12 @@ class PlayerFragment : BaseNetworkFragment(), SlidingLayout.Listener, PlayerGame
                 if (skipAccessToken >= 2 || thumbnailUrl.isNullOrBlank()) {
                     viewModel.loadClip(
                         networkLibrary = requireContext().prefs().getString(C.NETWORK_LIBRARY, "OkHttp"),
-                        gqlHeaders = TwitchApiHelper.getGQLHeaders(requireContext()),
+                        gqlHeaders = KickApiHelper.getGQLHeaders(requireContext()),
                         id = requireArguments().getString(KEY_CLIP_ID),
                         enableIntegrity = requireContext().prefs().getBoolean(C.ENABLE_INTEGRITY, false),
                     )
                 } else {
-                    viewModel.clipUrls.value = TwitchApiHelper.getClipUrlMapFromPreview(thumbnailUrl)
+                    viewModel.clipUrls.value = KickApiHelper.getClipUrlMapFromPreview(thumbnailUrl)
                 }
             }
             OFFLINE_VIDEO -> {
@@ -2062,7 +2062,7 @@ class PlayerFragment : BaseNetworkFragment(), SlidingLayout.Listener, PlayerGame
                 val proxyMultivariantPlaylist = prefs.getBoolean(C.PROXY_MULTIVARIANT_PLAYLIST, false) && !proxyHost.isNullOrBlank() && proxyPort != null
                 viewModel.loadStreamResult(
                     networkLibrary = prefs.getString(C.NETWORK_LIBRARY, "OkHttp"),
-                    gqlHeaders = TwitchApiHelper.getGQLHeaders(requireContext(), prefs.getBoolean(C.TOKEN_INCLUDE_TOKEN_STREAM, true)),
+                    gqlHeaders = KickApiHelper.getGQLHeaders(requireContext(), prefs.getBoolean(C.TOKEN_INCLUDE_TOKEN_STREAM, true)),
                     channelLogin = channelLogin,
                     randomDeviceId = prefs.getBoolean(C.TOKEN_RANDOM_DEVICEID, true),
                     xDeviceId = prefs.getString(C.TOKEN_XDEVICEID, "twitch-web-wall-mason"),
@@ -2083,7 +2083,7 @@ class PlayerFragment : BaseNetworkFragment(), SlidingLayout.Listener, PlayerGame
     private fun playVideo(skipAccessToken: Boolean, playbackPosition: Long?) {
         if (skipAccessToken && !requireArguments().getString(KEY_VIDEO_ANIMATED_PREVIEW).isNullOrBlank()) {
             requireArguments().getString(KEY_VIDEO_ANIMATED_PREVIEW)?.let { preview ->
-                val qualityMap = TwitchApiHelper.getVideoUrlMapFromPreview(preview, requireArguments().getString(KEY_VIDEO_TYPE), viewModel.backupQualities)
+                val qualityMap = KickApiHelper.getVideoUrlMapFromPreview(preview, requireArguments().getString(KEY_VIDEO_TYPE), viewModel.backupQualities)
                 val map = mutableMapOf<String, Pair<String, String?>>()
                 qualityMap.forEach {
                     when (it.key) {
@@ -2131,7 +2131,7 @@ class PlayerFragment : BaseNetworkFragment(), SlidingLayout.Listener, PlayerGame
             viewModel.playbackPosition = playbackPosition
             viewModel.loadVideo(
                 networkLibrary = requireContext().prefs().getString(C.NETWORK_LIBRARY, "OkHttp"),
-                gqlHeaders = TwitchApiHelper.getGQLHeaders(requireContext(), prefs.getBoolean(C.TOKEN_INCLUDE_TOKEN_VIDEO, true)),
+                gqlHeaders = KickApiHelper.getGQLHeaders(requireContext(), prefs.getBoolean(C.TOKEN_INCLUDE_TOKEN_VIDEO, true)),
                 videoId = requireArguments().getString(KEY_VIDEO_ID),
                 playerType = prefs.getString(C.TOKEN_PLAYERTYPE_VIDEO, "channel_home_live"),
                 supportedCodecs = prefs.getString(C.TOKEN_SUPPORTED_CODECS, "av1,h265,h264"),
@@ -2524,7 +2524,7 @@ class PlayerFragment : BaseNetworkFragment(), SlidingLayout.Listener, PlayerGame
                                 val proxyMultivariantPlaylist = prefs.getBoolean(C.PROXY_MULTIVARIANT_PLAYLIST, false) && !proxyHost.isNullOrBlank() && proxyPort != null
                                 viewModel.loadStreamResult(
                                     networkLibrary = prefs.getString(C.NETWORK_LIBRARY, "OkHttp"),
-                                    gqlHeaders = TwitchApiHelper.getGQLHeaders(requireContext(), prefs.getBoolean(C.TOKEN_INCLUDE_TOKEN_STREAM, true)),
+                                    gqlHeaders = KickApiHelper.getGQLHeaders(requireContext(), prefs.getBoolean(C.TOKEN_INCLUDE_TOKEN_STREAM, true)),
                                     channelLogin = channelLogin,
                                     randomDeviceId = prefs.getBoolean(C.TOKEN_RANDOM_DEVICEID, true),
                                     xDeviceId = prefs.getString(C.TOKEN_XDEVICEID, "twitch-web-wall-mason"),
@@ -2545,15 +2545,15 @@ class PlayerFragment : BaseNetworkFragment(), SlidingLayout.Listener, PlayerGame
                                 requireArguments().getString(KEY_CHANNEL_LOGIN),
                                 prefs.getString(C.UI_FOLLOW_BUTTON, "0")?.toIntOrNull() ?: 0,
                                 requireContext().prefs().getString(C.NETWORK_LIBRARY, "OkHttp"),
-                                TwitchApiHelper.getGQLHeaders(requireContext(), true),
-                                TwitchApiHelper.getHelixHeaders(requireContext()),
+                                KickApiHelper.getGQLHeaders(requireContext(), true),
+                                KickApiHelper.getHelixHeaders(requireContext()),
                             )
                         }
                         "refreshVideo" -> {
                             val videoId = requireArguments().getString(KEY_VIDEO_ID)
                             viewModel.loadVideo(
                                 networkLibrary = requireContext().prefs().getString(C.NETWORK_LIBRARY, "OkHttp"),
-                                gqlHeaders = TwitchApiHelper.getGQLHeaders(requireContext(), prefs.getBoolean(C.TOKEN_INCLUDE_TOKEN_VIDEO, true)),
+                                gqlHeaders = KickApiHelper.getGQLHeaders(requireContext(), prefs.getBoolean(C.TOKEN_INCLUDE_TOKEN_VIDEO, true)),
                                 videoId = videoId,
                                 playerType = prefs.getString(C.TOKEN_PLAYERTYPE_VIDEO, "channel_home_live"),
                                 supportedCodecs = prefs.getString(C.TOKEN_SUPPORTED_CODECS, "av1,h265,h264"),
@@ -2565,14 +2565,14 @@ class PlayerFragment : BaseNetworkFragment(), SlidingLayout.Listener, PlayerGame
                                 requireArguments().getString(KEY_CHANNEL_LOGIN),
                                 prefs.getString(C.UI_FOLLOW_BUTTON, "0")?.toIntOrNull() ?: 0,
                                 requireContext().prefs().getString(C.NETWORK_LIBRARY, "OkHttp"),
-                                TwitchApiHelper.getGQLHeaders(requireContext(), true),
-                                TwitchApiHelper.getHelixHeaders(requireContext()),
+                                KickApiHelper.getGQLHeaders(requireContext(), true),
+                                KickApiHelper.getHelixHeaders(requireContext()),
                             )
                             if (!videoId.isNullOrBlank() && (prefs.getBoolean(C.PLAYER_GAMESBUTTON, true) || prefs.getBoolean(C.PLAYER_MENU_GAMES, false))) {
                                 viewModel.loadGamesList(
                                     videoId,
                                     prefs.getString(C.NETWORK_LIBRARY, "OkHttp"),
-                                    TwitchApiHelper.getGQLHeaders(requireContext()),
+                                    KickApiHelper.getGQLHeaders(requireContext()),
                                     prefs.getBoolean(C.ENABLE_INTEGRITY, false),
                                 )
                             }
@@ -2580,7 +2580,7 @@ class PlayerFragment : BaseNetworkFragment(), SlidingLayout.Listener, PlayerGame
                         "refreshClip" -> {
                             viewModel.loadClip(
                                 networkLibrary = requireContext().prefs().getString(C.NETWORK_LIBRARY, "OkHttp"),
-                                gqlHeaders = TwitchApiHelper.getGQLHeaders(requireContext()),
+                                gqlHeaders = KickApiHelper.getGQLHeaders(requireContext()),
                                 id = requireArguments().getString(KEY_CLIP_ID),
                                 enableIntegrity = requireContext().prefs().getBoolean(C.ENABLE_INTEGRITY, false),
                             )
@@ -2590,8 +2590,8 @@ class PlayerFragment : BaseNetworkFragment(), SlidingLayout.Listener, PlayerGame
                                 requireArguments().getString(KEY_CHANNEL_LOGIN),
                                 prefs.getString(C.UI_FOLLOW_BUTTON, "0")?.toIntOrNull() ?: 0,
                                 requireContext().prefs().getString(C.NETWORK_LIBRARY, "OkHttp"),
-                                TwitchApiHelper.getGQLHeaders(requireContext(), true),
-                                TwitchApiHelper.getHelixHeaders(requireContext()),
+                                KickApiHelper.getGQLHeaders(requireContext(), true),
+                                KickApiHelper.getHelixHeaders(requireContext()),
                             )
                         }
                         "follow" -> viewModel.saveFollowChannel(
@@ -2603,7 +2603,7 @@ class PlayerFragment : BaseNetworkFragment(), SlidingLayout.Listener, PlayerGame
                             requireContext().prefs().getBoolean(C.LIVE_NOTIFICATIONS_ENABLED, false),
                             requireArguments().getString(KEY_STARTED_AT),
                             requireContext().prefs().getString(C.NETWORK_LIBRARY, "OkHttp"),
-                            TwitchApiHelper.getGQLHeaders(requireContext(), true),
+                            KickApiHelper.getGQLHeaders(requireContext(), true),
                             requireContext().prefs().getBoolean(C.ENABLE_INTEGRITY, false),
                         )
                         "unfollow" -> viewModel.deleteFollowChannel(
@@ -2611,7 +2611,7 @@ class PlayerFragment : BaseNetworkFragment(), SlidingLayout.Listener, PlayerGame
                             requireArguments().getString(KEY_CHANNEL_ID),
                             prefs.getString(C.UI_FOLLOW_BUTTON, "0")?.toIntOrNull() ?: 0,
                             requireContext().prefs().getString(C.NETWORK_LIBRARY, "OkHttp"),
-                            TwitchApiHelper.getGQLHeaders(requireContext(), true),
+                            KickApiHelper.getGQLHeaders(requireContext(), true),
                             requireContext().prefs().getBoolean(C.ENABLE_INTEGRITY, false),
                         )
                     }

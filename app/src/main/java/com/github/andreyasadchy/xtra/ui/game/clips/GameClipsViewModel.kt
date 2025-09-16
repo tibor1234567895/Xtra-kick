@@ -18,7 +18,7 @@ import com.github.andreyasadchy.xtra.type.Language
 import com.github.andreyasadchy.xtra.ui.common.VideosSortDialog
 import com.github.andreyasadchy.xtra.ui.game.GamePagerFragmentArgs
 import com.github.andreyasadchy.xtra.util.C
-import com.github.andreyasadchy.xtra.util.TwitchApiHelper
+import com.github.andreyasadchy.xtra.util.KickApiHelper
 import com.github.andreyasadchy.xtra.util.prefs
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -54,7 +54,7 @@ class GameClipsViewModel @Inject constructor(
         ) {
             val started = when (period) {
                 VideosSortDialog.PERIOD_ALL -> null
-                else -> TwitchApiHelper.getClipTime(
+                else -> KickApiHelper.getClipTime(
                     when (period) {
                         VideosSortDialog.PERIOD_DAY -> 1
                         VideosSortDialog.PERIOD_WEEK -> 7
@@ -65,7 +65,7 @@ class GameClipsViewModel @Inject constructor(
             }
             val ended = when (period) {
                 VideosSortDialog.PERIOD_ALL -> null
-                else -> TwitchApiHelper.getClipTime(0)
+                else -> KickApiHelper.getClipTime(0)
             }
             val gqlQueryPeriod = when (period) {
                 VideosSortDialog.PERIOD_DAY -> ClipsPeriod.LAST_DAY
@@ -100,12 +100,12 @@ class GameClipsViewModel @Inject constructor(
                 gqlPeriod = gqlPeriod,
                 startedAt = started,
                 endedAt = ended,
-                helixHeaders = TwitchApiHelper.getHelixHeaders(applicationContext),
+                helixHeaders = KickApiHelper.getHelixHeaders(applicationContext),
                 helixRepository = helixRepository,
-                gqlHeaders = TwitchApiHelper.getGQLHeaders(applicationContext),
+                gqlHeaders = KickApiHelper.getGQLHeaders(applicationContext),
                 graphQLRepository = graphQLRepository,
                 enableIntegrity = applicationContext.prefs().getBoolean(C.ENABLE_INTEGRITY, false),
-                apiPref = applicationContext.prefs().getString(C.API_PREFS_GAME_CLIPS, null)?.split(',') ?: TwitchApiHelper.gameClipsApiDefaults,
+                apiPref = applicationContext.prefs().getString(C.API_PREFS_GAME_CLIPS, null)?.split(',') ?: KickApiHelper.gameClipsApiDefaults,
                 networkLibrary = applicationContext.prefs().getString(C.NETWORK_LIBRARY, "OkHttp"),
             )
         }.flow

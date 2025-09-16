@@ -109,7 +109,7 @@
     <string name="playback_will_stop_hours_minutes">Wiedergabe stoppt in %1$s %2$s</string>
     <string name="timer_canceled">Timer abgebrochen</string>
     <string name="trouble_logging_in">Probleme beim Einloggen?</string>
-    <string name="login_problem_solution">Sie können sich über einen externen Browser anmelden. Dafür auf der Twitch-Seite mit Ihren Anmeldedaten einloggen. Nachdem Sie auf \"Autorisieren\" geklickt haben, sollte eine Seite mit einem Fehler erscheinen. Kopieren Sie die URL, kehren Sie hierher zurück und klicken Sie auf die Schaltfläche \"URL eingeben\". Fügen Sie die URL ein und klicken Sie auf \"Anmelden\"."</string>
+    <string name="login_problem_solution">Sie können sich über einen externen Browser anmelden. Dafür auf der Kick-Seite mit Ihren Anmeldedaten einloggen. Nachdem Sie auf \"Autorisieren\" geklickt haben, sollte eine Seite mit einem Fehler erscheinen. Kopieren Sie die URL, kehren Sie hierher zurück und klicken Sie auf die Schaltfläche \"URL eingeben\". Fügen Sie die URL ein und klicken Sie auf \"Anmelden\"."</string>
     <string name="no_browser_found">Keine Browser App gefunden</string>
     <string name="browser_workaround">Ihr Systembrowser wird nicht mehr unterstützt. Bitte klicken Sie auf die Schaltfläche unten für eine Umgehungslösung.</string>
     <string name="error">Fehler: %s</string>
@@ -168,7 +168,7 @@
     <string name="chat_first">Erstes Mal im Chat</string>
     <string name="chat_reward">Kanalpunkte Einlösung</string>
     <string name="always">Immer</string>
-    <string name="twitch">Twitch</string>
+    <string name="kick">Kick</string>
     <string name="local">Lokal</string>
     <string name="days">t</string>
     <string name="seconds">s</string>
@@ -210,12 +210,12 @@
     <string name="irc_notice_already_subs_off">Dieser Raum ist nicht im Nur-Abonnenten-Modus.</string>
     <string name="irc_notice_already_subs_on">Dieser Raum ist bereits im Nur-Abonnenten-Modus.</string>
     <string name="irc_notice_autohost_receive">%1$s hostet Sie jetzt automatisch für bis zu %2$s Zuschauer.</string>
-    <string name="irc_notice_bad_ban_admin">Sie können den Admin %s nicht sperren. Bitte senden Sie eine E-Mail an support@twitch.tv, wenn ein Admin beleidigend ist.</string>
+    <string name="irc_notice_bad_ban_admin">Sie können den Admin %s nicht sperren. Bitte senden Sie eine E-Mail an support.com wenn ein Admin beleidigend ist.</string>
     <string name="irc_notice_bad_ban_anon">Sie können anonyme Benutzer nicht sperren.</string>
     <string name="irc_notice_bad_ban_broadcaster">Sie können den Broadcaster nicht sperren.</string>
     <string name="irc_notice_bad_ban_mod">Sie können Moderator %s nicht sperren, es sei denn, Sie sind der Eigentümer dieses Kanals.</string>
     <string name="irc_notice_bad_ban_self">Sie können sich nicht selbst sperren.</string>
-    <string name="irc_notice_bad_ban_staff">Sie können einen Mitarbeiter %s nicht sperren. Bitte senden Sie eine E-Mail an support@twitch.tv, wenn ein Mitarbeiter beleidigend ist.</string>
+    <string name="irc_notice_bad_ban_staff">Sie können einen Mitarbeiter %s nicht sperren. Bitte senden Sie eine E-Mail an support.com wenn ein Mitarbeiter beleidigend ist.</string>
     <string name="irc_notice_bad_commercial_error">Der Werbespot konnte nicht gestartet werden.</string>
     <string name="irc_notice_bad_delete_message_broadcaster">Sie können die Nachrichten des Broadcasters nicht löschen.</string>
     <string name="irc_notice_bad_delete_message_mod">Sie können keine Nachrichten von einem anderen Moderator %s löschen.</string>
@@ -227,13 +227,13 @@
     <string name="irc_notice_bad_mod_banned">%s ist in diesem Kanal gesperrt. Sie müssen die Sperre dieses Benutzers aufheben, bevor Sie ihm den Mod-Status erteilen.</string>
     <string name="irc_notice_bad_mod_mod">%s ist bereits Moderator dieses Kanals.</string>
     <string name="irc_notice_bad_slow_duration">Sie können die Verzögerung nicht auf mehr als %s Sekunden einstellen.</string>
-    <string name="irc_notice_bad_timeout_admin">Sie können Admin %s nicht aussetzen. Bitte senden Sie eine E-Mail an support@twitch.tv, wenn ein Admin beleidigend ist.</string>
+    <string name="irc_notice_bad_timeout_admin">Sie können Admin %s nicht aussetzen. Bitte senden Sie eine E-Mail an support.com wenn ein Admin beleidigend ist.</string>
     <string name="irc_notice_bad_timeout_anon">Sie können anonyme Benutzer nicht aussetzen.</string>
     <string name="irc_notice_bad_timeout_broadcaster">Sie können den Broadcaster nicht aussetzen.</string>
     <string name="irc_notice_bad_timeout_duration">Die Zeitüberschreitung eines Benutzers kann nicht länger als %s betragen.</string>
     <string name="irc_notice_bad_timeout_mod">Sie können Moderator %s nicht aussetzen, es sei denn, Sie sind der Eigentümer dieses Kanals.</string>
     <string name="irc_notice_bad_timeout_self">Sie können sich selbst nicht aussetzen.</string>
-    <string name="irc_notice_bad_timeout_staff">Sie können Mitarbeiter %s nicht aussetzen. Bitte senden Sie eine E-Mail an support@twitch.tv, wenn ein Mitarbeiter beleidigend ist.</string>
+    <string name="irc_notice_bad_timeout_staff">Sie können Mitarbeiter %s nicht aussetzen. Bitte senden Sie eine E-Mail an support.com wenn ein Mitarbeiter beleidigend ist.</string>
     <string name="irc_notice_bad_unban_no_ban">%s ist von diesem Kanal nicht ausgeschlossen.</string>
     <string name="irc_notice_bad_unhost_error">Beim Verlassen des Host-Modus ist ein Problem aufgetreten. Bitte versuchen Sie es in einer Minute erneut.</string>
     <string name="irc_notice_bad_unmod_mod">%s ist kein Moderator dieses Kanals.</string>
@@ -243,11 +243,11 @@
     <string name="irc_notice_bad_vip_achievement_incomplete">VIP konnte nicht hinzugefügt werden. Besuchen Sie die Seite "Erfolge" in Ihrem Dashboard, um zu erfahren, wie Sie diese Funktion freischalten können.</string>
     <string name="irc_notice_bad_unvip_grantee_not_vip">%s ist kein VIP dieses Kanals.</string>
     <string name="irc_notice_ban_success">%s ist jetzt von diesem Kanal ausgeschlossen.</string>
-    <string name="irc_notice_cmds_available">In diesem Raum für Sie verfügbare Befehle (verwenden Sie /help für Details): %s Weitere Hilfe: https://help.twitch.tv/s/article/chat-commands.</string>
+    <string name="irc_notice_cmds_available">In diesem Raum für Sie verfügbare Befehle (verwenden Sie /help für Details): %s Weitere Hilfe: https://help.kick.com.</string>
     <string name="irc_notice_color_changed">Ihre Farbe wurde geändert.</string>
     <string name="irc_notice_commercial_success">Zweite Werbepause von %s wird eingeleitet. Denken Sie daran, dass Ihr Stream noch live ist und nicht jeder eine Werbung bekommt.</string>
     <string name="irc_notice_delete_message_success">Die Nachricht von %s wurde gelöscht.</string>
-    <string name="irc_notice_delete_staff_message_success">Du hast eine Nachricht vom Mitarbeiter %s gelöscht. Bitte sende eine E-Mail an support@twitch.tv, wenn ein Mitarbeiter beleidigend ist.</string>
+    <string name="irc_notice_delete_staff_message_success">Du hast eine Nachricht vom Mitarbeiter %s gelöscht. Bitte sende eine E-Mail an support.com wenn ein Mitarbeiter beleidigend ist.</string>
     <string name="irc_notice_emote_only_off">Dieser Raum ist nicht mehr im Nur-Emote-Modus.</string>
     <string name="irc_notice_emote_only_on">Dieser Raum ist jetzt im Nur-Emote-Modus.</string>
     <string name="irc_notice_followers_off">Dieser Raum ist nicht mehr im Nur-Follower-Modus.</string>
@@ -275,10 +275,10 @@
     <string name="irc_notice_msg_rejected">Hey! Deine Nachricht wird von Mods geprüft und wurde nicht gesendet.</string>
     <string name="irc_notice_msg_rejected_mandatory">Ihre Nachricht wurde aufgrund von Konflikten mit den Moderationseinstellungen des Kanals nicht gepostet.</string>
     <string name="irc_notice_msg_slowmode">Dieser Raum ist im langsamen Modus und Sie senden Nachrichten zu schnell. Sie können in %s Sekunden wieder chatten.</string>
-    <string name="irc_notice_msg_subsonly">Dieser Raum ist im Nur-Abonnenten-Modus. Um zu chatten, erwerben Sie ein Kanalabonnement unter https://www.twitch.tv/products/%s/ticket?ref=subscriber_only_mode_chat.</string>
+    <string name="irc_notice_msg_subsonly">Dieser Raum ist im Nur-Abonnenten-Modus. Um zu chatten, erwerben Sie ein Kanalabonnement unter https://kick.com</string>
     <string name="irc_notice_msg_suspended">Sie sind nicht berechtigt, diese Aktion auszuführen.</string>
     <string name="irc_notice_msg_timedout">Ihre Zeit ist um %s Sekunden abgelaufen.</string>
-    <string name="irc_notice_msg_verified_email">Um in diesem Raum zu chatten, ist ein verifiziertes Konto erforderlich. Bitte verifizieren Sie Ihr Konto unter https://www.twitch.tv/settings/security.</string>
+    <string name="irc_notice_msg_verified_email">Um in diesem Raum zu chatten, ist ein verifiziertes Konto erforderlich. Bitte verifizieren Sie Ihr Konto unter https://kick.com</string>
     <string name="irc_notice_no_help">Keine Hilfe verfügbar.</string>
     <string name="irc_notice_no_mods">Es gibt keine Moderatoren für diesen Kanal.</string>
     <string name="irc_notice_no_vips">Dieser Kanal hat keine VIPs.</string>
@@ -317,7 +317,7 @@
     <string name="irc_notice_usage_color">Verwendung: \"/color &lt;color&gt;\" - Ändere die Farbe deines Benutzernamens. Die Farbe muss hexadezimal (#000000) oder eines der folgenden sein: %s.</string>
     <string name="irc_notice_usage_commercial">Verwendung: \"/commercial [Länge]\" - Löst einen Werbespot aus. Länge (optional) muss eine positive Anzahl von Sekunden sein.</string>
     <string name="irc_notice_usage_disconnect">Verwendung: \"/disconnect\" - Stellt die Verbindung zum Chat wieder her.</string>
-    <string name="irc_notice_usage_delete">Verwendung: \"/delete &lt;msg id&gt;\" - Löscht die angegebene Nachricht. Weitere Informationen finden Sie unter https://dev.twitch.tv/docs/irc/commands/#clearmsg-twitch-commands.</string>
+    <string name="irc_notice_usage_delete">Verwendung: \"/delete &lt;msg id&gt;\" - Löscht die angegebene Nachricht. Weitere Informationen finden Sie unter https://docs.kick.com</string>
     <string name="irc_notice_usage_emote_only_off">Verwendung: \"/emoteonlyoff\" – Deaktiviert den Nur-Emote-Modus.</string>
     <string name="irc_notice_usage_emote_only_on">Verwendung: \"/emoteonly\" - Aktiviert den Nur-Emote-Modus (im Chat dürfen nur Emoticons verwendet werden). Verwenden Sie \"/emoteonlyoff\" zum Deaktivieren.</string>
     <string name="irc_notice_usage_followers_off">Verwendung: \"/followersoff\" – Deaktiviert den Nur-Follower-Modus.</string>
@@ -437,7 +437,7 @@
     <string name="restart_player">Player neustarten</string>
     <string name="sub_only_summary">Inhalt nur für Abonnenten verfügbar</string>
     <string name="follow_button">Folgen-Button</string>
-    <string name="follow_account">Mit Twitch Account folgen</string>
+    <string name="follow_account">Mit Kick Account folgen</string>
     <string name="follow_local">Lokal folgen</string>
     <string name="hide">Verstecken</string>
     <string name="chat_ssl">Verbunden über SSL</string>

@@ -21,7 +21,7 @@ import com.github.andreyasadchy.xtra.repository.OfflineRepository
 import com.github.andreyasadchy.xtra.repository.ShownNotificationsRepository
 import com.github.andreyasadchy.xtra.util.C
 import com.github.andreyasadchy.xtra.util.HttpEngineUtils
-import com.github.andreyasadchy.xtra.util.TwitchApiHelper
+import com.github.andreyasadchy.xtra.util.KickApiHelper
 import com.github.andreyasadchy.xtra.util.getByteArrayCronetCallback
 import dagger.Lazy
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -211,7 +211,7 @@ class ChannelPagerViewModel @Inject constructor(
                         _notificationsEnabled.value = true
                         notifications.value = Pair(true, errorMessage)
                         if (notificationsEnabled) {
-                            _stream.value?.startedAt.takeUnless { it.isNullOrBlank() }?.let { TwitchApiHelper.parseIso8601DateUTC(it) }?.let {
+                            _stream.value?.startedAt.takeUnless { it.isNullOrBlank() }?.let { KickApiHelper.parseIso8601DateUTC(it) }?.let {
                                 shownNotificationsRepository.saveList(listOf(ShownNotification(channelId, it)))
                             }
                         }
@@ -221,7 +221,7 @@ class ChannelPagerViewModel @Inject constructor(
                     _notificationsEnabled.value = true
                     notifications.value = Pair(true, null)
                     if (notificationsEnabled) {
-                        _stream.value?.startedAt.takeUnless { it.isNullOrBlank() }?.let { TwitchApiHelper.parseIso8601DateUTC(it) }?.let {
+                        _stream.value?.startedAt.takeUnless { it.isNullOrBlank() }?.let { KickApiHelper.parseIso8601DateUTC(it) }?.let {
                             shownNotificationsRepository.saveList(listOf(ShownNotification(channelId, it)))
                         }
                     }
@@ -324,7 +324,7 @@ class ChannelPagerViewModel @Inject constructor(
                             follow.value = Pair(true, null)
                             _notificationsEnabled.value = true
                             if (notificationsEnabled) {
-                                _stream.value?.startedAt.takeUnless { it.isNullOrBlank() }?.let { TwitchApiHelper.parseIso8601DateUTC(it) }?.let {
+                                _stream.value?.startedAt.takeUnless { it.isNullOrBlank() }?.let { KickApiHelper.parseIso8601DateUTC(it) }?.let {
                                     shownNotificationsRepository.saveList(listOf(ShownNotification(channelId, it)))
                                 }
                             }
@@ -336,7 +336,7 @@ class ChannelPagerViewModel @Inject constructor(
                         notificationUsersRepository.saveUser(NotificationUser(channelId))
                         _notificationsEnabled.value = true
                         if (notificationsEnabled) {
-                            _stream.value?.startedAt.takeUnless { it.isNullOrBlank() }?.let { TwitchApiHelper.parseIso8601DateUTC(it) }?.let {
+                            _stream.value?.startedAt.takeUnless { it.isNullOrBlank() }?.let { KickApiHelper.parseIso8601DateUTC(it) }?.let {
                                 shownNotificationsRepository.saveList(listOf(ShownNotification(channelId, it)))
                             }
                         }

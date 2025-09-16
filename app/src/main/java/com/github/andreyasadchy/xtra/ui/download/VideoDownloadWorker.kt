@@ -28,8 +28,8 @@ import com.github.andreyasadchy.xtra.R
 import com.github.andreyasadchy.xtra.model.chat.Badge
 import com.github.andreyasadchy.xtra.model.chat.CheerEmote
 import com.github.andreyasadchy.xtra.model.chat.Emote
-import com.github.andreyasadchy.xtra.model.chat.TwitchBadge
-import com.github.andreyasadchy.xtra.model.chat.TwitchEmote
+import com.github.andreyasadchy.xtra.model.chat.KickBadge
+import com.github.andreyasadchy.xtra.model.chat.KickEmote
 import com.github.andreyasadchy.xtra.model.chat.VideoChatMessage
 import com.github.andreyasadchy.xtra.model.gql.video.VideoMessagesResponse
 import com.github.andreyasadchy.xtra.model.ui.OfflineVideo
@@ -39,7 +39,7 @@ import com.github.andreyasadchy.xtra.repository.PlayerRepository
 import com.github.andreyasadchy.xtra.ui.main.MainActivity
 import com.github.andreyasadchy.xtra.util.C
 import com.github.andreyasadchy.xtra.util.HttpEngineUtils
-import com.github.andreyasadchy.xtra.util.TwitchApiHelper
+import com.github.andreyasadchy.xtra.util.KickApiHelper
 import com.github.andreyasadchy.xtra.util.getByteArrayCronetCallback
 import com.github.andreyasadchy.xtra.util.m3u8.PlaylistUtils
 import com.github.andreyasadchy.xtra.util.m3u8.Segment
@@ -841,7 +841,7 @@ class VideoDownloadWorker @AssistedInject constructor(
                 val resumed = !offlineVideo.chatUrl.isNullOrBlank()
                 val savedOffset = offlineVideo.chatOffsetSeconds
                 val latestSavedMessages = mutableListOf<VideoChatMessage>()
-                val savedTwitchEmotes = mutableListOf<String>()
+                val savedKickEmotes = mutableListOf<String>()
                 val savedBadges = mutableListOf<Pair<String, String>>()
                 val savedEmotes = mutableListOf<String>()
                 val fileUri = if (resumed) {
@@ -905,7 +905,7 @@ class VideoDownloadWorker @AssistedInject constructor(
                                                                     }
                                                                 }
                                                                 if (!id.isNullOrBlank()) {
-                                                                    savedTwitchEmotes.add(id)
+                                                                    savedKickEmotes.add(id)
                                                                 }
                                                                 reader.endObject()
                                                             }
@@ -1002,13 +1002,13 @@ class VideoDownloadWorker @AssistedInject constructor(
                 }
                 val downloadEmotes = offlineVideo.downloadChatEmotes
                 val networkLibrary = context.prefs().getString(C.NETWORK_LIBRARY, "OkHttp")
-                val gqlHeaders = TwitchApiHelper.getGQLHeaders(context, true)
-                val helixHeaders = TwitchApiHelper.getGQLHeaders(context)
+                val gqlHeaders = KickApiHelper.getGQLHeaders(context, true)
+                val helixHeaders = KickApiHelper.getGQLHeaders(context)
                 val emoteQuality = context.prefs().getString(C.CHAT_IMAGE_QUALITY, "4") ?: "4"
                 val useWebp = context.prefs().getBoolean(C.CHAT_USE_WEBP, true)
                 val channelId = offlineVideo.channelId
                 val channelLogin = offlineVideo.channelLogin
-                val badgeList = mutableListOf<TwitchBadge>().apply {
+                val badgeList = mutableListOf<KickBadge>().apply {
                     if (downloadEmotes) {
                         val channelBadges = try { playerRepository.loadChannelBadges(networkLibrary, helixHeaders, gqlHeaders, channelId, channelLogin, emoteQuality, false) } catch (e: Exception) { emptyList() }
                         addAll(channelBadges)
@@ -1132,14 +1132,14 @@ class VideoDownloadWorker @AssistedInject constructor(
                                         }
                                     }
                                 }
-                                val twitchEmotes = mutableListOf<TwitchEmote>()
-                                val twitchBadges = mutableListOf<TwitchBadge>()
+                                val twitchEmotes = mutableListOf<KickEmote>()
+                                val twitchBadges = mutableListOf<KickBadge>()
                                 val cheerEmotes = mutableListOf<CheerEmote>()
                                 val emotes = mutableListOf<Emote>()
                                 emoteIds.forEach {
-                                    if (!savedTwitchEmotes.contains(it)) {
-                                        savedTwitchEmotes.add(it)
-                                        twitchEmotes.add(TwitchEmote(id = it))
+                                    if (!savedKickEmotes.contains(it)) {
+                                        savedKickEmotes.add(it)
+                                        twitchEmotes.add(KickEmote(id = it))
                                     }
                                 }
                                 badges.forEach {
@@ -1451,7 +1451,7 @@ class VideoDownloadWorker @AssistedInject constructor(
         var userLogin: String? = null
         var userName: String? = null
         var color: String? = null
-        val emotesList = mutableListOf<TwitchEmote>()
+        val emotesList = mutableListOf<KickEmote>()
         val badgesList = mutableListOf<Badge>()
         while (reader.hasNext()) {
             when (reader.nextName()) {
@@ -1506,7 +1506,7 @@ class VideoDownloadWorker @AssistedInject constructor(
                                         }
                                     }
                                     if (fragmentText != null && !emoteId.isNullOrBlank()) {
-                                        emotesList.add(TwitchEmote(
+                                        emotesList.add(KickEmote(
                                             id = emoteId,
                                             begin = message.codePointCount(0, message.length),
                                             end = message.codePointCount(0, message.length) + fragmentText.lastIndex

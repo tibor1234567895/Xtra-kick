@@ -27,8 +27,8 @@ import androidx.work.WorkerParameters
 import com.github.andreyasadchy.xtra.R
 import com.github.andreyasadchy.xtra.model.chat.CheerEmote
 import com.github.andreyasadchy.xtra.model.chat.Emote
-import com.github.andreyasadchy.xtra.model.chat.TwitchBadge
-import com.github.andreyasadchy.xtra.model.chat.TwitchEmote
+import com.github.andreyasadchy.xtra.model.chat.KickBadge
+import com.github.andreyasadchy.xtra.model.chat.KickEmote
 import com.github.andreyasadchy.xtra.model.ui.OfflineVideo
 import com.github.andreyasadchy.xtra.model.ui.Stream
 import com.github.andreyasadchy.xtra.repository.GraphQLRepository
@@ -38,7 +38,7 @@ import com.github.andreyasadchy.xtra.repository.PlayerRepository
 import com.github.andreyasadchy.xtra.ui.main.MainActivity
 import com.github.andreyasadchy.xtra.util.C
 import com.github.andreyasadchy.xtra.util.HttpEngineUtils
-import com.github.andreyasadchy.xtra.util.TwitchApiHelper
+import com.github.andreyasadchy.xtra.util.KickApiHelper
 import com.github.andreyasadchy.xtra.util.chat.ChatReadWebSocket
 import com.github.andreyasadchy.xtra.util.chat.ChatUtils
 import com.github.andreyasadchy.xtra.util.getByteArrayCronetCallback
@@ -134,7 +134,7 @@ class StreamDownloadWorker @AssistedInject constructor(
         val proxyPort = context.prefs().getString(C.PROXY_PORT, null)?.toIntOrNull()
         val proxyMultivariantPlaylist = context.prefs().getBoolean(C.PROXY_MULTIVARIANT_PLAYLIST, false)
         val networkLibrary = context.prefs().getString(C.NETWORK_LIBRARY, "OkHttp")
-        val gqlHeaders = TwitchApiHelper.getGQLHeaders(context, context.prefs().getBoolean(C.TOKEN_INCLUDE_TOKEN_STREAM, true))
+        val gqlHeaders = KickApiHelper.getGQLHeaders(context, context.prefs().getBoolean(C.TOKEN_INCLUDE_TOKEN_STREAM, true))
         val randomDeviceId = context.prefs().getBoolean(C.TOKEN_RANDOM_DEVICEID, true)
         val xDeviceId = context.prefs().getString(C.TOKEN_XDEVICEID, "twitch-web-wall-mason")
         val playerType = context.prefs().getString(C.TOKEN_PLAYERTYPE, "site")
@@ -543,7 +543,7 @@ class StreamDownloadWorker @AssistedInject constructor(
                             val stream = try {
                                 graphQLRepository.loadQueryUsersStream(
                                     networkLibrary = networkLibrary,
-                                    headers = TwitchApiHelper.getGQLHeaders(context),
+                                    headers = KickApiHelper.getGQLHeaders(context),
                                     ids = channelId?.let { listOf(it) },
                                     logins = if (channelId.isNullOrBlank()) listOf(channelLogin) else null,
                                 ).data!!.users?.firstOrNull()?.let {
@@ -565,7 +565,7 @@ class StreamDownloadWorker @AssistedInject constructor(
                                     )
                                 }
                             } catch (e: Exception) {
-                                val helixHeaders = TwitchApiHelper.getHelixHeaders(context)
+                                val helixHeaders = KickApiHelper.getHelixHeaders(context)
                                 if (helixHeaders[C.HEADER_TOKEN].isNullOrBlank()) throw Exception()
                                 try {
                                     helixRepository.getStreams(
@@ -593,7 +593,7 @@ class StreamDownloadWorker @AssistedInject constructor(
                                     try {
                                         val response = graphQLRepository.loadViewerCount(
                                             networkLibrary,
-                                            TwitchApiHelper.getGQLHeaders(context),
+                                            KickApiHelper.getGQLHeaders(context),
                                             channelLogin
                                         )
                                         response.data!!.user.stream?.let {
@@ -670,7 +670,7 @@ class StreamDownloadWorker @AssistedInject constructor(
                                     gameId = stream.gameId
                                     gameSlug = stream.gameSlug
                                     gameName = stream.gameName
-                                    uploadDate = stream.startedAt?.let { TwitchApiHelper.parseIso8601DateUTC(it) }
+                                    uploadDate = stream.startedAt?.let { KickApiHelper.parseIso8601DateUTC(it) }
                                 })
                                 attempt += 10
                             }
@@ -933,7 +933,7 @@ class StreamDownloadWorker @AssistedInject constructor(
         val isShared = path.toUri().scheme == ContentResolver.SCHEME_CONTENT
         val fileName = "${channelLogin}${offlineVideo.quality ?: ""}${downloadDate}_chat.json"
         val resumed = !offlineVideo.chatUrl.isNullOrBlank()
-        val savedTwitchEmotes = mutableListOf<String>()
+        val savedKickEmotes = mutableListOf<String>()
         val savedBadges = mutableListOf<Pair<String, String>>()
         val savedEmotes = mutableListOf<String>()
         val fileUri = if (resumed) {
@@ -986,7 +986,7 @@ class StreamDownloadWorker @AssistedInject constructor(
                                                             }
                                                         }
                                                         if (!id.isNullOrBlank()) {
-                                                            savedTwitchEmotes.add(id)
+                                                            savedKickEmotes.add(id)
                                                         }
                                                         reader.endObject()
                                                     }
@@ -1082,12 +1082,12 @@ class StreamDownloadWorker @AssistedInject constructor(
         }
         val downloadEmotes = offlineVideo.downloadChatEmotes
         val networkLibrary = context.prefs().getString(C.NETWORK_LIBRARY, "OkHttp")
-        val gqlHeaders = TwitchApiHelper.getGQLHeaders(context, true)
-        val helixHeaders = TwitchApiHelper.getHelixHeaders(context)
+        val gqlHeaders = KickApiHelper.getGQLHeaders(context, true)
+        val helixHeaders = KickApiHelper.getHelixHeaders(context)
         val emoteQuality = context.prefs().getString(C.CHAT_IMAGE_QUALITY, "4") ?: "4"
         val useWebp = context.prefs().getBoolean(C.CHAT_USE_WEBP, true)
         val channelId = offlineVideo.channelId
-        val badgeList = mutableListOf<TwitchBadge>().apply {
+        val badgeList = mutableListOf<KickBadge>().apply {
             if (downloadEmotes) {
                 val channelBadges = try { playerRepository.loadChannelBadges(networkLibrary, helixHeaders, gqlHeaders, channelId, channelLogin, emoteQuality, false) } catch (e: Exception) { emptyList() }
                 addAll(channelBadges)
@@ -1196,13 +1196,13 @@ class StreamDownloadWorker @AssistedInject constructor(
                                     }
                                     if (userNotice != null) {
                                         val chatMessage = ChatUtils.parseChatMessage(message, userNotice)
-                                        val twitchEmotes = mutableListOf<TwitchEmote>()
-                                        val twitchBadges = mutableListOf<TwitchBadge>()
+                                        val twitchEmotes = mutableListOf<KickEmote>()
+                                        val twitchBadges = mutableListOf<KickBadge>()
                                         val cheerEmotes = mutableListOf<CheerEmote>()
                                         val emotes = mutableListOf<Emote>()
                                         chatMessage.emotes?.forEach {
-                                            if (it.id != null && !savedTwitchEmotes.contains(it.id)) {
-                                                savedTwitchEmotes.add(it.id)
+                                            if (it.id != null && !savedKickEmotes.contains(it.id)) {
+                                                savedKickEmotes.add(it.id)
                                                 twitchEmotes.add(it)
                                             }
                                         }

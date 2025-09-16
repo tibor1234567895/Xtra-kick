@@ -18,7 +18,7 @@ import com.github.andreyasadchy.xtra.databinding.FragmentFollowedChannelsListIte
 import com.github.andreyasadchy.xtra.model.ui.User
 import com.github.andreyasadchy.xtra.ui.channel.ChannelPagerFragmentDirections
 import com.github.andreyasadchy.xtra.util.C
-import com.github.andreyasadchy.xtra.util.TwitchApiHelper
+import com.github.andreyasadchy.xtra.util.KickApiHelper
 import com.github.andreyasadchy.xtra.util.gone
 import com.github.andreyasadchy.xtra.util.prefs
 import com.github.andreyasadchy.xtra.util.visible
@@ -90,7 +90,7 @@ class FollowedChannelsAdapter(
                         username.gone()
                     }
                     if (item.lastBroadcast != null) {
-                        val text = item.lastBroadcast?.let { TwitchApiHelper.formatTimeString(context, it) }
+                        val text = item.lastBroadcast?.let { KickApiHelper.formatTimeString(context, it) }
                         if (text != null) {
                             userStream.visible()
                             userStream.text = context.getString(R.string.last_broadcast_date, text)
@@ -101,7 +101,7 @@ class FollowedChannelsAdapter(
                         userStream.gone()
                     }
                     if (item.followedAt != null) {
-                        val text = TwitchApiHelper.formatTimeString(context, item.followedAt!!)
+                        val text = KickApiHelper.formatTimeString(context, item.followedAt!!)
                         if (text != null) {
                             userFollowed.visible()
                             userFollowed.text = context.getString(R.string.followed_at, text)

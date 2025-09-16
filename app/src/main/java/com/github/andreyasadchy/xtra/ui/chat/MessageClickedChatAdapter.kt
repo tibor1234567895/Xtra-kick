@@ -25,8 +25,8 @@ import com.github.andreyasadchy.xtra.model.chat.CheerEmote
 import com.github.andreyasadchy.xtra.model.chat.Emote
 import com.github.andreyasadchy.xtra.model.chat.NamePaint
 import com.github.andreyasadchy.xtra.model.chat.StvBadge
-import com.github.andreyasadchy.xtra.model.chat.TwitchBadge
-import com.github.andreyasadchy.xtra.model.chat.TwitchEmote
+import com.github.andreyasadchy.xtra.model.chat.KickBadge
+import com.github.andreyasadchy.xtra.model.chat.KickEmote
 import com.github.andreyasadchy.xtra.ui.view.NamePaintImageSpan
 import com.github.andreyasadchy.xtra.util.chat.ChatAdapterUtils
 import java.util.Random
@@ -75,15 +75,15 @@ class MessageClickedChatAdapter(
     private val userColors: HashMap<String, Int>,
     private val savedColors: HashMap<String, Int>,
     var loggedInUser: String?,
-    var localTwitchEmotes: List<TwitchEmote>?,
+    var localKickEmotes: List<KickEmote>?,
     var globalStvEmotes: List<Emote>?,
     var channelStvEmotes: List<Emote>?,
     var globalBttvEmotes: List<Emote>?,
     var channelBttvEmotes: List<Emote>?,
     var globalFfzEmotes: List<Emote>?,
     var channelFfzEmotes: List<Emote>?,
-    var globalBadges: List<TwitchBadge>?,
-    var channelBadges: List<TwitchBadge>?,
+    var globalBadges: List<KickBadge>?,
+    var channelBadges: List<KickBadge>?,
     var cheerEmotes: List<CheerEmote>?,
     var selectedMessage: ChatMessage?,
 ) : RecyclerView.Adapter<MessageClickedChatAdapter.ViewHolder>() {
@@ -107,7 +107,7 @@ class MessageClickedChatAdapter(
             field = value
         }
     private val random = Random()
-    private val savedLocalTwitchEmotes = mutableMapOf<String, ByteArray>()
+    private val savedLocalKickEmotes = mutableMapOf<String, ByteArray>()
     private val savedLocalBadges = mutableMapOf<String, ByteArray>()
     private val savedLocalCheerEmotes = mutableMapOf<String, ByteArray>()
     private val savedLocalEmotes = mutableMapOf<String, ByteArray>()
@@ -126,8 +126,8 @@ class MessageClickedChatAdapter(
             useRandomColors, random, useReadableColors, isLightTheme, nameDisplay, useBoldNames, showNamePaints, namePaints, paintUsers,
             showStvBadges, stvBadges, stvBadgeUsers, showPersonalEmotes, personalEmoteSets, personalEmoteSetUsers, showSystemMessageEmotes,
             enableOverlayEmotes, loggedInUser, chatUrl, getEmoteBytes, userColors, savedColors, translateAllMessages, translateMessage,
-            showLanguageDownloadDialog, false, localTwitchEmotes, globalStvEmotes, channelStvEmotes, globalBttvEmotes, channelBttvEmotes, globalFfzEmotes,
-            channelFfzEmotes, globalBadges, channelBadges, cheerEmotes, savedLocalTwitchEmotes, savedLocalBadges, savedLocalCheerEmotes, savedLocalEmotes
+            showLanguageDownloadDialog, false, localKickEmotes, globalStvEmotes, channelStvEmotes, globalBttvEmotes, channelBttvEmotes, globalFfzEmotes,
+            channelFfzEmotes, globalBadges, channelBadges, cheerEmotes, savedLocalKickEmotes, savedLocalBadges, savedLocalCheerEmotes, savedLocalEmotes
         )
         if (chatMessage == selectedMessage) {
             holder.textView.setBackgroundResource(R.color.chatMessageSelected)

@@ -168,7 +168,7 @@
     <string name="chat_first">第一次聊天</string>
     <string name="chat_reward">忠誠點數兌換</string>
     <string name="always">總是</string>
-    <string name="twitch">Twitch</string>
+    <string name="kick">Kick</string>
     <string name="local">本地</string>
     <string name="days">日</string>
     <string name="seconds">秒</string>
@@ -210,12 +210,12 @@
     <string name="irc_notice_already_subs_off">此房間不處於訂閱者限定模式。</string>
     <string name="irc_notice_already_subs_on">此房間已經處於訂閱者限定模式。</string>
     <string name="irc_notice_autohost_receive">%1$s 現在自動為您轉播高達 %2$s 觀眾。</string>
-    <string name="irc_notice_bad_ban_admin">您不能禁止管理員 %s。如果管理員有辱罵行為，請寄 email 至 support@twitch.tv 。</string>
+    <string name="irc_notice_bad_ban_admin">您不能禁止管理員 %s。如果管理員有辱罵行為，請寄 email 至 support.com 。</string>
     <string name="irc_notice_bad_ban_anon">您不能禁止匿名的使用者。</string>
     <string name="irc_notice_bad_ban_broadcaster">您不能禁止該實況主。</string>
     <string name="irc_notice_bad_ban_mod">您不能禁止 Mod %s 除非您是該頻道的所有者。</string>
     <string name="irc_notice_bad_ban_self">您不能禁止您自己。</string>
-    <string name="irc_notice_bad_ban_staff">您不能禁止工作人員 %s。如果工作人員有辱罵行為，請寄 email 至 support@twitch.tv 。</string>
+    <string name="irc_notice_bad_ban_staff">您不能禁止工作人員 %s。如果工作人員有辱罵行為，請寄 email 至 support.com 。</string>
     <string name="irc_notice_bad_commercial_error">無法啟動廣告。</string>
     <string name="irc_notice_bad_delete_message_broadcaster">您不能刪除實況主的訊息。</string>
     <string name="irc_notice_bad_delete_message_mod">您不能刪除來自另一位 Mod %s 的訊息。</string>
@@ -227,13 +227,13 @@
     <string name="irc_notice_bad_mod_banned">%s 在此頻道被禁止。在授予 Mod 狀態之前，您必須解除禁止該使用者。</string>
     <string name="irc_notice_bad_mod_mod">%s 已經是此頻道的 Mod。</string>
     <string name="irc_notice_bad_slow_duration">您不能設定發言時間延遲多於 %s 秒。</string>
-    <string name="irc_notice_bad_timeout_admin">您不能暫時禁言管理員 %s。如果管理員有辱罵行為，請寄 email 至 support@twitch.tv 。</string>
+    <string name="irc_notice_bad_timeout_admin">您不能暫時禁言管理員 %s。如果管理員有辱罵行為，請寄 email 至 support.com 。</string>
     <string name="irc_notice_bad_timeout_anon">您不能暫時禁言匿名的使用者。</string>
     <string name="irc_notice_bad_timeout_broadcaster">您不能暫時禁言該實況主。</string>
     <string name="irc_notice_bad_timeout_duration">您不能暫時禁言使用者時間多於 %s。</string>
     <string name="irc_notice_bad_timeout_mod">您不能暫時禁言 Mod %s 除非您是此頻道的所有者。</string>
     <string name="irc_notice_bad_timeout_self">您不能暫時禁言您自己。</string>
-    <string name="irc_notice_bad_timeout_staff">您不能暫時禁言工作人員 %s。如果工作人員有辱罵行為，請寄 email 至 support@twitch.tv 。</string>
+    <string name="irc_notice_bad_timeout_staff">您不能暫時禁言工作人員 %s。如果工作人員有辱罵行為，請寄 email 至 support.com 。</string>
     <string name="irc_notice_bad_unban_no_ban">%s 在此頻道沒有被禁止。</string>
     <string name="irc_notice_bad_unhost_error">退出轉播模式發生了問題。請在 1 分鐘後再次嘗試。</string>
     <string name="irc_notice_bad_unmod_mod">%s 不是此頻道的 Mod。</string>
@@ -243,11 +243,11 @@
     <string name="irc_notice_bad_vip_achievement_incomplete">無法加入 VIP。在您的儀表板造訪成就頁面以知悉如何解鎖此功能。</string>
     <string name="irc_notice_bad_unvip_grantee_not_vip">%s 不是此頻道的 VIP。</string>
     <string name="irc_notice_ban_success">%s 在此頻道被禁止。</string>
-    <string name="irc_notice_cmds_available">您可以在此房間中使用的指令（使用 /help 取得詳細資訊）：%s 更多說明： https://help.twitch.tv/s/article/chat-commands 。</string>
+    <string name="irc_notice_cmds_available">您可以在此房間中使用的指令（使用 /help 取得詳細資訊）：%s 更多說明： https://help.kick.com 。</string>
     <string name="irc_notice_color_changed">您的顏色已被變更。</string>
     <string name="irc_notice_commercial_success">開始 %s 第二個廣告插播。請記住您的串流仍在進行中，而且不是每個人都會收到廣告。</string>
     <string name="irc_notice_delete_message_success">來自 %s 的訊息現在已被刪除。</string>
-    <string name="irc_notice_delete_staff_message_success">您刪除了來自工作人員 %s 的一則。如果工作人員有辱罵行為，請寄 email 至 support@twitch.tv 。</string>
+    <string name="irc_notice_delete_staff_message_success">您刪除了來自工作人員 %s 的一則。如果工作人員有辱罵行為，請寄 email 至 support.com 。</string>
     <string name="irc_notice_emote_only_off">此房間不再處於表情符號限定模式。</string>
     <string name="irc_notice_emote_only_on">此房間現在處於表情符號限定模式。</string>
     <string name="irc_notice_followers_off">此房間不再處於追隨者限定模式。</string>
@@ -275,10 +275,10 @@
     <string name="irc_notice_msg_rejected">嘿！您的訊息正在被 Mod 檢查，而且尚未發送。</string>
     <string name="irc_notice_msg_rejected_mandatory">您的訊息未被發布，由於與頻道的審核設定衝突。</string>
     <string name="irc_notice_msg_slowmode">此房間目前處於發言時間限制模式，而且您發送訊息的速度太快。您在 %s 秒後就可以發言了。</string>
-    <string name="irc_notice_msg_subsonly">此房間目前處於訂閱者限定模式。若要發言，請在 https://www.twitch.tv/products/%s/ticket?ref=subscriber_only_mode_chat 購買頻道訂閱。</string>
+    <string name="irc_notice_msg_subsonly">此房間目前處於訂閱者限定模式。若要發言，請在 https://kick.com</string>
     <string name="irc_notice_msg_suspended">您沒有權限執行這項操作。</string>
     <string name="irc_notice_msg_timedout">您的暫時禁言還有 %s 秒。</string>
-    <string name="irc_notice_msg_verified_email">此房間需要認證帳號才可聊天。請在 https://www.twitch.tv/settings/security 認證您的帳戶。</string>
+    <string name="irc_notice_msg_verified_email">此房間需要認證帳號才可聊天。請在 https://kick.com</string>
     <string name="irc_notice_no_help">沒有可用的說明。</string>
     <string name="irc_notice_no_mods">此頻道沒有 Mod。</string>
     <string name="irc_notice_no_vips">此頻道沒有任何 VIP。</string>
@@ -317,7 +317,7 @@
     <string name="irc_notice_usage_color">用法： \"/color &lt;color&gt;\" - 變更您的使用者名稱顏色。顏色必須是 HEX 色碼 (#000000) 或者以下之一：%s。</string>
     <string name="irc_notice_usage_commercial">用法： \"/commercial [length]\" - 觸發廣告。長度（可選的）必須是正數秒。</string>
     <string name="irc_notice_usage_disconnect">用法： \"/disconnect\" - 重新連接聊天室。</string>
-    <string name="irc_notice_usage_delete">用法： \"/delete &lt;msg id&gt;\" - 刪除指定的訊息。對於更多資訊，請見 https://dev.twitch.tv/docs/irc/commands/#clearmsg-twitch-commands 。</string>
+    <string name="irc_notice_usage_delete">用法： \"/delete &lt;msg id&gt;\" - 刪除指定的訊息。對於更多資訊，請見 https://docs.kick.com</string>
     <string name="irc_notice_usage_emote_only_off">用法： \"/emoteonlyoff\" - 禁用表情符號限定模式。</string>
     <string name="irc_notice_usage_emote_only_on">用法： \"/emoteonly\" - 啟用表情符號限定模式（在聊天室中只能使用表情符號）。使用 \"/emoteonlyoff\" 以禁用。</string>
     <string name="irc_notice_usage_followers_off">用法： \"/followersoff\" - 禁用追隨者限定模式。</string>
@@ -437,7 +437,7 @@
     <string name="restart_player">重新啟動播放器</string>
     <string name="sub_only_summary">僅適用於訂閱的內容</string>
     <string name="follow_button">追隨按鈕</string>
-    <string name="follow_account">使用 twitch 帳號追隨</string>
+    <string name="follow_account">使用 Kick 帳號追隨</string>
     <string name="follow_local">本地追隨</string>
     <string name="hide">隱藏</string>
     <string name="chat_ssl">使用 SSL 連接</string>

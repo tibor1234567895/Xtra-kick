@@ -67,7 +67,7 @@ import com.github.andreyasadchy.xtra.ui.common.IntegrityDialog
 import com.github.andreyasadchy.xtra.util.AdminReceiver
 import com.github.andreyasadchy.xtra.util.C
 import com.github.andreyasadchy.xtra.util.DisplayUtils
-import com.github.andreyasadchy.xtra.util.TwitchApiHelper
+import com.github.andreyasadchy.xtra.util.KickApiHelper
 import com.github.andreyasadchy.xtra.util.applyTheme
 import com.github.andreyasadchy.xtra.util.convertDpToPixels
 import com.github.andreyasadchy.xtra.util.getAlertDialogBuilder
@@ -232,8 +232,8 @@ class SettingsActivity : AppCompatActivity() {
                     viewModel.restoreSettings(
                         list = list,
                         networkLibrary = requireContext().prefs().getString(C.NETWORK_LIBRARY, "OkHttp"),
-                        gqlHeaders = TwitchApiHelper.getGQLHeaders(requireContext(), true),
-                        helixHeaders = TwitchApiHelper.getHelixHeaders(requireContext())
+                        gqlHeaders = KickApiHelper.getGQLHeaders(requireContext(), true),
+                        helixHeaders = KickApiHelper.getHelixHeaders(requireContext())
                     )
                 }
             }
@@ -298,8 +298,8 @@ class SettingsActivity : AppCompatActivity() {
                 viewModel.toggleNotifications(
                     enabled = newValue as Boolean,
                     networkLibrary = requireContext().prefs().getString(C.NETWORK_LIBRARY, "OkHttp"),
-                    gqlHeaders = TwitchApiHelper.getGQLHeaders(requireContext(), true),
-                    helixHeaders = TwitchApiHelper.getHelixHeaders(requireContext())
+                    gqlHeaders = KickApiHelper.getGQLHeaders(requireContext(), true),
+                    helixHeaders = KickApiHelper.getHelixHeaders(requireContext())
                 )
                 true
             }
@@ -1197,21 +1197,21 @@ class SettingsActivity : AppCompatActivity() {
                 orientation = LinearLayout.VERTICAL
             }
             mapOf(
-                getString(R.string.games) to Pair(C.API_PREFS_GAMES, TwitchApiHelper.gamesApiDefaults),
-                getString(R.string.streams) to Pair(C.API_PREFS_STREAMS, TwitchApiHelper.streamsApiDefaults),
-                getString(R.string.game_streams) to Pair(C.API_PREFS_GAME_STREAMS, TwitchApiHelper.gameStreamsApiDefaults),
-                getString(R.string.game_videos) to Pair(C.API_PREFS_GAME_VIDEOS, TwitchApiHelper.gameVideosApiDefaults),
-                getString(R.string.game_clips) to Pair(C.API_PREFS_GAME_CLIPS, TwitchApiHelper.gameClipsApiDefaults),
-                getString(R.string.channel_videos) to Pair(C.API_PREFS_CHANNEL_VIDEOS, TwitchApiHelper.channelVideosApiDefaults),
-                getString(R.string.channel_clips) to Pair(C.API_PREFS_CHANNEL_CLIPS, TwitchApiHelper.channelClipsApiDefaults),
-                getString(R.string.search_videos) to Pair(C.API_PREFS_SEARCH_VIDEOS, TwitchApiHelper.searchVideosApiDefaults),
-                getString(R.string.search_streams) to Pair(C.API_PREFS_SEARCH_STREAMS, TwitchApiHelper.searchStreamsApiDefaults),
-                getString(R.string.search_channels) to Pair(C.API_PREFS_SEARCH_CHANNEL, TwitchApiHelper.searchChannelsApiDefaults),
-                getString(R.string.search_games) to Pair(C.API_PREFS_SEARCH_GAMES, TwitchApiHelper.searchGamesApiDefaults),
-                getString(R.string.followed_streams) to Pair(C.API_PREFS_FOLLOWED_STREAMS, TwitchApiHelper.followedStreamsApiDefaults),
-                getString(R.string.followed_videos) to Pair(C.API_PREFS_FOLLOWED_VIDEOS, TwitchApiHelper.followedVideosApiDefaults),
-                getString(R.string.followed_channels) to Pair(C.API_PREFS_FOLLOWED_CHANNELS, TwitchApiHelper.followedChannelsApiDefaults),
-                getString(R.string.followed_games) to Pair(C.API_PREFS_FOLLOWED_GAMES, TwitchApiHelper.followedGamesApiDefaults),
+                getString(R.string.games) to Pair(C.API_PREFS_GAMES, KickApiHelper.gamesApiDefaults),
+                getString(R.string.streams) to Pair(C.API_PREFS_STREAMS, KickApiHelper.streamsApiDefaults),
+                getString(R.string.game_streams) to Pair(C.API_PREFS_GAME_STREAMS, KickApiHelper.gameStreamsApiDefaults),
+                getString(R.string.game_videos) to Pair(C.API_PREFS_GAME_VIDEOS, KickApiHelper.gameVideosApiDefaults),
+                getString(R.string.game_clips) to Pair(C.API_PREFS_GAME_CLIPS, KickApiHelper.gameClipsApiDefaults),
+                getString(R.string.channel_videos) to Pair(C.API_PREFS_CHANNEL_VIDEOS, KickApiHelper.channelVideosApiDefaults),
+                getString(R.string.channel_clips) to Pair(C.API_PREFS_CHANNEL_CLIPS, KickApiHelper.channelClipsApiDefaults),
+                getString(R.string.search_videos) to Pair(C.API_PREFS_SEARCH_VIDEOS, KickApiHelper.searchVideosApiDefaults),
+                getString(R.string.search_streams) to Pair(C.API_PREFS_SEARCH_STREAMS, KickApiHelper.searchStreamsApiDefaults),
+                getString(R.string.search_channels) to Pair(C.API_PREFS_SEARCH_CHANNEL, KickApiHelper.searchChannelsApiDefaults),
+                getString(R.string.search_games) to Pair(C.API_PREFS_SEARCH_GAMES, KickApiHelper.searchGamesApiDefaults),
+                getString(R.string.followed_streams) to Pair(C.API_PREFS_FOLLOWED_STREAMS, KickApiHelper.followedStreamsApiDefaults),
+                getString(R.string.followed_videos) to Pair(C.API_PREFS_FOLLOWED_VIDEOS, KickApiHelper.followedVideosApiDefaults),
+                getString(R.string.followed_channels) to Pair(C.API_PREFS_FOLLOWED_CHANNELS, KickApiHelper.followedChannelsApiDefaults),
+                getString(R.string.followed_games) to Pair(C.API_PREFS_FOLLOWED_GAMES, KickApiHelper.followedGamesApiDefaults),
             ).forEach { entry ->
                 newId++
                 view.addView(TextView(requireContext()).apply {

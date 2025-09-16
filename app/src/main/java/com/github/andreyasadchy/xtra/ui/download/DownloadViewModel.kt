@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.andreyasadchy.xtra.R
 import com.github.andreyasadchy.xtra.repository.PlayerRepository
-import com.github.andreyasadchy.xtra.util.TwitchApiHelper
+import com.github.andreyasadchy.xtra.util.KickApiHelper
 import com.github.andreyasadchy.xtra.util.toast
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -96,7 +96,7 @@ class DownloadViewModel @Inject constructor(
                 viewModelScope.launch {
                     try {
                         if (skipAccessToken <= 1 && !animatedPreviewUrl.isNullOrBlank()) {
-                            val urls = TwitchApiHelper.getVideoUrlMapFromPreview(animatedPreviewUrl, videoType, backupQualities)
+                            val urls = KickApiHelper.getVideoUrlMapFromPreview(animatedPreviewUrl, videoType, backupQualities)
                             val map = mutableMapOf<String, Pair<String, String>>()
                             urls.entries.forEach {
                                 when (it.key) {
@@ -223,7 +223,7 @@ class DownloadViewModel @Inject constructor(
                                     .toMap()
                             } else {
                                 if (skipAccessToken == 2 && !animatedPreviewUrl.isNullOrBlank()) {
-                                    val urls = TwitchApiHelper.getVideoUrlMapFromPreview(animatedPreviewUrl, videoType, backupQualities)
+                                    val urls = KickApiHelper.getVideoUrlMapFromPreview(animatedPreviewUrl, videoType, backupQualities)
                                     val map = mutableMapOf<String, Pair<String, String>>()
                                     urls.entries.forEach {
                                         when (it.key) {
@@ -271,11 +271,11 @@ class DownloadViewModel @Inject constructor(
                 viewModelScope.launch {
                     try {
                         val urls = if (skipAccessToken <= 1 && !thumbnailUrl.isNullOrBlank()) {
-                            TwitchApiHelper.getClipUrlMapFromPreview(thumbnailUrl)
+                            KickApiHelper.getClipUrlMapFromPreview(thumbnailUrl)
                         } else {
                             playerRepository.loadClipUrls(networkLibrary, gqlHeaders, clipId, enableIntegrity) ?:
                             if (skipAccessToken == 2 && !thumbnailUrl.isNullOrBlank()) {
-                                TwitchApiHelper.getClipUrlMapFromPreview(thumbnailUrl)
+                                KickApiHelper.getClipUrlMapFromPreview(thumbnailUrl)
                             } else null
                         }
                         val map = mutableMapOf<String, Pair<String, String>>()

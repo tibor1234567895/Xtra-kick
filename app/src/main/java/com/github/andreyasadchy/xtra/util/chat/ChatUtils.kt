@@ -8,8 +8,8 @@ import com.github.andreyasadchy.xtra.model.chat.ChannelPointReward
 import com.github.andreyasadchy.xtra.model.chat.ChatMessage
 import com.github.andreyasadchy.xtra.model.chat.Reply
 import com.github.andreyasadchy.xtra.model.chat.RoomState
-import com.github.andreyasadchy.xtra.model.chat.TwitchEmote
-import com.github.andreyasadchy.xtra.util.TwitchApiHelper
+import com.github.andreyasadchy.xtra.model.chat.KickEmote
+import com.github.andreyasadchy.xtra.util.KickApiHelper
 import kotlin.collections.set
 
 object ChatUtils {
@@ -48,14 +48,14 @@ object ChatUtils {
                     isAction = true
                 }
             }
-            val emotesList = mutableListOf<TwitchEmote>()
+            val emotesList = mutableListOf<KickEmote>()
             val emotes = prefixes["emotes"]
             if (emotes != null) {
                 val entries = splitAndMakeMap(emotes, "/", ":").entries
                 entries.forEach { emote ->
                     emote.value?.split(",")?.forEach { indexes ->
                         val index = indexes.split("-")
-                        emotesList.add(TwitchEmote(id = emote.key, begin = index[0].toInt(), end = index[1].toInt()))
+                        emotesList.add(KickEmote(id = emote.key, begin = index[0].toInt(), end = index[1].toInt()))
                     }
                 }
             }
@@ -124,7 +124,7 @@ object ChatUtils {
         val login = if (userIndex != -1) messageInfo.substring(userIndex + 1) else null
         val text = if (login != null) {
             if (duration != null) {
-                ContextCompat.getString(context, R.string.chat_timeout).format(login, TwitchApiHelper.getDurationFromSeconds(context, duration))
+                ContextCompat.getString(context, R.string.chat_timeout).format(login, KickApiHelper.getDurationFromSeconds(context, duration))
             } else {
                 ContextCompat.getString(context, R.string.chat_ban).format(login)
             }
@@ -148,7 +148,7 @@ object ChatUtils {
         val text = messageInfo.substring(messageInfo.indexOf(":", messageInfo.indexOf(":") + 1) + 1)
         return Pair(
             ChatMessage(
-                systemMsg = TwitchApiHelper.getNoticeString(context, msgId, text),
+                systemMsg = KickApiHelper.getNoticeString(context, msgId, text),
                 fullMsg = message
             ), msgId == "unraid_success"
         )

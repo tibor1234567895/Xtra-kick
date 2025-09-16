@@ -25,7 +25,7 @@ import com.github.andreyasadchy.xtra.type.VideoSort
 import com.github.andreyasadchy.xtra.ui.common.VideosSortDialog
 import com.github.andreyasadchy.xtra.util.C
 import com.github.andreyasadchy.xtra.util.HttpEngineUtils
-import com.github.andreyasadchy.xtra.util.TwitchApiHelper
+import com.github.andreyasadchy.xtra.util.KickApiHelper
 import com.github.andreyasadchy.xtra.util.getByteArrayCronetCallback
 import com.github.andreyasadchy.xtra.util.prefs
 import dagger.Lazy
@@ -93,10 +93,10 @@ class FollowedVideosViewModel @Inject constructor(
                     VideosSortDialog.SORT_VIEWS -> VideoSort.VIEWS
                     else -> VideoSort.TIME
                 },
-                gqlHeaders = TwitchApiHelper.getGQLHeaders(applicationContext, true),
+                gqlHeaders = KickApiHelper.getGQLHeaders(applicationContext, true),
                 graphQLRepository = graphQLRepository,
                 enableIntegrity = applicationContext.prefs().getBoolean(C.ENABLE_INTEGRITY, false),
-                apiPref = applicationContext.prefs().getString(C.API_PREFS_FOLLOWED_VIDEOS, null)?.split(',') ?: TwitchApiHelper.followedVideosApiDefaults,
+                apiPref = applicationContext.prefs().getString(C.API_PREFS_FOLLOWED_VIDEOS, null)?.split(',') ?: KickApiHelper.followedVideosApiDefaults,
                 networkLibrary = applicationContext.prefs().getString(C.NETWORK_LIBRARY, "OkHttp"),
             )
         }.flow

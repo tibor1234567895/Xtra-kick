@@ -1,4 +1,4 @@
-<i>Xtra für Twitch</i> ist ein <a href='https://en.wikipedia.org/wiki/Twitch_(service)' target='_blank'>Twitch</a> Client mit dem Ziel, das beste Seh- und Chaterlebnis auf mobilen Geräten zu bieten:
+<i>Xtra für Kick</i> ist ein <a href='https://kick.com' target='_blank'>Kick</a> Client mit dem Ziel, das beste Seh- und Chaterlebnis auf mobilen Geräten zu bieten:
 
 * Unterstützung für beliebte Emotes mit BetterTTV und FrankerFaceZ Plugins
 * VODs und Clips mit Chat-Wiederholung ansehen

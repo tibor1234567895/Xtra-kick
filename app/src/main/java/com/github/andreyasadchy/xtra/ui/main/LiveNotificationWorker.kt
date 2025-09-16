@@ -17,7 +17,7 @@ import com.github.andreyasadchy.xtra.repository.HelixRepository
 import com.github.andreyasadchy.xtra.repository.NotificationUsersRepository
 import com.github.andreyasadchy.xtra.repository.ShownNotificationsRepository
 import com.github.andreyasadchy.xtra.util.C
-import com.github.andreyasadchy.xtra.util.TwitchApiHelper
+import com.github.andreyasadchy.xtra.util.KickApiHelper
 import com.github.andreyasadchy.xtra.util.prefs
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -47,9 +47,9 @@ class LiveNotificationWorker @AssistedInject constructor(
         val streams = shownNotifications.getNewStreams(
             notificationUsersRepository = notificationUsersRepository,
             networkLibrary = context.prefs().getString(C.NETWORK_LIBRARY, "OkHttp"),
-            gqlHeaders = TwitchApiHelper.getGQLHeaders(context, true),
+            gqlHeaders = KickApiHelper.getGQLHeaders(context, true),
             graphQLRepository = graphQLRepository,
-            helixHeaders = TwitchApiHelper.getHelixHeaders(context),
+            helixHeaders = KickApiHelper.getHelixHeaders(context),
             helixRepository = helixRepository
         )
         if (streams.isNotEmpty()) {

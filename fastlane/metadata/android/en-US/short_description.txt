@@ -1,1 +1,1 @@
-a Twitch player and browser
+a Kick player and browser

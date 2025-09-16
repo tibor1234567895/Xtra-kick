@@ -2,7 +2,7 @@ package com.github.andreyasadchy.xtra.ui.chat
 
 import com.github.andreyasadchy.xtra.model.chat.Badge
 import com.github.andreyasadchy.xtra.model.chat.ChatMessage
-import com.github.andreyasadchy.xtra.model.chat.TwitchEmote
+import com.github.andreyasadchy.xtra.model.chat.KickEmote
 import com.github.andreyasadchy.xtra.model.chat.VideoChatMessage
 import com.github.andreyasadchy.xtra.repository.GraphQLRepository
 import kotlinx.coroutines.CoroutineScope
@@ -81,7 +81,7 @@ class ChatReplayManager @Inject constructor(
                             val emotes = message.fragments?.mapNotNull { fragment ->
                                 fragment.text?.let { text ->
                                     fragment.emote?.emoteID?.let { id ->
-                                        TwitchEmote(
+                                        KickEmote(
                                             id = id,
                                             begin = chatMessage.codePointCount(0, chatMessage.length),
                                             end = chatMessage.codePointCount(0, chatMessage.length) + text.lastIndex

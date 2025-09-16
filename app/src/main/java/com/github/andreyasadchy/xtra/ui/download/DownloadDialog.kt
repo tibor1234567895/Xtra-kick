@@ -30,7 +30,7 @@ import com.github.andreyasadchy.xtra.ui.common.IntegrityDialog
 import com.github.andreyasadchy.xtra.ui.main.MainActivity
 import com.github.andreyasadchy.xtra.util.C
 import com.github.andreyasadchy.xtra.util.DownloadUtils
-import com.github.andreyasadchy.xtra.util.TwitchApiHelper
+import com.github.andreyasadchy.xtra.util.KickApiHelper
 import com.github.andreyasadchy.xtra.util.getAlertDialogBuilder
 import com.github.andreyasadchy.xtra.util.gone
 import com.github.andreyasadchy.xtra.util.prefs
@@ -223,7 +223,7 @@ class DownloadDialog : DialogFragment(), IntegrityDialog.CallbackListener {
                 }
                 viewModel.setStream(
                     networkLibrary = requireContext().prefs().getString(C.NETWORK_LIBRARY, "OkHttp"),
-                    gqlHeaders = TwitchApiHelper.getGQLHeaders(requireContext(), requireContext().prefs().getBoolean(C.TOKEN_INCLUDE_TOKEN_STREAM, true)),
+                    gqlHeaders = KickApiHelper.getGQLHeaders(requireContext(), requireContext().prefs().getBoolean(C.TOKEN_INCLUDE_TOKEN_STREAM, true)),
                     channelLogin = requireArguments().getString(KEY_CHANNEL_LOGIN),
                     qualities = requireArguments().getStringArray(KEY_QUALITY_KEYS)?.let { keys ->
                         requireArguments().getStringArray(KEY_QUALITY_NAMES)?.let { names ->
@@ -247,7 +247,7 @@ class DownloadDialog : DialogFragment(), IntegrityDialog.CallbackListener {
                                 initVideo(
                                     it,
                                     requireArguments().getLong(KEY_VIDEO_TOTAL_DURATION).takeIf { it > 0 }
-                                        ?: requireArguments().getString(KEY_DURATION)?.let { TwitchApiHelper.getDuration(it)?.times(1000) }
+                                        ?: requireArguments().getString(KEY_DURATION)?.let { KickApiHelper.getDuration(it)?.times(1000) }
                                         ?: 0,
                                     requireArguments().getLong(KEY_VIDEO_CURRENT_POSITION)
                                 )
@@ -266,7 +266,7 @@ class DownloadDialog : DialogFragment(), IntegrityDialog.CallbackListener {
                 }
                 viewModel.setVideo(
                     networkLibrary = requireContext().prefs().getString(C.NETWORK_LIBRARY, "OkHttp"),
-                    gqlHeaders = TwitchApiHelper.getGQLHeaders(requireContext(), requireContext().prefs().getBoolean(C.TOKEN_INCLUDE_TOKEN_VIDEO, true)),
+                    gqlHeaders = KickApiHelper.getGQLHeaders(requireContext(), requireContext().prefs().getBoolean(C.TOKEN_INCLUDE_TOKEN_VIDEO, true)),
                     videoId = requireArguments().getString(KEY_VIDEO_ID),
                     animatedPreviewUrl = requireArguments().getString(KEY_VIDEO_ANIMATED_PREVIEW),
                     videoType = requireArguments().getString(KEY_VIDEO_TYPE),
@@ -295,7 +295,7 @@ class DownloadDialog : DialogFragment(), IntegrityDialog.CallbackListener {
                 }
                 viewModel.setClip(
                     networkLibrary = requireContext().prefs().getString(C.NETWORK_LIBRARY, "OkHttp"),
-                    gqlHeaders = TwitchApiHelper.getGQLHeaders(requireContext()),
+                    gqlHeaders = KickApiHelper.getGQLHeaders(requireContext()),
                     clipId = requireArguments().getString(KEY_CLIP_ID),
                     thumbnailUrl = requireArguments().getString(KEY_THUMBNAIL_URL),
                     qualities = requireArguments().getStringArray(KEY_QUALITY_KEYS)?.let { keys ->
