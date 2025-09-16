@@ -43,6 +43,7 @@ The migration scaffolding introduced in this iteration includes:
 - `KickTokenStore` – persists tokens, scopes, and expiry information in encrypted shared preferences for reuse across API and chat clients.
 - `KickApiClient` – strongly typed REST client for `/livestreams`, `/categories`, `/channels`, and `/users`, including paging/query helpers and header management.
 - `KickChatClient` – websocket connector that issues Phoenix-style join payloads against `ws.kick.com` and exposes a listener interface for downstream chat UI components.
+- `KickBttvService` – preserves BetterTTV global and channel emotes so Kick chat retains third-party reactions that long-time users expect.
 - Comprehensive unit tests for the auth, REST, and chat layers using `MockWebServer` and coroutine test utilities.
 
 ## Known Gaps
