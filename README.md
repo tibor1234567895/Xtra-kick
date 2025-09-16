@@ -19,5 +19,9 @@ You can find released APKs [here](https://github.com/crackededed/Xtra/releases/t
 
 [Xtra subreddit](https://www.reddit.com/r/XtraForTwitch)
 
+## CI
+
+The GitHub Actions workflow `android-tests / unit` runs on each push and pull request and should be configured as a required status check in branch protection.
+
 ## License
 Xtra is licensed under the [GNU Affero General Public License v3.0](LICENSE).
