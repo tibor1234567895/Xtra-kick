@@ -138,6 +138,7 @@ dependencies {
     ksp(libs.hilt.extension.compiler)
 
     implementation(libs.coroutines)
+    implementation(libs.security.crypto)
 
     testImplementation(kotlin("test"))
     testImplementation(libs.coroutines.test)

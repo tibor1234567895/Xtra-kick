@@ -1,9 +1,15 @@
 package com.github.andreyasadchy.xtra.kick.storage
 
 import android.content.Context
+import android.content.SharedPreferences
+import android.os.Build
 import androidx.core.content.edit
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKey
 import com.github.andreyasadchy.xtra.kick.auth.KickTokenResponse
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.io.IOException
+import java.security.GeneralSecurityException
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -12,7 +18,12 @@ class KickTokenStore @Inject constructor(
     @ApplicationContext context: Context
 ) : KickTokenProvider {
 
-    private val preferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+    private val preferences: SharedPreferences
+
+    init {
+        val legacyPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        preferences = createEncryptedPreferences(context, legacyPreferences)
+    }
 
     override val accessToken: String?
         get() = preferences.getString(KEY_ACCESS_TOKEN, null)
@@ -75,6 +86,95 @@ class KickTokenStore @Inject constructor(
         expiresAtMillis = expiresAtMillis
     )
 
+    private fun createEncryptedPreferences(
+        context: Context,
+        legacyPreferences: SharedPreferences
+    ): SharedPreferences {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            return legacyPreferences
+        }
+
+        val encryptedPreferences = try {
+            val masterKey = MasterKey.Builder(context)
+                .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+                .build()
+
+            EncryptedSharedPreferences.create(
+                context,
+                PREFS_NAME_ENCRYPTED,
+                masterKey,
+                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+            )
+        } catch (error: GeneralSecurityException) {
+            legacyPreferences
+        } catch (error: IOException) {
+            legacyPreferences
+        }
+
+        if (encryptedPreferences !== legacyPreferences) {
+            migrateLegacyTokensIfNeeded(legacyPreferences, encryptedPreferences)
+        }
+
+        return encryptedPreferences
+    }
+
+    private fun migrateLegacyTokensIfNeeded(
+        legacyPreferences: SharedPreferences,
+        encryptedPreferences: SharedPreferences
+    ) {
+        if (encryptedPreferences.getBoolean(KEY_MIGRATION_COMPLETE, false)) {
+            return
+        }
+
+        val legacyAccessToken = legacyPreferences.getString(KEY_ACCESS_TOKEN, null)
+        val legacyRefreshToken = legacyPreferences.getString(KEY_REFRESH_TOKEN, null)
+        val legacyTokenType = legacyPreferences.getString(KEY_TOKEN_TYPE, null)
+        val legacyScopes = legacyPreferences.getString(KEY_SCOPES, null)
+        val legacyExpiresAt = if (legacyPreferences.contains(KEY_EXPIRES_AT)) {
+            legacyPreferences.getLong(KEY_EXPIRES_AT, 0L)
+        } else {
+            null
+        }
+
+        encryptedPreferences.edit(commit = true) {
+            putBoolean(KEY_MIGRATION_COMPLETE, true)
+            if (legacyAccessToken != null) {
+                putString(KEY_ACCESS_TOKEN, legacyAccessToken)
+            } else {
+                remove(KEY_ACCESS_TOKEN)
+            }
+
+            if (!legacyRefreshToken.isNullOrBlank()) {
+                putString(KEY_REFRESH_TOKEN, legacyRefreshToken)
+            } else {
+                remove(KEY_REFRESH_TOKEN)
+            }
+
+            if (legacyTokenType != null) {
+                putString(KEY_TOKEN_TYPE, legacyTokenType)
+            } else {
+                remove(KEY_TOKEN_TYPE)
+            }
+
+            putString(KEY_SCOPES, legacyScopes ?: "")
+
+            if (legacyExpiresAt != null) {
+                putLong(KEY_EXPIRES_AT, legacyExpiresAt)
+            } else {
+                remove(KEY_EXPIRES_AT)
+            }
+        }
+
+        legacyPreferences.edit(commit = true) {
+            remove(KEY_ACCESS_TOKEN)
+            remove(KEY_REFRESH_TOKEN)
+            remove(KEY_TOKEN_TYPE)
+            remove(KEY_SCOPES)
+            remove(KEY_EXPIRES_AT)
+        }
+    }
+
     data class KickTokenSnapshot(
         val accessToken: String?,
         val refreshToken: String?,
@@ -85,6 +185,8 @@ class KickTokenStore @Inject constructor(
 
     private companion object {
         const val PREFS_NAME = "kick_tokens"
+        const val PREFS_NAME_ENCRYPTED = "kick_tokens_encrypted"
+        const val KEY_MIGRATION_COMPLETE = "tokens_migrated"
         const val KEY_ACCESS_TOKEN = "access_token"
         const val KEY_REFRESH_TOKEN = "refresh_token"
         const val KEY_TOKEN_TYPE = "token_type"
