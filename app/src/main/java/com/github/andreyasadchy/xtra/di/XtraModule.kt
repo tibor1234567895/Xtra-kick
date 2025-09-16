@@ -8,6 +8,7 @@ import android.util.Log
 import androidx.annotation.OptIn
 import com.github.andreyasadchy.xtra.BuildConfig
 import com.github.andreyasadchy.xtra.R
+import com.github.andreyasadchy.xtra.kick.config.KickEnvironment
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -39,11 +40,9 @@ class XtraModule {
     fun providesHttpEngine(application: Application): HttpEngine? {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && SdkExtensions.getExtensionVersion(Build.VERSION_CODES.S) >= 7) {
             HttpEngine.Builder(application).apply {
-                addQuicHint("gql.twitch.tv", 443, 443)
-                addQuicHint("www.twitch.tv", 443, 443)
-                addQuicHint("7tv.io", 443, 443)
-                addQuicHint("cdn.7tv.app", 443, 443)
-                addQuicHint("api.betterttv.net", 443, 443)
+                addQuicHint("api.kick.com", 443, 443)
+                addQuicHint("id.kick.com", 443, 443)
+                addQuicHint("ws.kick.com", 443, 443)
             }.build()
         } else {
             null
@@ -59,11 +58,9 @@ class XtraModule {
                 val userAgent = "Cronet/" + defaultUserAgent.substringAfter("Cronet/", "").substringBefore(')')
                 setUserAgent(userAgent)
                 setQuicOptions(QuicOptions.builder().setHandshakeUserAgent(userAgent).build())
-                addQuicHint("gql.twitch.tv", 443, 443)
-                addQuicHint("www.twitch.tv", 443, 443)
-                addQuicHint("7tv.io", 443, 443)
-                addQuicHint("cdn.7tv.app", 443, 443)
-                addQuicHint("api.betterttv.net", 443, 443)
+                addQuicHint("api.kick.com", 443, 443)
+                addQuicHint("id.kick.com", 443, 443)
+                addQuicHint("ws.kick.com", 443, 443)
             }.build().also {
                 if (BuildConfig.DEBUG) {
                     it.addRequestFinishedListener(object : RequestFinishedInfo.Listener(Executors.newSingleThreadExecutor()) {
@@ -128,4 +125,8 @@ class XtraModule {
     fun providesJsonInstance(): Json {
         return Json { ignoreUnknownKeys = true }
     }
+
+    @Singleton
+    @Provides
+    fun providesKickEnvironment(): KickEnvironment = KickEnvironment.fromBuildConfig()
 }

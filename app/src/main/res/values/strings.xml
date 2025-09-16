@@ -126,6 +126,10 @@
     <string name="timer_canceled">The timer has been canceled</string>
     <string name="trouble_logging_in">Having trouble logging in?</string>
     <string name="login_problem_solution">You can log in using an external browser. After you press \"Authorize\", a page with an error should appear. Copy the url, return here and click the \"Enter url\" button. Paste the url and click \"Log in\"</string>
+    <string name="login_error_generic">Unable to load the Kick login page. Please try again.</string>
+    <string name="login_error_with_code">Kick login failed (code %1$d). Please try again.</string>
+    <string name="login_error_oauth">Kick login failed: %1$s</string>
+    <string name="login_error_state">Kick login could not be verified. Please try again.</string>
     <string name="no_browser_found">No browser app found</string>
     <string name="browser_workaround">Your system browser is no longer supported. Please click the button below for a workaround</string>
     <string name="error">Error: %s</string>

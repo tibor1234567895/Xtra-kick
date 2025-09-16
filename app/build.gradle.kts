@@ -9,6 +9,12 @@ plugins {
     alias(libs.plugins.apollo)
 }
 
+fun buildConfigString(name: String): String {
+    val raw = System.getenv(name) ?: ""
+    val escaped = raw.replace("\"", "\\\"")
+    return "\"$escaped\""
+}
+
 kotlin {
     jvmToolchain(21)
 }
@@ -31,6 +37,13 @@ android {
         targetSdk = 36
         versionCode = 121
         versionName = "2.47.2"
+        buildConfigField("String", "KICK_API_BASE_URL", "\"https://api.kick.com/public/v1\"")
+        buildConfigField("String", "KICK_OAUTH_BASE_URL", "\"https://id.kick.com\"")
+        buildConfigField("String", "KICK_CHAT_SOCKET_URL", "\"wss://ws.kick.com/v2\"")
+        buildConfigField("String", "KICK_CLIENT_ID", buildConfigString("KICK_CLIENT_ID"))
+        buildConfigField("String", "KICK_CLIENT_SECRET", buildConfigString("KICK_CLIENT_SECRET"))
+        buildConfigField("String", "KICK_REDIRECT_URI", buildConfigString("KICK_REDIRECT_URI"))
+        buildConfigField("String", "KICK_SCOPES", buildConfigString("KICK_SCOPES"))
     }
 
     buildTypes {
@@ -125,6 +138,10 @@ dependencies {
     ksp(libs.hilt.extension.compiler)
 
     implementation(libs.coroutines)
+
+    testImplementation(kotlin("test"))
+    testImplementation(libs.coroutines.test)
+    testImplementation(libs.okhttp.mockwebserver)
 }
 
 ksp {
