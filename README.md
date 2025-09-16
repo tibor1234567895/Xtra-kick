@@ -40,7 +40,8 @@ The migration scaffolding introduced in this iteration includes:
 
 - `KickEnvironment` – single source of truth for API hosts, OAuth configuration, and scopes derived from `BuildConfig`.
 - `KickOAuthClient` – implements the OAuth 2.1 authorization-code, refresh, client credentials, revoke, and introspection flows (PKCE helpers included).
-- `KickTokenStore` – persists tokens, scopes, and expiry information in encrypted shared preferences for reuse across API and chat clients.
+- `KickTokenStore` – persists tokens, scopes, and expiry information in shared preferences (follow-up planned for encryption) for reuse across API and chat clients.
+- `LoginActivity` – rewired to the Kick OAuth authorization-code flow with PKCE, storing credentials via `KickTokenStore` after successful login.
 - `KickApiClient` – strongly typed REST client for `/livestreams`, `/categories`, `/channels`, and `/users`, including paging/query helpers and header management.
 - `KickChatClient` – websocket connector that issues Phoenix-style join payloads against `ws.kick.com` and exposes a listener interface for downstream chat UI components.
 - `KickBttvService` – preserves BetterTTV global and channel emotes so Kick chat retains third-party reactions that long-time users expect.
@@ -49,6 +50,7 @@ The migration scaffolding introduced in this iteration includes:
 ## Known Gaps
 
 - UI still references Twitch data sources and needs to be re-wired to consume the new Kick repositories.
+- Kick session refresh and account metadata are not yet surfaced beyond token storage.
 - Kick chat message schemas require full parsing and presentation logic.
 - Some Twitch assets, strings, and documentation remain and should be removed in the next migration pass.
 
