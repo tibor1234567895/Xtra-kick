@@ -4,6 +4,11 @@ import com.github.andreyasadchy.xtra.kick.config.KickEnvironment
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.parseToJsonElement
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
@@ -21,7 +26,7 @@ class KickChatClient @Inject constructor(
 
     interface Listener {
         fun onConnected()
-        fun onMessage(message: KickChatEnvelope)
+        fun onMessage(event: KickChatEvent)
         fun onClosed(code: Int, reason: String)
         fun onError(throwable: Throwable)
     }
@@ -51,8 +56,11 @@ class KickChatClient @Inject constructor(
                 }
 
                 override fun onMessage(webSocket: WebSocket, text: String) {
-                    runCatching { json.decodeFromString<KickChatEnvelope>(text) }
-                        .onSuccess { parsed -> this@KickChatClient.listener?.onMessage(parsed) }
+                    runCatching {
+                        val envelope = json.decodeFromString<KickChatEnvelope>(text)
+                        envelope.toKickEvent(json)
+                    }
+                        .onSuccess { event -> this@KickChatClient.listener?.onMessage(event) }
                         .onFailure { error -> this@KickChatClient.listener?.onError(error) }
                 }
 
@@ -85,4 +93,54 @@ class KickChatClient @Inject constructor(
     companion object {
         private const val NORMAL_CLOSURE_STATUS = 1000
     }
+}
+
+private fun KickChatEnvelope.toKickEvent(json: Json): KickChatEvent {
+    val messageElement = findMessageElement(json)
+    if (messageElement != null) {
+        return runCatching {
+            val message = json.decodeFromJsonElement(KickChatMessage.serializer(), messageElement)
+            KickChatEvent.ChatMessage(this, message)
+        }.getOrElse { KickChatEvent.Unknown(this) }
+    }
+
+    return KickChatEvent.Unknown(this)
+}
+
+private fun KickChatEnvelope.findMessageElement(json: Json): JsonElement? {
+    fun JsonElement?.decodeStringIfNeeded(): JsonElement? {
+        val primitive = this as? JsonPrimitive
+        if (primitive != null && primitive.isString) {
+            return runCatching { json.parseToJsonElement(primitive.content) }.getOrNull()
+        }
+        return this
+    }
+
+    payload["message"]?.decodeStringIfNeeded()?.let { return it }
+
+    payload["data"]?.decodeStringIfNeeded()?.let { dataElement ->
+        when (dataElement) {
+            is JsonObject -> {
+                dataElement["message"]?.decodeStringIfNeeded()?.let { return it }
+                dataElement["messages"]?.decodeStringIfNeeded()?.let { nested ->
+                    when (nested) {
+                        is JsonArray -> if (nested.isNotEmpty()) return nested.first()
+                        else -> return nested
+                    }
+                }
+                return dataElement
+            }
+            is JsonArray -> if (dataElement.isNotEmpty()) return dataElement.first()
+            else -> return dataElement
+        }
+    }
+
+    payload["messages"]?.decodeStringIfNeeded()?.let { messagesElement ->
+        when (messagesElement) {
+            is JsonArray -> if (messagesElement.isNotEmpty()) return messagesElement.first()
+            else -> return messagesElement
+        }
+    }
+
+    return null
 }
