@@ -54,10 +54,10 @@ class KickChatClientTest {
             })
         )
 
-        val events = mutableListOf<KickChatEnvelope>()
+        val events = mutableListOf<KickChatEvent>()
         val listener = object : KickChatClient.Listener {
             override fun onConnected() {}
-            override fun onMessage(message: KickChatEnvelope) { events.add(message) }
+            override fun onMessage(event: KickChatEvent) { events.add(event) }
             override fun onClosed(code: Int, reason: String) {}
             override fun onError(throwable: Throwable) {}
         }
