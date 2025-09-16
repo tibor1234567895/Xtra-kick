@@ -28,7 +28,7 @@ jobs:
           mv "$ANDROID_SDK_ROOT/cmdline-tools/cmdline-tools" "$ANDROID_SDK_ROOT/cmdline-tools/latest"
           export PATH="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools:$PATH"
 
-          yes | sdkmanager --licenses >/dev/null
+          yes | sdkmanager --licenses >/dev/null || true
 
           # Detect compileSdk (Kotlin or Groovy DSL)
           COMPILE_SDK=$(grep -RhoE 'compileSdk\s*=\s*[0-9]+' --include=build.gradle.kts . | grep -oE '[0-9]+' | head -n1 || true)
