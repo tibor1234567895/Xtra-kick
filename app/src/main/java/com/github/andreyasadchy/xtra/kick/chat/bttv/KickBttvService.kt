@@ -87,8 +87,8 @@ class KickBttvService @Inject constructor(
         return KickBttvImageSet(
             url1x = "https://cdn.betterttv.net/emote/$emoteId/$suffix1x",
             url2x = "https://cdn.betterttv.net/emote/$emoteId/$suffix2x",
-            url3x = "https://cdn.betterttv.net/emote/$emoteId/$suffix2x",
-            url4x = "https://cdn.betterttv.net/emote/$emoteId/$suffix3x",
+            url3x = "https://cdn.betterttv.net/emote/$emoteId/$suffix3x",
+            url4x = null,
         )
     }
 

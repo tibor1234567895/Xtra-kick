@@ -8,6 +8,7 @@ import okhttp3.mockwebserver.MockWebServer
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -51,6 +52,9 @@ class KickBttvServiceTest {
         assertTrue(emote.isOverlay)
         assertTrue(emote.isAnimated)
         assertEquals("https://cdn.betterttv.net/emote/abc123/1x", emote.images.url1x)
+        assertEquals("https://cdn.betterttv.net/emote/abc123/2x", emote.images.url2x)
+        assertEquals("https://cdn.betterttv.net/emote/abc123/3x", emote.images.url3x)
+        assertNull(emote.images.url4x)
         assertEquals("/3/cached/emotes/global", mockWebServer.takeRequest().path)
     }
 
@@ -78,9 +82,14 @@ class KickBttvServiceTest {
         assertEquals("Hello", hello.name)
         assertFalse(hello.isAnimated)
         assertEquals("https://cdn.betterttv.net/emote/def456/1x.webp", hello.images.url1x)
+        assertEquals("https://cdn.betterttv.net/emote/def456/2x.webp", hello.images.url2x)
+        assertEquals("https://cdn.betterttv.net/emote/def456/3x.webp", hello.images.url3x)
+        assertNull(hello.images.url4x)
         assertEquals("World", world.name)
         assertTrue(world.isAnimated)
         assertEquals("https://cdn.betterttv.net/emote/ghi789/2x.webp", world.images.url2x)
+        assertEquals("https://cdn.betterttv.net/emote/ghi789/3x.webp", world.images.url3x)
+        assertNull(world.images.url4x)
 
         val firstRequest = mockWebServer.takeRequest()
         val secondRequest = mockWebServer.takeRequest()
