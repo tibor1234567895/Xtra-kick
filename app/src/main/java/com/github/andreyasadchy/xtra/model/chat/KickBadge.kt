@@ -1,5 +1,7 @@
 package com.github.andreyasadchy.xtra.model.chat
 
+import com.github.andreyasadchy.xtra.kick.chat.KickChatBadgeImage
+
 data class KickBadge(
     val id: String? = null,
     val setId: String? = null,
@@ -14,4 +16,9 @@ data class KickBadge(
     val format: String? = null,
     val isAnimated: Boolean = false,
     val source: String? = null,
+    val type: String? = null,
+    val text: String? = null,
+    val count: Int? = null,
+    val image: KickChatBadgeImage? = null,
+    val badgeImage: KickChatBadgeImage? = null,
 )

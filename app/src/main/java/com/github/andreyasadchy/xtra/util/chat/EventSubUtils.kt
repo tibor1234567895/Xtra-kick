@@ -8,6 +8,7 @@ import com.github.andreyasadchy.xtra.model.chat.ChatMessage
 import com.github.andreyasadchy.xtra.model.chat.RoomState
 import com.github.andreyasadchy.xtra.model.chat.KickEmote
 import com.github.andreyasadchy.xtra.model.chat.KickBadge
+import com.github.andreyasadchy.xtra.ui.chat.KickChatMessageMapper
 import com.github.andreyasadchy.xtra.util.KickApiHelper
 import org.json.JSONObject
 
@@ -62,7 +63,7 @@ object EventSubUtils {
             color = if (!json.isNull("color")) json.optString("color").takeIf { it.isNotBlank() } else null,
             emotes = emotesList,
             badges = badgesList,
-            isAction = messageText?.startsWith(ChatUtils.ACTION) == true,
+            isAction = messageText?.startsWith(KickChatMessageMapper.ACTION) == true,
             bits = json.optJSONObject("cheer")?.let { cheer -> if (!cheer.isNull("bits")) cheer.optInt("bits").takeIf { it > 0 } else null },
             msgId = if (!json.isNull("message_type")) json.optString("message_type").takeIf { it.isNotBlank() && !it.equals("text", true) } else null,
             reward = if (!json.isNull("channel_points_custom_reward_id")) json.optString("channel_points_custom_reward_id").takeIf { it.isNotBlank() }?.let { ChannelPointReward(id = it) } else null,
@@ -123,7 +124,7 @@ object EventSubUtils {
                 color = if (!json.isNull("color")) json.optString("color").takeIf { it.isNotBlank() } else null,
                 emotes = emotesList,
                 badges = badgesList,
-                isAction = messageText.startsWith(ChatUtils.ACTION),
+                isAction = messageText.startsWith(KickChatMessageMapper.ACTION),
                 systemMsg = systemMsg,
                 msgId = if (!json.isNull("notice_type")) json.optString("notice_type").takeIf { it.isNotBlank() } else null,
                 timestamp = timestamp?.let { KickApiHelper.parseIso8601DateUTC(it) },

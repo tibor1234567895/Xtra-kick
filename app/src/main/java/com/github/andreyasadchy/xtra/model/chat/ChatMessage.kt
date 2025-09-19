@@ -1,5 +1,8 @@
 package com.github.andreyasadchy.xtra.model.chat
 
+import com.github.andreyasadchy.xtra.kick.chat.KickChatBadge
+import com.github.andreyasadchy.xtra.kick.chat.KickChatEmote
+
 class ChatMessage(
     val id: String? = null,
     val userId: String? = null,
@@ -9,6 +12,8 @@ class ChatMessage(
     val color: String? = null,
     val emotes: List<KickEmote>? = null,
     val badges: List<KickBadge>? = null,
+    val kickBadges: List<KickChatBadge>? = null,
+    val kickEmotesRaw: List<KickChatEmote>? = null,
     val isAction: Boolean = false,
     val isFirst: Boolean = false,
     val bits: Int? = null,
