@@ -26,26 +26,20 @@ import com.github.andreyasadchy.xtra.model.chat.RoomState
 import com.github.andreyasadchy.xtra.model.chat.StvBadge
 import com.github.andreyasadchy.xtra.model.chat.KickBadge
 import com.github.andreyasadchy.xtra.model.chat.KickEmote
-import com.github.andreyasadchy.xtra.kick.chat.KickChatBadge
 import com.github.andreyasadchy.xtra.kick.chat.KickChatClient
-import com.github.andreyasadchy.xtra.kick.chat.KickChatEmote
 import com.github.andreyasadchy.xtra.kick.chat.KickChatEnvelope
 import com.github.andreyasadchy.xtra.kick.chat.KickChatEvent
 import com.github.andreyasadchy.xtra.kick.chat.KickChatMessage
-import com.github.andreyasadchy.xtra.kick.chat.KickChatReply
+import com.github.andreyasadchy.xtra.kick.chat.readKickChatMessage
+import com.github.andreyasadchy.xtra.kick.chat.toChatMessage
 import com.github.andreyasadchy.xtra.repository.GraphQLRepository
 import com.github.andreyasadchy.xtra.repository.HelixRepository
 import com.github.andreyasadchy.xtra.repository.PlayerRepository
 import com.github.andreyasadchy.xtra.repository.TranslateAllMessagesUsersRepository
 import com.github.andreyasadchy.xtra.util.C
 import com.github.andreyasadchy.xtra.util.KickApiHelper
-import com.github.andreyasadchy.xtra.util.chat.ChatUtils
-import com.github.andreyasadchy.xtra.util.chat.EventSubUtils
-import com.github.andreyasadchy.xtra.util.chat.EventSubWebSocket
 import com.github.andreyasadchy.xtra.util.chat.HermesWebSocket
 import com.github.andreyasadchy.xtra.util.chat.PubSubUtils
-import com.github.andreyasadchy.xtra.util.chat.PubSubWebSocket
-import com.github.andreyasadchy.xtra.util.chat.RecentMessageUtils
 import com.github.andreyasadchy.xtra.util.chat.StvEventApiWebSocket
 import com.github.andreyasadchy.xtra.util.prefs
 import com.github.andreyasadchy.xtra.util.tokenPrefs
@@ -86,9 +80,7 @@ class ChatViewModel @Inject constructor(
 
     val integrity = MutableStateFlow<String?>(null)
 
-    private var eventSub: EventSubWebSocket? = null
     private var hermesWebSocket: HermesWebSocket? = null
-    private var pubSub: PubSubWebSocket? = null
     private var stvEventApi: StvEventApiWebSocket? = null
     private var kickChatState = KickChatState.IDLE
     private var kickChatChannelId: Long? = null
@@ -185,15 +177,12 @@ class ChatViewModel @Inject constructor(
     val newChatter = MutableStateFlow<Chatter?>(null)
 
     fun startLive(networkLibrary: String?, channelId: String?, channelLogin: String?, channelName: String?, streamId: String?) {
-        if (kickChatState == KickChatState.IDLE && eventSub == null && channelLogin != null) {
+        if (kickChatState == KickChatState.IDLE && channelLogin != null) {
             messageLimit = applicationContext.prefs().getInt(C.CHAT_LIMIT, 600)
             this.streamId = streamId
             startLiveChat(channelId, channelLogin)
             addChatter(channelName)
             loadEmotes(channelId, channelLogin)
-            if (applicationContext.prefs().getBoolean(C.CHAT_RECENT, true)) {
-                loadRecentMessages(networkLibrary, channelLogin)
-            }
             val isLoggedIn = !applicationContext.tokenPrefs().getString(C.USERNAME, null).isNullOrBlank() &&
                     (!KickApiHelper.getGQLHeaders(applicationContext, true)[C.HEADER_TOKEN].isNullOrBlank() ||
                             !KickApiHelper.getHelixHeaders(applicationContext)[C.HEADER_TOKEN].isNullOrBlank())
@@ -215,7 +204,7 @@ class ChatViewModel @Inject constructor(
 
     fun resumeLive(channelId: String?, channelLogin: String?) {
         if (!autoReconnect || channelLogin == null) return
-        if (kickChatState == KickChatState.IDLE || eventSub?.isActive == false) {
+        if (kickChatState == KickChatState.IDLE) {
             startLiveChat(channelId, channelLogin)
         }
     }
@@ -551,58 +540,6 @@ class ChatViewModel @Inject constructor(
         loadEmotes(channelId, channelLogin)
     }
 
-    fun loadRecentMessages(networkLibrary: String?, channelLogin: String) {
-        viewModelScope.launch {
-            try {
-                val list = mutableListOf<ChatMessage>()
-                playerRepository.loadRecentMessages(networkLibrary, channelLogin, applicationContext.prefs().getInt(C.CHAT_RECENT_LIMIT, 100).toString()).messages.forEach { message ->
-                    when {
-                        message.contains("PRIVMSG") -> RecentMessageUtils.parseChatMessage(message, false)
-                        message.contains("USERNOTICE") -> {
-                            if (applicationContext.prefs().getBoolean(C.CHAT_SHOW_USERNOTICE, true)) {
-                                RecentMessageUtils.parseChatMessage(message, true)
-                            } else null
-                        }
-                        message.contains("CLEARMSG") -> {
-                            if (applicationContext.prefs().getBoolean(C.CHAT_SHOW_CLEARMSG, true)) {
-                                val pair = RecentMessageUtils.parseClearMessage(message)
-                                val deletedMessage = pair.second?.let { targetId -> list.find { it.id == targetId } }
-                                getClearMessage(pair.first, deletedMessage, applicationContext.prefs().getString(C.UI_NAME_DISPLAY, "0"))
-                            } else null
-                        }
-                        message.contains("CLEARCHAT") -> {
-                            if (applicationContext.prefs().getBoolean(C.CHAT_SHOW_CLEARCHAT, true)) {
-                                RecentMessageUtils.parseClearChat(applicationContext, message)
-                            } else null
-                        }
-                        message.contains("NOTICE") -> RecentMessageUtils.parseNotice(applicationContext, message)
-                        else -> null
-                    }?.let {
-                        if (it.reply?.message != null) {
-                            list.add(ChatMessage(
-                                reply = it.reply,
-                                isReply = true,
-                                replyParent = it,
-                            ))
-                        }
-                        list.add(it)
-                    }
-                }
-                if (list.isNotEmpty()) {
-                    _chatMessages.value = arrayListOf<ChatMessage>().apply {
-                        addAll(list)
-                        addAll(_chatMessages.value.toList())
-                    }
-                    if (!scrollDown.value) {
-                        scrollDown.value = true
-                    }
-                }
-            } catch (e: Exception) {
-                Log.e(TAG, "Failed to load recent messages for channel $channelLogin", e)
-            }
-        }
-    }
-
     fun checkTranslateAllMessages(id: String) {
         viewModelScope.launch {
             translateAllMessages.value = translateAllMessagesUsersRepository.getByUserId(id) != null
@@ -653,81 +590,32 @@ class ChatViewModel @Inject constructor(
         val accountId = applicationContext.tokenPrefs().getString(C.USER_ID, null)
         val accountLogin = applicationContext.tokenPrefs().getString(C.USERNAME, null)
         val isLoggedIn = !accountLogin.isNullOrBlank() && (!gqlHeaders[C.HEADER_TOKEN].isNullOrBlank() || !helixHeaders[C.HEADER_TOKEN].isNullOrBlank())
-        val usePubSub = applicationContext.prefs().getBoolean(C.CHAT_PUBSUB_ENABLED, true)
-        val showUserNotice = applicationContext.prefs().getBoolean(C.CHAT_SHOW_USERNOTICE, true)
-        val showClearChat = applicationContext.prefs().getBoolean(C.CHAT_SHOW_CLEARCHAT, true)
+        val useHermes = applicationContext.prefs().getBoolean(C.CHAT_PUBSUB_ENABLED, true)
         kickReconnectJob?.cancel()
         kickChatChannelIdString = channelId
         kickChatChannelLogin = channelLogin
         kickChatChannelId = channelId?.toLongOrNull()
-        val debugEventSubChat = applicationContext.prefs().getBoolean(C.DEBUG_EVENTSUB_CHAT, false)
-        if (debugEventSubChat && !helixHeaders[C.HEADER_TOKEN].isNullOrBlank()) {
-            eventSub = EventSubWebSocket(
-                client = okHttpClient,
-                onConnect = { onConnect(channelLogin) },
-                onWelcomeMessage = { sessionId ->
-                    listOf(
-                        "channel.chat.clear",
-                        "channel.chat.message",
-                        "channel.chat.notification",
-                        "channel.chat_settings.update",
-                    ).forEach {
-                        viewModelScope.launch {
-                            try {
-                                helixRepository.createEventSubSubscription(networkLibrary, helixHeaders, accountId, channelId, it, sessionId)?.let {
-                                    onMessage(ChatMessage(systemMsg = it))
-                                }
-                            } catch (e: Exception) {
-
-                            }
-                        }
-                    }
-                },
-                onChatMessage = { json, timestamp ->
-                    val chatMessage = EventSubUtils.parseChatMessage(json, timestamp)
-                    if (usePubSub && chatMessage.reward != null && !chatMessage.reward.id.isNullOrBlank()) {
-                        onRewardMessage(chatMessage, networkLibrary, isLoggedIn, accountId, channelId)
-                    } else {
-                        onChatMessage(chatMessage, networkLibrary, isLoggedIn, accountId, channelId)
-                    }
-                },
-                onUserNotice = { json, timestamp ->
-                    if (showUserNotice) {
-                        onChatMessage(EventSubUtils.parseUserNotice(json, timestamp), networkLibrary, isLoggedIn, accountId, channelId)
-                    }
-                },
-                onClearChat = { json, timestamp ->
-                    if (showClearChat) {
-                        onMessage(EventSubUtils.parseClearChat(applicationContext, json, timestamp))
-                    }
-                },
-                onRoomState = { json, timestamp ->
-                    roomState.value = EventSubUtils.parseRoomState(json)
-                },
-            ).apply { connect() }
+        val channelNumericId = kickChatChannelId
+        if (channelNumericId == null) {
+            Log.w(TAG, "Missing channel id for chat connection to $channelLogin")
+            kickChatState = KickChatState.IDLE
         } else {
-            val channelNumericId = kickChatChannelId
-            if (channelNumericId == null) {
-                Log.w(TAG, "Missing channel id for chat connection to $channelLogin")
-                kickChatState = KickChatState.IDLE
-            } else {
-                val chatToken = gqlHeaders[C.HEADER_TOKEN].stripAuthPrefix()
-                    ?: helixHeaders[C.HEADER_TOKEN].stripAuthPrefix()
-                kickChatState = KickChatState.CONNECTING
-                kickChatClient.connect(
-                    channelNumericId,
-                    chatToken,
-                    KickChatListener(
-                        channelId = channelId,
-                        channelLogin = channelLogin,
-                        networkLibrary = networkLibrary,
-                        isLoggedIn = isLoggedIn,
-                        accountId = accountId
-                    )
+            val chatToken = gqlHeaders[C.HEADER_TOKEN].stripAuthPrefix()
+                ?: helixHeaders[C.HEADER_TOKEN].stripAuthPrefix()
+            kickChatState = KickChatState.CONNECTING
+            kickChatClient.connect(
+                channelNumericId,
+                chatToken,
+                KickChatListener(
+                    channelId = channelId,
+                    channelLogin = channelLogin,
+                    networkLibrary = networkLibrary,
+                    isLoggedIn = isLoggedIn,
+                    accountId = accountId
                 )
-            }
+            )
         }
-        if (usePubSub && !channelId.isNullOrBlank()) {
+        if (useHermes && !channelId.isNullOrBlank()) {
             val collectPoints = applicationContext.prefs().getBoolean(C.CHAT_POINTS_COLLECT, true)
             val onPlaybackMessage: (JSONObject) -> Unit = { message ->
                 val playbackMessage = PubSubUtils.parsePlaybackMessage(message)
@@ -886,55 +774,31 @@ class ChatViewModel @Inject constructor(
                     prediction.value = it
                 }
             }
-            val useNewPubSub = applicationContext.prefs().getBoolean(C.DEBUG_USE_NEW_PUBSUB, true)
             val webGQLToken = applicationContext.tokenPrefs().getString(C.GQL_TOKEN_WEB, null)
-            if (useNewPubSub && (accountId.isNullOrBlank() || !collectPoints || !webGQLToken.isNullOrBlank() || enableIntegrity)) {
-                hermesWebSocket = HermesWebSocket(
-                    channelId = channelId,
-                    userId = accountId,
-                    gqlToken = if (enableIntegrity) {
-                        gqlHeaders[C.HEADER_TOKEN]?.removePrefix("OAuth ")
-                    } else {
-                        webGQLToken
-                    },
-                    collectPoints = collectPoints,
-                    notifyPoints = applicationContext.prefs().getBoolean(C.CHAT_POINTS_NOTIFY, false),
-                    showRaids = applicationContext.prefs().getBoolean(C.CHAT_RAIDS_SHOW, true),
-                    showPolls = applicationContext.prefs().getBoolean(C.CHAT_POLLS_SHOW, true),
-                    showPredictions = applicationContext.prefs().getBoolean(C.CHAT_PREDICTIONS_SHOW, true),
-                    client = okHttpClient,
-                    onPlaybackMessage = onPlaybackMessage,
-                    onStreamInfo = onStreamInfo,
-                    onRewardMessage = onRewardMessage,
-                    onPointsEarned = onPointsEarned,
-                    onClaimAvailable = onClaimAvailable,
-                    onMinuteWatched = onMinuteWatched,
-                    onRaidUpdate = onRaidUpdate,
-                    onPollUpdate = onPollUpdate,
-                    onPredictionUpdate = onPredictionUpdate,
-                ).apply { connect() }
-            } else {
-                pubSub = PubSubWebSocket(
-                    channelId = channelId,
-                    userId = accountId,
-                    gqlToken = gqlHeaders[C.HEADER_TOKEN]?.removePrefix("OAuth "),
-                    collectPoints = collectPoints,
-                    notifyPoints = applicationContext.prefs().getBoolean(C.CHAT_POINTS_NOTIFY, false),
-                    showRaids = applicationContext.prefs().getBoolean(C.CHAT_RAIDS_SHOW, true),
-                    showPolls = applicationContext.prefs().getBoolean(C.CHAT_POLLS_SHOW, true),
-                    showPredictions = applicationContext.prefs().getBoolean(C.CHAT_PREDICTIONS_SHOW, true),
-                    client = okHttpClient,
-                    onPlaybackMessage = onPlaybackMessage,
-                    onStreamInfo = onStreamInfo,
-                    onRewardMessage = onRewardMessage,
-                    onPointsEarned = onPointsEarned,
-                    onClaimAvailable = onClaimAvailable,
-                    onMinuteWatched = onMinuteWatched,
-                    onRaidUpdate = onRaidUpdate,
-                    onPollUpdate = onPollUpdate,
-                    onPredictionUpdate = onPredictionUpdate,
-                ).apply { connect() }
-            }
+            hermesWebSocket = HermesWebSocket(
+                channelId = channelId,
+                userId = accountId,
+                gqlToken = if (enableIntegrity) {
+                    gqlHeaders[C.HEADER_TOKEN]?.removePrefix("OAuth ")
+                } else {
+                    webGQLToken
+                },
+                collectPoints = collectPoints,
+                notifyPoints = applicationContext.prefs().getBoolean(C.CHAT_POINTS_NOTIFY, false),
+                showRaids = applicationContext.prefs().getBoolean(C.CHAT_RAIDS_SHOW, true),
+                showPolls = applicationContext.prefs().getBoolean(C.CHAT_POLLS_SHOW, true),
+                showPredictions = applicationContext.prefs().getBoolean(C.CHAT_PREDICTIONS_SHOW, true),
+                client = okHttpClient,
+                onPlaybackMessage = onPlaybackMessage,
+                onStreamInfo = onStreamInfo,
+                onRewardMessage = onRewardMessage,
+                onPointsEarned = onPointsEarned,
+                onClaimAvailable = onClaimAvailable,
+                onMinuteWatched = onMinuteWatched,
+                onRaidUpdate = onRaidUpdate,
+                onPollUpdate = onPollUpdate,
+                onPredictionUpdate = onPredictionUpdate,
+            ).apply { connect() }
         }
         val showNamePaints = applicationContext.prefs().getBoolean(C.CHAT_SHOW_PAINTS, true)
         val showStvBadges = applicationContext.prefs().getBoolean(C.CHAT_SHOW_STV_BADGES, true)
@@ -1042,12 +906,8 @@ class ChatViewModel @Inject constructor(
             kickChatClient.disconnect()
             kickChatState = KickChatState.IDLE
         }
-        eventSub?.disconnect()
-        eventSub = null
         hermesWebSocket?.disconnect()
         hermesWebSocket = null
-        pubSub?.disconnect()
-        pubSub = null
         stvEventApi?.disconnect()
         stvEventApi = null
         kickChatChannelId = null
@@ -1056,7 +916,6 @@ class ChatViewModel @Inject constructor(
     }
 
     fun isActive(): Boolean? {
-        eventSub?.isActive?.let { return it }
         return when (kickChatState) {
             KickChatState.CONNECTED -> true
             KickChatState.CONNECTING -> null
@@ -1168,91 +1027,6 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    private fun KickChatMessage.toChatMessage(): ChatMessage {
-        val isAction = type.equals("action", true)
-        val isSystem = type.equals("system", true)
-        val replyMessage = reply?.toReply()
-        val badges = (metadata?.badges.orEmpty() + sender.identity?.badges.orEmpty())
-            .mapNotNull { it.toBadge() }
-            .distinctBy { it.setId to it.version }
-        val emotes = metadata?.emotes?.mapNotNull { it.toKickEmote() }
-        return ChatMessage(
-            id = id,
-            userId = sender.id.toString(),
-            userLogin = sender.username,
-            userName = sender.username,
-            message = if (isSystem) null else content,
-            color = sender.identity?.color,
-            emotes = emotes,
-            badges = badges,
-            isAction = isAction,
-            isFirst = false,
-            systemMsg = if (isSystem) content else null,
-            reply = replyMessage,
-            isReply = replyMessage != null,
-            timestamp = KickApiHelper.parseIso8601DateUTC(createdAt),
-            fullMsg = content,
-        )
-    }
-
-    private fun KickChatBadge.toBadge(): Badge? {
-        val setId = type.takeIf { it.isNotBlank() } ?: return null
-        val version = when {
-            !text.isNullOrBlank() -> text!!
-            count != null -> count.toString()
-            !source.isNullOrBlank() -> source!!
-            else -> "1"
-        }
-        return Badge(setId, version)
-    }
-
-    private fun KickChatReply.toReply(): Reply {
-        return Reply(
-            threadParentId = id,
-            userLogin = username ?: displayName,
-            userName = displayName ?: username,
-            message = text,
-        )
-    }
-
-    private fun KickChatEmote.toKickEmote(): KickEmote? {
-        val name = code ?: this.name ?: return null
-        val urls = parseSrcSet(image?.srcSet ?: image?.srcset)
-        val baseUrl = image?.src ?: url
-        val url1x = urls["1x"] ?: baseUrl
-        val url2x = urls["2x"] ?: url1x
-        val url3x = urls["3x"] ?: url2x
-        val url4x = urls["4x"] ?: url3x
-        val format = type ?: if ((url1x ?: url4x)?.endsWith(".gif", true) == true) "gif" else null
-        val animated = format?.contains("gif", true) == true
-        return KickEmote(
-            id = id ?: slug ?: name,
-            name = name,
-            url1x = url1x,
-            url2x = url2x,
-            url3x = url3x,
-            url4x = url4x,
-            format = format,
-            isAnimated = animated,
-        )
-    }
-
-    private fun parseSrcSet(srcSet: String?): Map<String, String> {
-        if (srcSet.isNullOrBlank()) {
-            return emptyMap()
-        }
-        return srcSet.split(',')
-            .mapNotNull { entry ->
-                val parts = entry.trim().split(" ")
-                if (parts.size >= 2) {
-                    parts[1] to parts[0]
-                } else {
-                    null
-                }
-            }
-            .toMap()
-    }
-
     private fun String?.stripAuthPrefix(): String? {
         if (this.isNullOrBlank()) {
             return null
@@ -1305,62 +1079,6 @@ class ChatViewModel @Inject constructor(
             systemMsg = ContextCompat.getString(applicationContext, R.string.chat_send_msg_error).format(message),
             fullMsg = fullMsg
         ))
-    }
-
-    private fun onChatMessage(message: String, userNotice: Boolean, showUserNotice: Boolean, usePubSub: Boolean, networkLibrary: String?, isLoggedIn: Boolean, accountId: String?, channelId: String?) {
-        if (!userNotice || showUserNotice) {
-            val chatMessage = ChatUtils.parseChatMessage(message, userNotice)
-            if (chatMessage.reply?.message != null) {
-                onMessage(ChatMessage(
-                    reply = chatMessage.reply,
-                    isReply = true,
-                    replyParent = chatMessage,
-                ))
-            }
-            if (usePubSub && chatMessage.reward != null && !chatMessage.reward.id.isNullOrBlank()) {
-                onRewardMessage(chatMessage, networkLibrary, isLoggedIn, accountId, channelId)
-            } else {
-                onChatMessage(chatMessage, networkLibrary, isLoggedIn, accountId, channelId)
-            }
-        }
-    }
-
-    private fun onClearMessage(message: String, nameDisplay: String?) {
-        val pair = ChatUtils.parseClearMessage(message)
-        val deletedMessage = try {
-            pair.second?.let { targetId -> _chatMessages.value.toList().find { it.id == targetId } }
-        } catch (e: NullPointerException) {
-            null
-        }
-        onMessage(getClearMessage(pair.first, deletedMessage, nameDisplay))
-    }
-
-    private fun onClearChat(message: String) {
-        onMessage(ChatUtils.parseClearChat(applicationContext, message))
-    }
-
-    private fun onNotice(message: String) {
-        val result = ChatUtils.parseNotice(applicationContext, message)
-        onMessage(result.first)
-        if (result.second) {
-            if (!hideRaid.value) {
-                hideRaid.value = true
-            }
-        }
-    }
-
-    private fun onRoomState(message: String) {
-        roomState.value = ChatUtils.parseRoomState(message)
-    }
-
-    private fun onUserState(message: String, channelId: String?) {
-        val emoteSets = ChatUtils.parseEmoteSets(message)
-        if (emoteSets != null && savedEmoteSets != emoteSets) {
-            savedEmoteSets = emoteSets
-            if (!loadedUserEmotes) {
-                loadEmoteSets(channelId)
-            }
-        }
     }
 
     private fun onChatMessage(message: ChatMessage, networkLibrary: String?, isLoggedIn: Boolean, accountId: String?, channelId: String?) {
@@ -2267,454 +1985,70 @@ class ChatViewModel @Inject constructor(
     private fun readChatFile(url: String, channelId: String?, channelLogin: String?) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val nameDisplay = applicationContext.prefs().getString(C.UI_NAME_DISPLAY, "0")
                 val messages = mutableListOf<ChatMessage>()
                 var startTimeMs = 0L
-                val kickEmotes = mutableListOf<KickEmote>()
-                val kickBadges = mutableListOf<KickBadge>()
-                val cheerEmotesList = mutableListOf<CheerEmote>()
-                val emotes = mutableListOf<Emote>()
-                if (url.toUri().scheme == ContentResolver.SCHEME_CONTENT) {
+                val readerSource = if (url.toUri().scheme == ContentResolver.SCHEME_CONTENT) {
                     applicationContext.contentResolver.openInputStream(url.toUri())?.bufferedReader()
                 } else {
                     FileInputStream(File(url)).bufferedReader()
-                }?.use { fileReader ->
+                }
+                readerSource?.use { fileReader ->
                     JsonReader(fileReader).use { reader ->
                         reader.isLenient = true
-                        var position = 0L
-                        var token: JsonToken
-                        do {
-                            token = reader.peek()
-                            when (token) {
-                                JsonToken.END_DOCUMENT -> {}
-                                JsonToken.BEGIN_OBJECT -> {
-                                    reader.beginObject().also { position += 1 }
-                                    while (reader.hasNext()) {
-                                        when (reader.peek()) {
-                                            JsonToken.NAME -> {
-                                                when (reader.nextName().also { position += it.length + 3 }) {
-                                                    "liveStartTime" -> { KickApiHelper.parseIso8601DateUTC(reader.nextString().also { position += it.length + 2 })?.let { startTimeMs = it } }
-                                                    "liveComments" -> {
-                                                        reader.beginArray().also { position += 1 }
-                                                        while (reader.hasNext()) {
-                                                            val message = reader.nextString().also { position += it.length + 2 + it.count { c -> c == '"' || c == '\\' } }
-                                                            when {
-                                                                message.contains("PRIVMSG") -> {
-                                                                    val chatMessage = ChatUtils.parseChatMessage(message, false)
-                                                                    if (chatMessage.reply?.message != null) {
-                                                                        messages.add(ChatMessage(
-                                                                            reply = chatMessage.reply,
-                                                                            isReply = true,
-                                                                            replyParent = chatMessage,
-                                                                        ))
-                                                                    }
-                                                                    messages.add(chatMessage)
-                                                                }
-                                                                message.contains("USERNOTICE") -> {
-                                                                    val chatMessage = ChatUtils.parseChatMessage(message, true)
-                                                                    if (chatMessage.reply?.message != null) {
-                                                                        messages.add(ChatMessage(
-                                                                            reply = chatMessage.reply,
-                                                                            isReply = true,
-                                                                            replyParent = chatMessage,
-                                                                        ))
-                                                                    }
-                                                                    messages.add(chatMessage)
-                                                                }
-                                                                message.contains("CLEARMSG") -> {
-                                                                    val pair = ChatUtils.parseClearMessage(message)
-                                                                    val deletedMessage = pair.second?.let { targetId -> messages.find { it.id == targetId } }
-                                                                    messages.add(getClearMessage(pair.first, deletedMessage, nameDisplay))
-                                                                }
-                                                                message.contains("CLEARCHAT") -> messages.add(ChatUtils.parseClearChat(applicationContext, message))
-                                                            }
-                                                            if (reader.peek() != JsonToken.END_ARRAY) {
-                                                                position += 1
-                                                            }
-                                                        }
-                                                        reader.endArray().also { position += 1 }
-                                                    }
-                                                    "comments" -> {
-                                                        reader.beginArray().also { position += 1 }
-                                                        while (reader.hasNext()) {
-                                                            reader.beginObject().also { position += 1 }
-                                                            val message = StringBuilder()
-                                                            var id: String? = null
-                                                            var offsetSeconds: Int? = null
-                                                            var userId: String? = null
-                                                            var userLogin: String? = null
-                                                            var userName: String? = null
-                                                            var color: String? = null
-                                                            val emotesList = mutableListOf<KickEmote>()
-                                                            val badgesList = mutableListOf<KickBadge>()
-                                                            while (reader.hasNext()) {
-                                                                when (reader.nextName().also { position += it.length + 3 }) {
-                                                                    "id" -> id = reader.nextString().also { position += it.length + 2 }
-                                                                    "commenter" -> {
-                                                                        reader.beginObject().also { position += 1 }
-                                                                        while (reader.hasNext()) {
-                                                                            when (reader.nextName().also { position += it.length + 3 }) {
-                                                                                "id" -> userId = reader.nextString().also { position += it.length + 2 }
-                                                                                "login" -> userLogin = reader.nextString().also { position += it.length + 2 }
-                                                                                "displayName" -> userName = reader.nextString().also { position += it.length + 2 }
-                                                                                else -> position += skipJsonValue(reader)
-                                                                            }
-                                                                            if (reader.peek() != JsonToken.END_OBJECT) {
-                                                                                position += 1
-                                                                            }
-                                                                        }
-                                                                        reader.endObject().also { position += 1 }
-                                                                    }
-                                                                    "contentOffsetSeconds" -> offsetSeconds = reader.nextInt().also { position += it.toString().length }
-                                                                    "message" -> {
-                                                                        reader.beginObject().also { position += 1 }
-                                                                        while (reader.hasNext()) {
-                                                                            when (reader.nextName().also { position += it.length + 3 }) {
-                                                                                "fragments" -> {
-                                                                                    reader.beginArray().also { position += 1 }
-                                                                                    while (reader.hasNext()) {
-                                                                                        reader.beginObject().also { position += 1 }
-                                                                                        var emoteId: String? = null
-                                                                                        var fragmentText: String? = null
-                                                                                        while (reader.hasNext()) {
-                                                                                            when (reader.nextName().also { position += it.length + 3 }) {
-                                                                                                "emote" -> {
-                                                                                                    when (reader.peek()) {
-                                                                                                        JsonToken.BEGIN_OBJECT -> {
-                                                                                                            reader.beginObject().also { position += 1 }
-                                                                                                            while (reader.hasNext()) {
-                                                                                                                when (reader.nextName().also { position += it.length + 3 }) {
-                                                                                                                    "emoteID" -> emoteId = reader.nextString().also { position += it.length + 2 }
-                                                                                                                    else -> position += skipJsonValue(reader)
-                                                                                                                }
-                                                                                                                if (reader.peek() != JsonToken.END_OBJECT) {
-                                                                                                                    position += 1
-                                                                                                                }
-                                                                                                            }
-                                                                                                            reader.endObject().also { position += 1 }
-                                                                                                        }
-                                                                                                        else -> position += skipJsonValue(reader)
-                                                                                                    }
-                                                                                                }
-                                                                                                "text" -> fragmentText = reader.nextString().also { position += it.length + 2 + it.count { c -> c == '"' || c == '\\' } }
-                                                                                                else -> position += skipJsonValue(reader)
-                                                                                            }
-                                                                                            if (reader.peek() != JsonToken.END_OBJECT) {
-                                                                                                position += 1
-                                                                                            }
-                                                                                        }
-                                                                                        if (fragmentText != null && !emoteId.isNullOrBlank()) {
-                                                                                            emotesList.add(KickEmote(
-                                                                                                id = emoteId,
-                                                                                                begin = message.codePointCount(0, message.length),
-                                                                                                end = message.codePointCount(0, message.length) + fragmentText.lastIndex
-                                                                                            ))
-                                                                                        }
-                                                                                        message.append(fragmentText)
-                                                                                        reader.endObject().also { position += 1 }
-                                                                                        if (reader.peek() != JsonToken.END_ARRAY) {
-                                                                                            position += 1
-                                                                                        }
-                                                                                    }
-                                                                                    reader.endArray().also { position += 1 }
-                                                                                }
-                                                                                "userBadges" -> {
-                                                                                    reader.beginArray().also { position += 1 }
-                                                                                    while (reader.hasNext()) {
-                                                                                        reader.beginObject().also { position += 1 }
-                                                                                        var set: String? = null
-                                                                                        var version: String? = null
-                                                                                        while (reader.hasNext()) {
-                                                                                            when (reader.nextName().also { position += it.length + 3 }) {
-                                                                                                "setID" -> set = reader.nextString().also { position += it.length + 2 }
-                                                                                                "version" -> version = reader.nextString().also { position += it.length + 2 }
-                                                                                                else -> position += skipJsonValue(reader)
-                                                                                            }
-                                                                                            if (reader.peek() != JsonToken.END_OBJECT) {
-                                                                                                position += 1
-                                                                                            }
-                                                                                        }
-                                                                                        if (!set.isNullOrBlank() && !version.isNullOrBlank()) {
-                                                                                            badgesList.add(KickBadge(setId = set, version = version))
-                                                                                        }
-                                                                                        reader.endObject().also { position += 1 }
-                                                                                        if (reader.peek() != JsonToken.END_ARRAY) {
-                                                                                            position += 1
-                                                                                        }
-                                                                                    }
-                                                                                    reader.endArray().also { position += 1 }
-                                                                                }
-                                                                                "userColor" -> {
-                                                                                    when (reader.peek()) {
-                                                                                        JsonToken.STRING -> color = reader.nextString().also { position += it.length + 2 }
-                                                                                        else -> position += skipJsonValue(reader)
-                                                                                    }
-                                                                                }
-                                                                                else -> position += skipJsonValue(reader)
-                                                                            }
-                                                                            if (reader.peek() != JsonToken.END_OBJECT) {
-                                                                                position += 1
-                                                                            }
-                                                                        }
-                                                                        messages.add(ChatMessage(
-                                                                            id = id,
-                                                                            userId = userId,
-                                                                            userLogin = userLogin,
-                                                                            userName = userName,
-                                                                            message = message.toString(),
-                                                                            color = color,
-                                                                            emotes = emotesList,
-                                                                            badges = badgesList,
-                                                                            bits = 0,
-                                                                            timestamp = offsetSeconds?.times(1000L),
-                                                                            fullMsg = null
-                                                                        ))
-                                                                        reader.endObject().also { position += 1 }
-                                                                    }
-                                                                    else -> position += skipJsonValue(reader)
-                                                                }
-                                                                if (reader.peek() != JsonToken.END_OBJECT) {
-                                                                    position += 1
-                                                                }
-                                                            }
-                                                            reader.endObject().also { position += 1 }
-                                                            if (reader.peek() != JsonToken.END_ARRAY) {
-                                                                position += 1
-                                                            }
-                                                        }
-                                                        reader.endArray().also { position += 1 }
-                                                    }
-                                                    "kickEmotes" -> {
-                                                        reader.beginArray().also { position += 1 }
-                                                        while (reader.hasNext()) {
-                                                            reader.beginObject().also { position += 1 }
-                                                            var id: String? = null
-                                                            var data: Pair<Long, Int>? = null
-                                                            while (reader.hasNext()) {
-                                                                when (reader.nextName().also { position += it.length + 3 }) {
-                                                                    "data" -> {
-                                                                        position += 1
-                                                                        val length = reader.nextString().length
-                                                                        data = Pair(position, length)
-                                                                        position += length + 1
-                                                                    }
-                                                                    "id" -> id = reader.nextString().also { position += it.length + 2 }
-                                                                    else -> position += skipJsonValue(reader)
-                                                                }
-                                                                if (reader.peek() != JsonToken.END_OBJECT) {
-                                                                    position += 1
-                                                                }
-                                                            }
-                                                            if (!id.isNullOrBlank() && data != null) {
-                                                                kickEmotes.add(KickEmote(
-                                                                    id = id,
-                                                                    localData = data
-                                                                ))
-                                                            }
-                                                            reader.endObject().also { position += 1 }
-                                                            if (reader.peek() != JsonToken.END_ARRAY) {
-                                                                position += 1
-                                                            }
-                                                        }
-                                                        reader.endArray().also { position += 1 }
-                                                    }
-                                                    "kickBadges" -> {
-                                                        reader.beginArray().also { position += 1 }
-                                                        while (reader.hasNext()) {
-                                                            reader.beginObject().also { position += 1 }
-                                                            var setId: String? = null
-                                                            var version: String? = null
-                                                            var data: Pair<Long, Int>? = null
-                                                            while (reader.hasNext()) {
-                                                                when (reader.nextName().also { position += it.length + 3 }) {
-                                                                    "data" -> {
-                                                                        position += 1
-                                                                        val length = reader.nextString().length
-                                                                        data = Pair(position, length)
-                                                                        position += length + 1
-                                                                    }
-                                                                    "setId" -> setId = reader.nextString().also { position += it.length + 2 }
-                                                                    "version" -> version = reader.nextString().also { position += it.length + 2 }
-                                                                    else -> position += skipJsonValue(reader)
-                                                                }
-                                                                if (reader.peek() != JsonToken.END_OBJECT) {
-                                                                    position += 1
-                                                                }
-                                                            }
-                                                            if (!setId.isNullOrBlank() && !version.isNullOrBlank() && data != null) {
-                                                                kickBadges.add(KickBadge(
-                                                                    setId = setId,
-                                                                    version = version,
-                                                                    localData = data
-                                                                ))
-                                                            }
-                                                            reader.endObject().also { position += 1 }
-                                                            if (reader.peek() != JsonToken.END_ARRAY) {
-                                                                position += 1
-                                                            }
-                                                        }
-                                                        reader.endArray().also { position += 1 }
-                                                    }
-                                                    "cheerEmotes" -> {
-                                                        reader.beginArray().also { position += 1 }
-                                                        while (reader.hasNext()) {
-                                                            reader.beginObject().also { position += 1 }
-                                                            var name: String? = null
-                                                            var data: Pair<Long, Int>? = null
-                                                            var minBits: Int? = null
-                                                            var color: String? = null
-                                                            while (reader.hasNext()) {
-                                                                when (reader.nextName().also { position += it.length + 3 }) {
-                                                                    "data" -> {
-                                                                        position += 1
-                                                                        val length = reader.nextString().length
-                                                                        data = Pair(position, length)
-                                                                        position += length + 1
-                                                                    }
-                                                                    "name" -> name = reader.nextString().also { position += it.length + 2 }
-                                                                    "minBits" -> minBits = reader.nextInt().also { position += it.toString().length }
-                                                                    "color" -> {
-                                                                        when (reader.peek()) {
-                                                                            JsonToken.STRING -> color = reader.nextString().also { position += it.length + 2 }
-                                                                            else -> position += skipJsonValue(reader)
-                                                                        }
-                                                                    }
-                                                                    else -> position += skipJsonValue(reader)
-                                                                }
-                                                                if (reader.peek() != JsonToken.END_OBJECT) {
-                                                                    position += 1
-                                                                }
-                                                            }
-                                                            if (!name.isNullOrBlank() && minBits != null && data != null) {
-                                                                cheerEmotesList.add(CheerEmote(
-                                                                    name = name,
-                                                                    localData = data,
-                                                                    minBits = minBits,
-                                                                    color = color
-                                                                ))
-                                                            }
-                                                            reader.endObject().also { position += 1 }
-                                                            if (reader.peek() != JsonToken.END_ARRAY) {
-                                                                position += 1
-                                                            }
-                                                        }
-                                                        reader.endArray().also { position += 1 }
-                                                    }
-                                                    "emotes" -> {
-                                                        reader.beginArray().also { position += 1 }
-                                                        while (reader.hasNext()) {
-                                                            reader.beginObject().also { position += 1 }
-                                                            var data: Pair<Long, Int>? = null
-                                                            var name: String? = null
-                                                            var isOverlayEmote = false
-                                                            while (reader.hasNext()) {
-                                                                when (reader.nextName().also { position += it.length + 3 }) {
-                                                                    "data" -> {
-                                                                        position += 1
-                                                                        val length = reader.nextString().length
-                                                                        data = Pair(position, length)
-                                                                        position += length + 1
-                                                                    }
-                                                                    "name" -> name = reader.nextString().also { position += it.length + 2 }
-                                                                    "isZeroWidth" -> isOverlayEmote = reader.nextBoolean().also { position += it.toString().length }
-                                                                    else -> position += skipJsonValue(reader)
-                                                                }
-                                                                if (reader.peek() != JsonToken.END_OBJECT) {
-                                                                    position += 1
-                                                                }
-                                                            }
-                                                            if (!name.isNullOrBlank() && data != null) {
-                                                                emotes.add(Emote(
-                                                                    name = name,
-                                                                    localData = data,
-                                                                    isOverlayEmote = isOverlayEmote
-                                                                ))
-                                                            }
-                                                            reader.endObject().also { position += 1 }
-                                                            if (reader.peek() != JsonToken.END_ARRAY) {
-                                                                position += 1
-                                                            }
-                                                        }
-                                                        reader.endArray().also { position += 1 }
-                                                    }
-                                                    "startTime" -> { startTimeMs = reader.nextInt().also { position += it.toString().length }.times(1000L) }
-                                                    else -> position += skipJsonValue(reader)
-                                                }
-                                            }
-                                            else -> position += skipJsonValue(reader)
-                                        }
-                                        if (reader.peek() != JsonToken.END_OBJECT) {
-                                            position += 1
-                                        }
+                        if (reader.peek() == JsonToken.BEGIN_OBJECT) {
+                            reader.beginObject()
+                            while (reader.hasNext()) {
+                                when (reader.nextName()) {
+                                    "liveStartTime" -> {
+                                        val liveStart = reader.nextString()
+                                        startTimeMs = KickApiHelper.parseIso8601DateUTC(liveStart) ?: 0L
                                     }
-                                    reader.endObject().also { position += 1 }
+                                    "messages" -> {
+                                        reader.beginArray()
+                                        while (reader.hasNext()) {
+                                            val chatMessage = reader.readKickChatMessage()
+                                            if (chatMessage != null) {
+                                                if (chatMessage.reply?.message != null) {
+                                                    messages.add(
+                                                        ChatMessage(
+                                                            reply = chatMessage.reply,
+                                                            isReply = true,
+                                                            replyParent = chatMessage,
+                                                        )
+                                                    )
+                                                }
+                                                messages.add(chatMessage)
+                                            } else {
+                                                reader.skipValue()
+                                            }
+                                        }
+                                        reader.endArray()
+                                    }
+                                    else -> reader.skipValue()
                                 }
-                                else -> position += skipJsonValue(reader)
                             }
-                        } while (token != JsonToken.END_DOCUMENT)
-                    }
-                }
-                _localKickEmotes.value = kickEmotes
-                _channelBadges.value = kickBadges
-                _cheerEmotes.value = cheerEmotesList
-                _channelStvEmotes.value = emotes
-                if (emotes.isEmpty()) {
-                    viewModelScope.launch {
-                        loadEmotes(channelId, channelLogin)
+                            reader.endObject()
+                        }
                     }
                 }
                 if (messages.isNotEmpty()) {
+                    _localKickEmotes.value = null
+                    _channelBadges.value = null
+                    _cheerEmotes.value = null
+                    _channelStvEmotes.value = null
                     viewModelScope.launch {
                         chatReplayManagerLocal?.setMessages(messages, startTimeMs)
                     }
                 }
+                if (!channelId.isNullOrBlank() || !channelLogin.isNullOrBlank()) {
+                    viewModelScope.launch {
+                        loadEmotes(channelId, channelLogin)
+                    }
+                }
             } catch (e: Exception) {
-
+                Log.e(TAG, "Failed to read chat file", e)
             }
         }
-    }
-
-    private fun skipJsonValue(reader: JsonReader): Int {
-        var length = 0
-        when (reader.peek()) {
-            JsonToken.BEGIN_ARRAY -> {
-                reader.beginArray().also { length += 1 }
-                while (reader.hasNext()) {
-                    when (reader.peek()) {
-                        JsonToken.NAME -> length += reader.nextName().length + 3
-                        else -> {
-                            length += skipJsonValue(reader)
-                            if (reader.peek() != JsonToken.END_ARRAY) {
-                                length += 1
-                            }
-                        }
-                    }
-                }
-                reader.endArray().also { length += 1 }
-            }
-            JsonToken.END_ARRAY -> length += 1
-            JsonToken.BEGIN_OBJECT -> {
-                reader.beginObject().also { length += 1 }
-                while (reader.hasNext()) {
-                    when (reader.peek()) {
-                        JsonToken.NAME -> length += reader.nextName().length + 3
-                        else -> {
-                            length += skipJsonValue(reader)
-                            if (reader.peek() != JsonToken.END_OBJECT) {
-                                length += 1
-                            }
-                        }
-                    }
-                }
-                reader.endObject().also { length += 1 }
-            }
-            JsonToken.END_OBJECT -> length += 1
-            JsonToken.STRING -> reader.nextString().let { length += it.length + 2 + it.count { c -> c == '"' || c == '\\' } }
-            JsonToken.NUMBER -> length += reader.nextString().length
-            JsonToken.BOOLEAN -> length += reader.nextBoolean().toString().length
-            else -> reader.skipValue()
-        }
-        return length
     }
 
     companion object {
