@@ -282,7 +282,7 @@ class VideosAdapter(
                                     R.id.share -> {
                                         context.startActivity(Intent.createChooser(Intent().apply {
                                             action = Intent.ACTION_SEND
-                                            putExtra(Intent.EXTRA_TEXT, "https://twitch.tv/videos/${item.id}")
+                                            putExtra(Intent.EXTRA_TEXT, "https://kick.com/video/${item.id}")
                                             item.title?.let {
                                                 putExtra(Intent.EXTRA_TITLE, it)
                                             }

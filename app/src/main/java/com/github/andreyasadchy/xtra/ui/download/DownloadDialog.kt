@@ -233,7 +233,7 @@ class DownloadDialog : DialogFragment(), IntegrityDialog.CallbackListener {
                         }
                     },
                     randomDeviceId = requireContext().prefs().getBoolean(C.TOKEN_RANDOM_DEVICEID, true),
-                    xDeviceId = requireContext().prefs().getString(C.TOKEN_XDEVICEID, "twitch-web-wall-mason"),
+                    xDeviceId = requireContext().prefs().getString(C.TOKEN_XDEVICEID, "kick-android-client"),
                     playerType = requireContext().prefs().getString(C.TOKEN_PLAYERTYPE, "site"),
                     supportedCodecs = requireContext().prefs().getString(C.TOKEN_SUPPORTED_CODECS, "av1,h265,h264"),
                     enableIntegrity = requireContext().prefs().getBoolean(C.ENABLE_INTEGRITY, false),

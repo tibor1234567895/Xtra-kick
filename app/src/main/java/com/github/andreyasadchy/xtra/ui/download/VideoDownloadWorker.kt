@@ -893,7 +893,7 @@ class VideoDownloadWorker @AssistedInject constructor(
                                                             }
                                                             reader.endArray()
                                                         }
-                                                        "twitchEmotes" -> {
+                                                        "kickEmotes" -> {
                                                             reader.beginArray()
                                                             while (reader.hasNext()) {
                                                                 reader.beginObject()
@@ -911,7 +911,7 @@ class VideoDownloadWorker @AssistedInject constructor(
                                                             }
                                                             reader.endArray()
                                                         }
-                                                        "twitchBadges" -> {
+                                                        "kickBadges" -> {
                                                             reader.beginArray()
                                                             while (reader.hasNext()) {
                                                                 reader.beginObject()
@@ -1132,14 +1132,14 @@ class VideoDownloadWorker @AssistedInject constructor(
                                         }
                                     }
                                 }
-                                val twitchEmotes = mutableListOf<KickEmote>()
-                                val twitchBadges = mutableListOf<KickBadge>()
+                                val kickEmotes = mutableListOf<KickEmote>()
+                                val kickBadges = mutableListOf<KickBadge>()
                                 val cheerEmotes = mutableListOf<CheerEmote>()
                                 val emotes = mutableListOf<Emote>()
                                 emoteIds.forEach {
                                     if (!savedKickEmotes.contains(it)) {
                                         savedKickEmotes.add(it)
-                                        twitchEmotes.add(KickEmote(id = it))
+                                        kickEmotes.add(KickEmote(id = it))
                                     }
                                 }
                                 badges.forEach {
@@ -1148,7 +1148,7 @@ class VideoDownloadWorker @AssistedInject constructor(
                                         savedBadges.add(pair)
                                         val badge = badgeList.find { badge -> badge.setId == it.setId && badge.version == it.version }
                                         if (badge != null) {
-                                            twitchBadges.add(badge)
+                                            kickBadges.add(badge)
                                         }
                                     }
                                 }
@@ -1171,11 +1171,11 @@ class VideoDownloadWorker @AssistedInject constructor(
                                         }
                                     }
                                 }
-                                if (twitchEmotes.isNotEmpty()) {
-                                    writer.name("twitchEmotes".also { position += it.length + 4 })
+                                if (kickEmotes.isNotEmpty()) {
+                                    writer.name("kickEmotes".also { position += it.length + 4 })
                                     writer.beginArray().also { position += 1 }
-                                    val last = twitchEmotes.lastOrNull()
-                                    twitchEmotes.forEach { emote ->
+                                    val last = kickEmotes.lastOrNull()
+                                    kickEmotes.forEach { emote ->
                                         val url = when (emoteQuality) {
                                             "4" -> emote.url4x ?: emote.url3x ?: emote.url2x ?: emote.url1x
                                             "3" -> emote.url3x ?: emote.url2x ?: emote.url1x
@@ -1217,11 +1217,11 @@ class VideoDownloadWorker @AssistedInject constructor(
                                     }
                                     writer.endArray().also { position += 1 }
                                 }
-                                if (twitchBadges.isNotEmpty()) {
-                                    writer.name("twitchBadges".also { position += it.length + 4 })
+                                if (kickBadges.isNotEmpty()) {
+                                    writer.name("kickBadges".also { position += it.length + 4 })
                                     writer.beginArray().also { position += 1 }
-                                    val last = twitchBadges.lastOrNull()
-                                    twitchBadges.forEach { badge ->
+                                    val last = kickBadges.lastOrNull()
+                                    kickBadges.forEach { badge ->
                                         val url = when (emoteQuality) {
                                             "4" -> badge.url4x ?: badge.url3x ?: badge.url2x ?: badge.url1x
                                             "3" -> badge.url3x ?: badge.url2x ?: badge.url1x

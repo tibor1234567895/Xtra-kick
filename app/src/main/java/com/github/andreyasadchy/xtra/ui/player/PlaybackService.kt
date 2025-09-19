@@ -457,7 +457,7 @@ class PlaybackService : MediaSessionService() {
                                                             proxySelector(
                                                                 object : ProxySelector() {
                                                                     override fun select(u: URI): List<Proxy> {
-                                                                        return if (Regex("video-weaver\\.\\w+\\.hls\\.ttvnw\\.net").matches(u.host)) {
+                                                                        return if (Regex("stream\\.kick\\.com").matches(u.host)) {
                                                                             listOf(Proxy(Proxy.Type.HTTP, InetSocketAddress(proxyHost, proxyPort)), Proxy.NO_PROXY)
                                                                         } else {
                                                                             listOf(Proxy.NO_PROXY)
@@ -547,7 +547,7 @@ class PlaybackService : MediaSessionService() {
                                                     ?: it.durationUs.takeIf { it != androidx.media3.common.C.TIME_UNSET }?.let { startTime + it }
                                                     ?: it.plannedDurationUs.takeIf { it != androidx.media3.common.C.TIME_UNSET }?.let { startTime + it }
                                                 endTime != null && (it.id.startsWith("stitched-ad-") ||
-                                                        it.clientDefinedAttributes.find { it.name == "CLASS" }?.textValue == "twitch-stitched-ad" ||
+                                                        it.clientDefinedAttributes.find { it.name == "CLASS" }?.textValue == "kick-stitched-ad" ||
                                                         it.clientDefinedAttributes.find { it.name.startsWith("X-TV-TWITCH-AD-") } != null)
                                                         && (startTime <= segmentStartTime && segmentStartTime < endTime)
                                             } != null

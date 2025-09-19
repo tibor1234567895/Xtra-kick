@@ -136,7 +136,7 @@ class StreamDownloadWorker @AssistedInject constructor(
         val networkLibrary = context.prefs().getString(C.NETWORK_LIBRARY, "OkHttp")
         val gqlHeaders = KickApiHelper.getGQLHeaders(context, context.prefs().getBoolean(C.TOKEN_INCLUDE_TOKEN_STREAM, true))
         val randomDeviceId = context.prefs().getBoolean(C.TOKEN_RANDOM_DEVICEID, true)
-        val xDeviceId = context.prefs().getString(C.TOKEN_XDEVICEID, "twitch-web-wall-mason")
+        val xDeviceId = context.prefs().getString(C.TOKEN_XDEVICEID, "kick-android-client")
         val playerType = context.prefs().getString(C.TOKEN_PLAYERTYPE, "site")
         val supportedCodecs = context.prefs().getString(C.TOKEN_SUPPORTED_CODECS, "av1,h265,h264")
         val proxyPlaybackAccessToken = context.prefs().getBoolean(C.PROXY_PLAYBACK_ACCESS_TOKEN, false)
@@ -974,7 +974,7 @@ class StreamDownloadWorker @AssistedInject constructor(
                                     when (reader.peek()) {
                                         JsonToken.NAME -> {
                                             when (reader.nextName()) {
-                                                "twitchEmotes" -> {
+                                                "kickEmotes" -> {
                                                     reader.beginArray()
                                                     while (reader.hasNext()) {
                                                         reader.beginObject()
@@ -992,7 +992,7 @@ class StreamDownloadWorker @AssistedInject constructor(
                                                     }
                                                     reader.endArray()
                                                 }
-                                                "twitchBadges" -> {
+                                                "kickBadges" -> {
                                                     reader.beginArray()
                                                     while (reader.hasNext()) {
                                                         reader.beginObject()
@@ -1142,7 +1142,7 @@ class StreamDownloadWorker @AssistedInject constructor(
                 webSocketListener = object : WebSocketListener() {
                     override fun onOpen(webSocket: WebSocket, response: Response) {
                         chatReadWebSocket?.apply {
-                            write("CAP REQ :twitch.tv/tags twitch.tv/commands")
+                            write("CAP REQ :kick.com/tags kick.com/commands")
                             write("NICK justinfan${Random().nextInt(((9999 - 1000) + 1)) + 1000}") //random number between 1000 and 9999
                             write("JOIN $hashChannelName")
                             pingTimer?.cancel()
@@ -1196,14 +1196,14 @@ class StreamDownloadWorker @AssistedInject constructor(
                                     }
                                     if (userNotice != null) {
                                         val chatMessage = ChatUtils.parseChatMessage(message, userNotice)
-                                        val twitchEmotes = mutableListOf<KickEmote>()
-                                        val twitchBadges = mutableListOf<KickBadge>()
+                                        val kickEmotes = mutableListOf<KickEmote>()
+                                        val kickBadges = mutableListOf<KickBadge>()
                                         val cheerEmotes = mutableListOf<CheerEmote>()
                                         val emotes = mutableListOf<Emote>()
                                         chatMessage.emotes?.forEach {
                                             if (it.id != null && !savedKickEmotes.contains(it.id)) {
                                                 savedKickEmotes.add(it.id)
-                                                twitchEmotes.add(it)
+                                                kickEmotes.add(it)
                                             }
                                         }
                                         chatMessage.badges?.forEach {
@@ -1212,7 +1212,7 @@ class StreamDownloadWorker @AssistedInject constructor(
                                                 savedBadges.add(pair)
                                                 val badge = badgeList.find { badge -> badge.setId == it.setId && badge.version == it.version }
                                                 if (badge != null) {
-                                                    twitchBadges.add(badge)
+                                                    kickBadges.add(badge)
                                                 }
                                             }
                                         }
@@ -1237,11 +1237,11 @@ class StreamDownloadWorker @AssistedInject constructor(
                                                 }
                                             }
                                         }
-                                        if (twitchEmotes.isNotEmpty()) {
-                                            writer.name("twitchEmotes".also { position += it.length + 4 })
+                                        if (kickEmotes.isNotEmpty()) {
+                                            writer.name("kickEmotes".also { position += it.length + 4 })
                                             writer.beginArray().also { position += 1 }
-                                            val last = twitchEmotes.lastOrNull()
-                                            twitchEmotes.forEach { emote ->
+                                            val last = kickEmotes.lastOrNull()
+                                            kickEmotes.forEach { emote ->
                                                 val url = when (emoteQuality) {
                                                     "4" -> emote.url4x ?: emote.url3x ?: emote.url2x ?: emote.url1x
                                                     "3" -> emote.url3x ?: emote.url2x ?: emote.url1x
@@ -1287,11 +1287,11 @@ class StreamDownloadWorker @AssistedInject constructor(
                                             }
                                             writer.endArray().also { position += 1 }
                                         }
-                                        if (twitchBadges.isNotEmpty()) {
-                                            writer.name("twitchBadges".also { position += it.length + 4 })
+                                        if (kickBadges.isNotEmpty()) {
+                                            writer.name("kickBadges".also { position += it.length + 4 })
                                             writer.beginArray().also { position += 1 }
-                                            val last = twitchBadges.lastOrNull()
-                                            twitchBadges.forEach { badge ->
+                                            val last = kickBadges.lastOrNull()
+                                            kickBadges.forEach { badge ->
                                                 val url = when (emoteQuality) {
                                                     "4" -> badge.url4x ?: badge.url3x ?: badge.url2x ?: badge.url1x
                                                     "3" -> badge.url3x ?: badge.url2x ?: badge.url1x

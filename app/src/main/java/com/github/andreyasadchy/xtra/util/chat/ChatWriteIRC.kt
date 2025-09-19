@@ -34,7 +34,7 @@ class ChatWriteIRC(
     override fun run() {
 
         fun handlePing(writer: BufferedWriter) {
-            write("PONG :tmi.twitch.tv", writer)
+            write("PONG :chat.kick.com", writer)
             writer.flush()
         }
 
@@ -71,16 +71,16 @@ class ChatWriteIRC(
         Log.d(TAG, "Connecting to Kick IRC - SSL $useSSL")
         try {
             socketOut = if (useSSL) {
-                SSLSocketFactory.getDefault().createSocket("irc.twitch.tv", 6697)
+                SSLSocketFactory.getDefault().createSocket("irc.kick.com", 6697)
             } else {
-                Socket("irc.twitch.tv", 6667)
+                Socket("irc.kick.com", 6667)
             }.apply {
                 readerOut = BufferedReader(InputStreamReader(getInputStream()))
                 writerOut = BufferedWriter(OutputStreamWriter(getOutputStream()))
                 write("PASS oauth:$userToken", writerOut)
                 write("NICK $userLogin", writerOut)
             }
-            write("CAP REQ :twitch.tv/tags twitch.tv/commands", writerOut)
+            write("CAP REQ :kick.com/tags kick.com/commands", writerOut)
             write("JOIN $hashChannelName", writerOut)
             writerOut.flush()
             Log.d(TAG, "Successfully connected to - $hashChannelName")

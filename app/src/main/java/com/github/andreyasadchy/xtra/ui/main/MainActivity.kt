@@ -407,8 +407,8 @@ class MainActivity : AppCompatActivity(), SlidingLayout.Listener {
             Intent.ACTION_VIEW -> {
                 val url = intent.data.toString()
                 when {
-                    url.contains("twitch.tv/videos/") -> {
-                        val id = url.substringAfter("twitch.tv/videos/").takeIf { it.isNotBlank() }?.let { it.substringBefore("?", it.substringBefore("/")) }
+                    url.contains("kick.com/video/") -> {
+                        val id = url.substringAfter("kick.com/video/").takeIf { it.isNotBlank() }?.let { it.substringBefore("?", it.substringBefore("/")) }
                         val offset = url.substringAfter("?t=").takeIf { it.isNotBlank() }?.let { (KickApiHelper.getDuration(it) ?: 0) * 1000 }
                         if (!id.isNullOrBlank()) {
                             viewModel.loadVideo(
@@ -458,8 +458,8 @@ class MainActivity : AppCompatActivity(), SlidingLayout.Listener {
                             }
                         }
                     }
-                    url.contains("clips.twitch.tv/") -> {
-                        val id = url.substringAfter("clips.twitch.tv/").takeIf { it.isNotBlank() }?.let { it.substringBefore("?", it.substringBefore("/")) }
+                    url.contains("kick.com/clip/") -> {
+                        val id = url.substringAfter("kick.com/clip/").takeIf { it.isNotBlank() }?.let { it.substringBefore("?", it.substringBefore("/")) }
                         if (!id.isNullOrBlank()) {
                             viewModel.loadClip(
                                 id,
@@ -482,8 +482,8 @@ class MainActivity : AppCompatActivity(), SlidingLayout.Listener {
                             }
                         }
                     }
-                    url.contains("twitch.tv/directory/category/") -> {
-                        val slug = url.substringAfter("twitch.tv/directory/category/").takeIf { it.isNotBlank() }?.substringBefore("/")
+                    url.contains("kick.com/category/") -> {
+                        val slug = url.substringAfter("kick.com/category/").takeIf { it.isNotBlank() }?.substringBefore("/")
                         if (!slug.isNullOrBlank()) {
                             playerFragment?.minimize()
                             navController.navigate(
@@ -499,8 +499,8 @@ class MainActivity : AppCompatActivity(), SlidingLayout.Listener {
                             )
                         }
                     }
-                    url.contains("twitch.tv/directory/game/") -> {
-                        val name = url.substringAfter("twitch.tv/directory/game/").takeIf { it.isNotBlank() }?.let { it.substringBefore("?", it.substringBefore("/")) }
+                    url.contains("kick.com/category/") -> {
+                        val name = url.substringAfter("kick.com/category/").takeIf { it.isNotBlank() }?.let { it.substringBefore("?", it.substringBefore("/")) }
                         if (!name.isNullOrBlank()) {
                             playerFragment?.minimize()
                             navController.navigate(
@@ -517,7 +517,7 @@ class MainActivity : AppCompatActivity(), SlidingLayout.Listener {
                         }
                     }
                     else -> {
-                        val login = url.substringAfter("twitch.tv/").takeIf { it.isNotBlank() }?.let { it.substringBefore("?", it.substringBefore("/")) }
+                        val login = url.substringAfter("kick.com/").takeIf { it.isNotBlank() }?.let { it.substringBefore("?", it.substringBefore("/")) }
                         if (!login.isNullOrBlank()) {
                             viewModel.loadUser(
                                 login,
@@ -837,7 +837,7 @@ class MainActivity : AppCompatActivity(), SlidingLayout.Listener {
             prefs.edit {
                 if (prefs().getString(C.GQL_CLIENT_ID2, "kd1unb4b3q4t58fwlpcbzcbnm76a8fp") == "kd1unb4b3q4t58fwlpcbzcbnm76a8fp" && prefs().getString(C.GQL_TOKEN2, null).isNullOrBlank()) {
                     putString(C.GQL_CLIENT_ID2, "ue6666qo983tsx6so1t0vnawi233wa")
-                    putString(C.GQL_REDIRECT2, "https://www.twitch.tv/settings/connections")
+                    putString(C.GQL_REDIRECT2, "https://www.kick.com/settings/connections")
                 }
             }
         }

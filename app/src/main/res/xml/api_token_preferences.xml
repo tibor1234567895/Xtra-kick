@@ -36,7 +36,7 @@
         app:singleLineTitle="false" />
 
     <EditTextPreference
-        android:defaultValue="https://www.twitch.tv/"
+        android:defaultValue="https://kick.com/"
         android:key="gql_redirect2"
         android:title="@string/api_gql_redirect"
         app:useSimpleSummaryProvider="true"

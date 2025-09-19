@@ -1,6 +1,6 @@
 # Xtra for Kick
 
-Xtra is an Android client that is being migrated to the [Kick public API](https://docs.kick.com). This repository now ships Kick-native network clients, OAuth helpers, and chat plumbing so the remaining UI can finish the service switch without relying on any Twitch infrastructure.
+Xtra is an Android client that is being migrated to the [Kick public API](https://docs.kick.com). This repository now ships Kick-native network clients, OAuth helpers, and chat plumbing so the remaining UI can finish the service switch without relying on the legacy infrastructure.
 
 ## Prerequisites
 
@@ -49,10 +49,10 @@ The migration scaffolding introduced in this iteration includes:
 
 ## Known Gaps
 
-- UI still references Twitch data sources and needs to be re-wired to consume the new Kick repositories.
+- UI still references legacy data sources and needs to be re-wired to consume the new Kick repositories.
 - Kick session refresh and account metadata are not yet surfaced beyond token storage.
 - Kick chat message schemas require full parsing and presentation logic.
-- Some Twitch assets, strings, and documentation remain and should be removed in the next migration pass.
+- Some legacy assets, strings, and documentation remain and should be removed in the next migration pass.
 
 ## CI
 

@@ -153,9 +153,9 @@ class FollowedGamesAdapter(
                         tagsLayout.gone()
                     }
                     if (item.followAccount) {
-                        twitchText.visible()
+                        kickText.visible()
                     } else {
-                        twitchText.gone()
+                        kickText.gone()
                     }
                     if (item.followLocal) {
                         localText.visible()

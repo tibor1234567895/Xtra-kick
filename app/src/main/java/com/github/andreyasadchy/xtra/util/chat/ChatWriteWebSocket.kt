@@ -23,7 +23,7 @@ class ChatWriteWebSocket(
 
     fun connect() {
         socket = client.newWebSocket(
-            Request.Builder().url("wss://irc-ws.chat.twitch.tv").build(),
+            Request.Builder().url("wss://irc.chat.kick.com").build(),
             ChatWriteWebSocketListener()
         )
     }
@@ -67,7 +67,7 @@ class ChatWriteWebSocket(
 
     private inner class ChatWriteWebSocketListener : WebSocketListener() {
         override fun onOpen(webSocket: WebSocket, response: Response) {
-            write("CAP REQ :twitch.tv/tags twitch.tv/commands")
+            write("CAP REQ :kick.com/tags kick.com/commands")
             write("PASS oauth:$userToken")
             write("NICK $userLogin")
             write("JOIN $hashChannelName")

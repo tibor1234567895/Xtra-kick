@@ -2067,8 +2067,8 @@ class ChatViewModel @Inject constructor(
                 val nameDisplay = applicationContext.prefs().getString(C.UI_NAME_DISPLAY, "0")
                 val messages = mutableListOf<ChatMessage>()
                 var startTimeMs = 0L
-                val twitchEmotes = mutableListOf<KickEmote>()
-                val twitchBadges = mutableListOf<KickBadge>()
+                val kickEmotes = mutableListOf<KickEmote>()
+                val kickBadges = mutableListOf<KickBadge>()
                 val cheerEmotesList = mutableListOf<CheerEmote>()
                 val emotes = mutableListOf<Emote>()
                 if (url.toUri().scheme == ContentResolver.SCHEME_CONTENT) {
@@ -2281,7 +2281,7 @@ class ChatViewModel @Inject constructor(
                                                         }
                                                         reader.endArray().also { position += 1 }
                                                     }
-                                                    "twitchEmotes" -> {
+                                                    "kickEmotes" -> {
                                                         reader.beginArray().also { position += 1 }
                                                         while (reader.hasNext()) {
                                                             reader.beginObject().also { position += 1 }
@@ -2303,7 +2303,7 @@ class ChatViewModel @Inject constructor(
                                                                 }
                                                             }
                                                             if (!id.isNullOrBlank() && data != null) {
-                                                                twitchEmotes.add(KickEmote(
+                                                                kickEmotes.add(KickEmote(
                                                                     id = id,
                                                                     localData = data
                                                                 ))
@@ -2315,7 +2315,7 @@ class ChatViewModel @Inject constructor(
                                                         }
                                                         reader.endArray().also { position += 1 }
                                                     }
-                                                    "twitchBadges" -> {
+                                                    "kickBadges" -> {
                                                         reader.beginArray().also { position += 1 }
                                                         while (reader.hasNext()) {
                                                             reader.beginObject().also { position += 1 }
@@ -2339,7 +2339,7 @@ class ChatViewModel @Inject constructor(
                                                                 }
                                                             }
                                                             if (!setId.isNullOrBlank() && !version.isNullOrBlank() && data != null) {
-                                                                twitchBadges.add(KickBadge(
+                                                                kickBadges.add(KickBadge(
                                                                     setId = setId,
                                                                     version = version,
                                                                     localData = data
@@ -2451,8 +2451,8 @@ class ChatViewModel @Inject constructor(
                         } while (token != JsonToken.END_DOCUMENT)
                     }
                 }
-                _localKickEmotes.value = twitchEmotes
-                _channelBadges.value = twitchBadges
+                _localKickEmotes.value = kickEmotes
+                _channelBadges.value = kickBadges
                 _cheerEmotes.value = cheerEmotesList
                 _channelStvEmotes.value = emotes
                 if (emotes.isEmpty()) {
