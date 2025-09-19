@@ -81,20 +81,44 @@ class KickBttvService @Inject constructor(
 
     private fun buildImageSet(emoteId: String, preferWebp: Boolean): KickBttvImageSet {
         val extension = if (preferWebp) "webp" else null
-        val suffix1x = if (extension != null) "1x.$extension" else "1x"
-        val suffix2x = if (extension != null) "2x.$extension" else "2x"
-        val suffix3x = if (extension != null) "3x.$extension" else "3x"
+        val suffix1x = pickFirstAvailableSuffix(emoteId, scaleSuffixes("1x", extension))
+        val suffix2x = pickFirstAvailableSuffix(emoteId, scaleSuffixes("2x", extension))
+        val suffix3x = pickFirstAvailableSuffix(
+            emoteId,
+            (scaleSuffixes("3x", extension) + scaleSuffixes("2x", extension)).distinct()
+        )
         return KickBttvImageSet(
-            url1x = "https://cdn.betterttv.net/emote/$emoteId/$suffix1x",
-            url2x = "https://cdn.betterttv.net/emote/$emoteId/$suffix2x",
-            url3x = "https://cdn.betterttv.net/emote/$emoteId/$suffix3x",
+            url1x = buildCdnUrl(emoteId, suffix1x),
+            url2x = buildCdnUrl(emoteId, suffix2x),
+            url3x = buildCdnUrl(emoteId, suffix3x),
             url4x = null,
         )
     }
 
-    private companion object {
+    private fun scaleSuffixes(scale: String, extension: String?): List<String> =
+        if (extension != null) listOf("$scale.$extension", scale) else listOf(scale)
+
+    private fun buildCdnUrl(emoteId: String, suffix: String): String =
+        "$CDN_BASE_URL/$emoteId/$suffix"
+
+    private fun pickFirstAvailableSuffix(emoteId: String, candidates: List<String>): String {
+        val availabilityOverride = assetAvailabilityOverride
+        if (availabilityOverride != null) {
+            for (candidate in candidates) {
+                if (availabilityOverride(emoteId, candidate)) {
+                    return candidate
+                }
+            }
+            return candidates.last()
+        }
+        return candidates.first()
+    }
+
+    companion object {
         private const val DEFAULT_BASE_URL = "https://api.betterttv.net/3"
         private const val DEFAULT_USER_AGENT = "XtraKick/1.0"
+        private const val CDN_BASE_URL = "https://cdn.betterttv.net/emote"
+        internal var assetAvailabilityOverride: ((String, String) -> Boolean)? = null
         private val OVERLAY_EMOTE_NAMES = setOf(
             "IceCold",
             "SoSnowy",

@@ -29,11 +29,13 @@ class KickBttvServiceTest {
             baseUrl = baseUrl,
             userAgent = "UnitTest"
         )
+        KickBttvService.assetAvailabilityOverride = null
     }
 
     @After
     fun tearDown() {
         mockWebServer.shutdown()
+        KickBttvService.assetAvailabilityOverride = null
     }
 
     @Test
@@ -54,6 +56,28 @@ class KickBttvServiceTest {
         assertEquals("https://cdn.betterttv.net/emote/abc123/1x", emote.images.url1x)
         assertEquals("https://cdn.betterttv.net/emote/abc123/2x", emote.images.url2x)
         assertEquals("https://cdn.betterttv.net/emote/abc123/3x", emote.images.url3x)
+        assertNull(emote.images.url4x)
+        assertEquals("/3/cached/emotes/global", mockWebServer.takeRequest().path)
+    }
+
+    @Test
+    fun `3x asset falls back to 2x when unavailable`() = runBlocking {
+        KickBttvService.assetAvailabilityOverride = { _, suffix ->
+            suffix != "3x.webp" && suffix != "3x"
+        }
+        mockWebServer.enqueue(
+            MockResponse()
+                .setResponseCode(200)
+                .setBody("""[{"id":"fallback","code":"Fallback","animated":false}]""")
+        )
+
+        val emotes = service.getGlobalEmotes(preferWebp = true)
+
+        assertEquals(1, emotes.size)
+        val emote = emotes.first()
+        assertEquals("https://cdn.betterttv.net/emote/fallback/2x.webp", emote.images.url3x)
+        assertEquals("https://cdn.betterttv.net/emote/fallback/2x.webp", emote.images.url2x)
+        assertEquals("https://cdn.betterttv.net/emote/fallback/1x.webp", emote.images.url1x)
         assertNull(emote.images.url4x)
         assertEquals("/3/cached/emotes/global", mockWebServer.takeRequest().path)
     }
