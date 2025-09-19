@@ -13,8 +13,8 @@ class KickTokenStoreTest {
 
     @Test
     fun `update persists the latest token payload`() {
-        val preferences = InMemorySharedPreferences()
-        val store = KickTokenStore(preferences)
+        val securePreferences = FakeSecurePreferences()
+        val store = KickTokenStore(securePreferences)
         val expectedExpiresLowerBound = System.currentTimeMillis() + 60_000
 
         val response = KickTokenResponse(
@@ -39,8 +39,8 @@ class KickTokenStoreTest {
 
     @Test
     fun `clear removes persisted credentials`() {
-        val preferences = InMemorySharedPreferences()
-        val store = KickTokenStore(preferences)
+        val securePreferences = FakeSecurePreferences()
+        val store = KickTokenStore(securePreferences)
 
         store.update(
             KickTokenResponse(
@@ -105,6 +105,17 @@ class KickTokenStoreTest {
 
         assertNull(encryptedPreferences.getString("access_token", null))
         assertTrue(legacyPreferences.contains("access_token"))
+    }
+
+    @Test
+    fun `initialization triggers secure migration`() {
+        val securePreferences = FakeSecurePreferences()
+
+        assertEquals(0, securePreferences.ensureMigrationCompleteInvocations)
+
+        KickTokenStore(securePreferences)
+
+        assertEquals(1, securePreferences.ensureMigrationCompleteInvocations)
     }
 
     private class InMemorySharedPreferences : SharedPreferences {
@@ -235,6 +246,22 @@ class KickTokenStoreTest {
             private fun notifyListeners(key: String) {
                 listeners.forEach { it.onSharedPreferenceChanged(this@InMemorySharedPreferences, key) }
             }
+        }
+    }
+
+    private class FakeSecurePreferences(
+        val delegate: SharedPreferences = InMemorySharedPreferences(),
+        private val onEnsureMigrationComplete: () -> Unit = {}
+    ) : KickTokenStore.SecurePreferences {
+        var ensureMigrationCompleteInvocations: Int = 0
+            private set
+
+        override val preferences: SharedPreferences
+            get() = delegate
+
+        override fun ensureMigrationComplete() {
+            ensureMigrationCompleteInvocations++
+            onEnsureMigrationComplete()
         }
     }
 }
