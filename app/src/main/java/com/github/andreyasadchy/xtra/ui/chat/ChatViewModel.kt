@@ -17,6 +17,7 @@ import com.github.andreyasadchy.xtra.model.chat.ChatMessage
 import com.github.andreyasadchy.xtra.model.chat.Chatter
 import com.github.andreyasadchy.xtra.model.chat.CheerEmote
 import com.github.andreyasadchy.xtra.model.chat.Emote
+import com.github.andreyasadchy.xtra.model.chat.Reply
 import com.github.andreyasadchy.xtra.model.chat.NamePaint
 import com.github.andreyasadchy.xtra.model.chat.Poll
 import com.github.andreyasadchy.xtra.model.chat.Prediction
@@ -26,17 +27,20 @@ import com.github.andreyasadchy.xtra.model.chat.RoomState
 import com.github.andreyasadchy.xtra.model.chat.StvBadge
 import com.github.andreyasadchy.xtra.model.chat.KickBadge
 import com.github.andreyasadchy.xtra.model.chat.KickEmote
+import com.github.andreyasadchy.xtra.kick.chat.KickChatBadge
+import com.github.andreyasadchy.xtra.kick.chat.KickChatClient
+import com.github.andreyasadchy.xtra.kick.chat.KickChatEmote
+import com.github.andreyasadchy.xtra.kick.chat.KickChatEnvelope
+import com.github.andreyasadchy.xtra.kick.chat.KickChatEvent
+import com.github.andreyasadchy.xtra.kick.chat.KickChatMessage
+import com.github.andreyasadchy.xtra.kick.chat.KickChatReply
 import com.github.andreyasadchy.xtra.repository.GraphQLRepository
 import com.github.andreyasadchy.xtra.repository.HelixRepository
 import com.github.andreyasadchy.xtra.repository.PlayerRepository
 import com.github.andreyasadchy.xtra.repository.TranslateAllMessagesUsersRepository
 import com.github.andreyasadchy.xtra.util.C
 import com.github.andreyasadchy.xtra.util.KickApiHelper
-import com.github.andreyasadchy.xtra.util.chat.ChatReadIRC
-import com.github.andreyasadchy.xtra.util.chat.ChatReadWebSocket
 import com.github.andreyasadchy.xtra.util.chat.ChatUtils
-import com.github.andreyasadchy.xtra.util.chat.ChatWriteIRC
-import com.github.andreyasadchy.xtra.util.chat.ChatWriteWebSocket
 import com.github.andreyasadchy.xtra.util.chat.EventSubUtils
 import com.github.andreyasadchy.xtra.util.chat.EventSubWebSocket
 import com.github.andreyasadchy.xtra.util.chat.HermesWebSocket
@@ -63,6 +67,11 @@ import java.util.Timer
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import kotlin.concurrent.scheduleAtFixedRate
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 
 
 @HiltViewModel
@@ -72,19 +81,21 @@ class ChatViewModel @Inject constructor(
     private val graphQLRepository: GraphQLRepository,
     private val helixRepository: HelixRepository,
     private val playerRepository: PlayerRepository,
+    private val kickChatClient: KickChatClient,
     private val okHttpClient: OkHttpClient,
 ) : ViewModel() {
 
     val integrity = MutableStateFlow<String?>(null)
 
-    private var chatReadIRC: ChatReadIRC? = null
-    private var chatWriteIRC: ChatWriteIRC? = null
-    private var chatReadWebSocket: ChatReadWebSocket? = null
-    private var chatWriteWebSocket: ChatWriteWebSocket? = null
     private var eventSub: EventSubWebSocket? = null
     private var hermesWebSocket: HermesWebSocket? = null
     private var pubSub: PubSubWebSocket? = null
     private var stvEventApi: StvEventApiWebSocket? = null
+    private var kickChatState = KickChatState.IDLE
+    private var kickChatChannelId: Long? = null
+    private var kickChatChannelIdString: String? = null
+    private var kickChatChannelLogin: String? = null
+    private var kickReconnectJob: Job? = null
     private var stvUserId: String? = null
     private var stvLastPresenceUpdate: Long? = null
     private val allEmotes = mutableListOf<Emote>()
@@ -97,6 +108,8 @@ class ChatViewModel @Inject constructor(
 
     private var chatReplayManager: ChatReplayManager? = null
     private var chatReplayManagerLocal: ChatReplayManagerLocal? = null
+
+    private enum class KickChatState { IDLE, CONNECTING, CONNECTED }
 
     val recentEmotes by lazy { playerRepository.loadRecentEmotesFlow() }
     val hasRecentEmotes = MutableStateFlow(false)
@@ -173,7 +186,7 @@ class ChatViewModel @Inject constructor(
     val newChatter = MutableStateFlow<Chatter?>(null)
 
     fun startLive(networkLibrary: String?, channelId: String?, channelLogin: String?, channelName: String?, streamId: String?) {
-        if (chatReadIRC == null && chatReadWebSocket == null && eventSub == null && channelLogin != null) {
+        if (kickChatState == KickChatState.IDLE && eventSub == null && channelLogin != null) {
             messageLimit = applicationContext.prefs().getInt(C.CHAT_LIMIT, 600)
             this.streamId = streamId
             startLiveChat(channelId, channelLogin)
@@ -202,7 +215,8 @@ class ChatViewModel @Inject constructor(
     }
 
     fun resumeLive(channelId: String?, channelLogin: String?) {
-        if ((chatReadIRC?.isActive == false || chatReadWebSocket?.isActive == false || eventSub?.isActive == false) && channelLogin != null && autoReconnect) {
+        if (!autoReconnect || channelLogin == null) return
+        if (kickChatState == KickChatState.IDLE || eventSub?.isActive == false) {
             startLiveChat(channelId, channelLogin)
         }
     }
@@ -642,11 +656,13 @@ class ChatViewModel @Inject constructor(
         val isLoggedIn = !accountLogin.isNullOrBlank() && (!gqlHeaders[C.HEADER_TOKEN].isNullOrBlank() || !helixHeaders[C.HEADER_TOKEN].isNullOrBlank())
         val usePubSub = applicationContext.prefs().getBoolean(C.CHAT_PUBSUB_ENABLED, true)
         val showUserNotice = applicationContext.prefs().getBoolean(C.CHAT_SHOW_USERNOTICE, true)
-        val showClearMsg = applicationContext.prefs().getBoolean(C.CHAT_SHOW_CLEARMSG, true)
         val showClearChat = applicationContext.prefs().getBoolean(C.CHAT_SHOW_CLEARCHAT, true)
-        val nameDisplay = applicationContext.prefs().getString(C.UI_NAME_DISPLAY, "0")
-        val useApiChatMessages = applicationContext.prefs().getBoolean(C.DEBUG_API_CHAT_MESSAGES, true)
-        if (applicationContext.prefs().getBoolean(C.DEBUG_EVENTSUB_CHAT, false) && !helixHeaders[C.HEADER_TOKEN].isNullOrBlank()) {
+        kickReconnectJob?.cancel()
+        kickChatChannelIdString = channelId
+        kickChatChannelLogin = channelLogin
+        kickChatChannelId = channelId?.toLongOrNull()
+        val debugEventSubChat = applicationContext.prefs().getBoolean(C.DEBUG_EVENTSUB_CHAT, false)
+        if (debugEventSubChat && !helixHeaders[C.HEADER_TOKEN].isNullOrBlank()) {
             eventSub = EventSubWebSocket(
                 client = okHttpClient,
                 onConnect = { onConnect(channelLogin) },
@@ -691,56 +707,25 @@ class ChatViewModel @Inject constructor(
                 },
             ).apply { connect() }
         } else {
-            val gqlToken = gqlHeaders[C.HEADER_TOKEN]?.removePrefix("OAuth ")
-            val helixToken = helixHeaders[C.HEADER_TOKEN]?.removePrefix("Bearer ")
-            if (applicationContext.prefs().getBoolean(C.CHAT_USE_WEBSOCKET, false)) {
-                chatReadWebSocket = ChatReadWebSocket(
-                    loggedIn = isLoggedIn,
-                    channelName = channelLogin,
-                    client = okHttpClient,
-                    onConnect = { onConnect(channelLogin) },
-                    onDisconnect = { message, fullMsg -> onDisconnect(channelLogin, message, fullMsg) },
-                    onChatMessage = { message, fullMsg -> onChatMessage(message, fullMsg, showUserNotice, usePubSub, networkLibrary, isLoggedIn, accountId, channelId) },
-                    onClearMessage = { if (showClearMsg) { onClearMessage(it, nameDisplay) } },
-                    onClearChat = { if (showClearChat) { onClearChat(it) } },
-                    onNotice = { onNotice(it) },
-                    onRoomState = { onRoomState(it) }
-                ).apply { connect() }
-                if (isLoggedIn && (!gqlToken.isNullOrBlank() || !helixHeaders[C.HEADER_TOKEN].isNullOrBlank() && !useApiChatMessages)) {
-                    chatWriteWebSocket = ChatWriteWebSocket(
-                        userLogin = accountLogin,
-                        userToken = gqlToken?.takeIf { it.isNotBlank() } ?: helixToken,
-                        channelName = channelLogin,
-                        client = okHttpClient,
-                        onNotice = { onNotice(it) },
-                        onUserState = { onUserState(it, channelId) }
-                    ).apply { connect() }
-                }
+            val channelNumericId = kickChatChannelId
+            if (channelNumericId == null) {
+                Log.w(TAG, "Missing channel id for chat connection to $channelLogin")
+                kickChatState = KickChatState.IDLE
             } else {
-                val useSSL = applicationContext.prefs().getBoolean(C.CHAT_USE_SSL, true)
-                chatReadIRC = ChatReadIRC(
-                    useSSL = useSSL,
-                    loggedIn = isLoggedIn,
-                    channelName = channelLogin,
-                    onConnect = { onConnect(channelLogin) },
-                    onDisconnect = { message, fullMsg -> onDisconnect(channelLogin, message, fullMsg) },
-                    onChatMessage = { message, fullMsg -> onChatMessage(message, fullMsg, showUserNotice, usePubSub, networkLibrary, isLoggedIn, accountId, channelId) },
-                    onClearMessage = { if (showClearMsg) { onClearMessage(it, nameDisplay) } },
-                    onClearChat = { if (showClearChat) { onClearChat(it) } },
-                    onNotice = { onNotice(it) },
-                    onRoomState = { onRoomState(it) }
-                ).apply { start() }
-                if (isLoggedIn && (!gqlToken.isNullOrBlank() || !helixHeaders[C.HEADER_TOKEN].isNullOrBlank() && !useApiChatMessages)) {
-                    chatWriteIRC = ChatWriteIRC(
-                        useSSL = useSSL,
-                        userLogin = accountLogin,
-                        userToken = gqlToken?.takeIf { it.isNotBlank() } ?: helixToken,
-                        channelName = channelLogin,
-                        onSendMessageError = { message, fullMsg -> onSendMessageError(message, fullMsg) },
-                        onNotice = { onNotice(it) },
-                        onUserState = { onUserState(it, channelId) }
-                    ).apply { start() }
-                }
+                val chatToken = gqlHeaders[C.HEADER_TOKEN].stripAuthPrefix()
+                    ?: helixHeaders[C.HEADER_TOKEN].stripAuthPrefix()
+                kickChatState = KickChatState.CONNECTING
+                kickChatClient.connect(
+                    channelNumericId,
+                    chatToken,
+                    KickChatListener(
+                        channelId = channelId,
+                        channelLogin = channelLogin,
+                        networkLibrary = networkLibrary,
+                        isLoggedIn = isLoggedIn,
+                        accountId = accountId
+                    )
+                )
             }
         }
         if (usePubSub && !channelId.isNullOrBlank()) {
@@ -1052,22 +1037,229 @@ class ChatViewModel @Inject constructor(
     }
 
     fun stopLiveChat() {
-        chatReadIRC?.let {
-            viewModelScope.launch {
-                it.disconnect()
-            }
-        } ?: chatReadWebSocket?.disconnect() ?: eventSub?.disconnect()
-        chatWriteIRC?.let {
-            viewModelScope.launch {
-                it.disconnect()
-            }
-        } ?: chatWriteWebSocket?.disconnect()
-        hermesWebSocket?.disconnect() ?: pubSub?.disconnect()
+        kickReconnectJob?.cancel()
+        kickReconnectJob = null
+        if (kickChatState != KickChatState.IDLE) {
+            kickChatClient.disconnect()
+            kickChatState = KickChatState.IDLE
+        }
+        eventSub?.disconnect()
+        eventSub = null
+        hermesWebSocket?.disconnect()
+        hermesWebSocket = null
+        pubSub?.disconnect()
+        pubSub = null
         stvEventApi?.disconnect()
+        stvEventApi = null
+        kickChatChannelId = null
+        kickChatChannelIdString = null
+        kickChatChannelLogin = null
     }
 
     fun isActive(): Boolean? {
-        return chatReadIRC?.isActive ?: chatReadWebSocket?.isActive ?: eventSub?.isActive
+        eventSub?.isActive?.let { return it }
+        return when (kickChatState) {
+            KickChatState.CONNECTED -> true
+            KickChatState.CONNECTING -> null
+            KickChatState.IDLE -> null
+        }
+    }
+
+    private inner class KickChatListener(
+        private val channelId: String?,
+        private val channelLogin: String,
+        private val networkLibrary: String?,
+        private val isLoggedIn: Boolean,
+        private val accountId: String?,
+    ) : KickChatClient.Listener {
+        override fun onConnected() {
+            kickReconnectJob?.cancel()
+            kickReconnectJob = null
+            kickChatState = KickChatState.CONNECTED
+            onConnect(channelLogin)
+        }
+
+        override fun onMessage(event: KickChatEvent) {
+            when (event) {
+                is KickChatEvent.ChatMessage -> handleKickChatMessage(event.message, networkLibrary, isLoggedIn, accountId, channelId)
+                is KickChatEvent.Unknown -> handlePhoenixEvent(event.envelope, channelLogin)
+            }
+        }
+
+        override fun onClosed(code: Int, reason: String) {
+            val message = reason.takeIf { it.isNotBlank() } ?: code.toString()
+            handleKickSocketClosed(channelLogin, message)
+        }
+
+        override fun onError(throwable: Throwable) {
+            handleKickSocketClosed(channelLogin, throwable.message ?: throwable.toString())
+        }
+    }
+
+    private fun handleKickChatMessage(
+        message: KickChatMessage,
+        networkLibrary: String?,
+        isLoggedIn: Boolean,
+        accountId: String?,
+        channelId: String?,
+    ) {
+        val chatMessage = message.toChatMessage()
+        if (chatMessage.reply != null) {
+            onMessage(
+                ChatMessage(
+                    reply = chatMessage.reply,
+                    isReply = true,
+                    replyParent = chatMessage,
+                )
+            )
+        }
+        if (chatMessage.systemMsg != null && chatMessage.message.isNullOrBlank()) {
+            onMessage(chatMessage)
+        } else {
+            onChatMessage(chatMessage, networkLibrary, isLoggedIn, accountId, channelId)
+        }
+    }
+
+    private fun handlePhoenixEvent(envelope: KickChatEnvelope, channelLogin: String) {
+        when (envelope.event) {
+            "phx_reply" -> {
+                val status = envelope.payload["status"]?.jsonPrimitive?.contentOrNull
+                if (status.equals("error", true)) {
+                    val reason = envelope.payload["response"]?.jsonObject?.let { response ->
+                        response["message"]?.jsonPrimitive?.contentOrNull
+                            ?: response["reason"]?.jsonPrimitive?.contentOrNull
+                    } ?: status
+                    handleKickSocketClosed(channelLogin, reason)
+                }
+            }
+            "phx_error", "phx_close" -> {
+                val reason = envelope.payload["reason"]?.jsonPrimitive?.contentOrNull
+                    ?: envelope.payload["response"]?.jsonObject?.let { response ->
+                        response["message"]?.jsonPrimitive?.contentOrNull
+                            ?: response["reason"]?.jsonPrimitive?.contentOrNull
+                    }
+                    ?: envelope.payload["status"]?.jsonPrimitive?.contentOrNull
+                handleKickSocketClosed(channelLogin, reason)
+            }
+        }
+    }
+
+    private fun handleKickSocketClosed(channelLogin: String, reason: String?) {
+        if (kickChatState == KickChatState.IDLE) {
+            return
+        }
+        kickChatState = KickChatState.IDLE
+        val message = reason?.takeIf { it.isNotBlank() } ?: "closed"
+        onDisconnect(channelLogin, message, reason ?: message)
+        scheduleKickReconnect()
+    }
+
+    private fun scheduleKickReconnect() {
+        if (!autoReconnect) {
+            return
+        }
+        val channelId = kickChatChannelIdString ?: return
+        val channelLogin = kickChatChannelLogin ?: return
+        kickReconnectJob?.cancel()
+        kickReconnectJob = viewModelScope.launch {
+            delay(2000)
+            if (autoReconnect) {
+                startLiveChat(channelId, channelLogin)
+            }
+        }
+    }
+
+    private fun KickChatMessage.toChatMessage(): ChatMessage {
+        val isAction = type.equals("action", true)
+        val isSystem = type.equals("system", true)
+        val replyMessage = reply?.toReply()
+        val badges = (metadata?.badges.orEmpty() + sender.identity?.badges.orEmpty())
+            .mapNotNull { it.toBadge() }
+            .distinctBy { it.setId to it.version }
+        val emotes = metadata?.emotes?.mapNotNull { it.toKickEmote() }
+        return ChatMessage(
+            id = id,
+            userId = sender.id.toString(),
+            userLogin = sender.username,
+            userName = sender.username,
+            message = if (isSystem) null else content,
+            color = sender.identity?.color,
+            emotes = emotes,
+            badges = badges,
+            isAction = isAction,
+            isFirst = false,
+            systemMsg = if (isSystem) content else null,
+            reply = replyMessage,
+            isReply = replyMessage != null,
+            timestamp = KickApiHelper.parseIso8601DateUTC(createdAt),
+            fullMsg = content,
+        )
+    }
+
+    private fun KickChatBadge.toBadge(): Badge? {
+        val setId = type.takeIf { it.isNotBlank() } ?: return null
+        val version = when {
+            !text.isNullOrBlank() -> text!!
+            count != null -> count.toString()
+            !source.isNullOrBlank() -> source!!
+            else -> "1"
+        }
+        return Badge(setId, version)
+    }
+
+    private fun KickChatReply.toReply(): Reply {
+        return Reply(
+            threadParentId = id,
+            userLogin = username ?: displayName,
+            userName = displayName ?: username,
+            message = text,
+        )
+    }
+
+    private fun KickChatEmote.toKickEmote(): KickEmote? {
+        val name = code ?: this.name ?: return null
+        val urls = parseSrcSet(image?.srcSet ?: image?.srcset)
+        val baseUrl = image?.src ?: url
+        val url1x = urls["1x"] ?: baseUrl
+        val url2x = urls["2x"] ?: url1x
+        val url3x = urls["3x"] ?: url2x
+        val url4x = urls["4x"] ?: url3x
+        val format = type ?: if ((url1x ?: url4x)?.endsWith(".gif", true) == true) "gif" else null
+        val animated = format?.contains("gif", true) == true
+        return KickEmote(
+            id = id ?: slug ?: name,
+            name = name,
+            url1x = url1x,
+            url2x = url2x,
+            url3x = url3x,
+            url4x = url4x,
+            format = format,
+            isAnimated = animated,
+        )
+    }
+
+    private fun parseSrcSet(srcSet: String?): Map<String, String> {
+        if (srcSet.isNullOrBlank()) {
+            return emptyMap()
+        }
+        return srcSet.split(',')
+            .mapNotNull { entry ->
+                val parts = entry.trim().split(" ")
+                if (parts.size >= 2) {
+                    parts[1] to parts[0]
+                } else {
+                    null
+                }
+            }
+            .toMap()
+    }
+
+    private fun String?.stripAuthPrefix(): String? {
+        if (this.isNullOrBlank()) {
+            return null
+        }
+        val token = substringAfter(' ', this).trim()
+        return token.takeIf { it.isNotBlank() }
     }
 
     fun disconnect() {
@@ -1351,7 +1543,19 @@ class ChatViewModel @Inject constructor(
                 }
             }
         } else {
-            chatWriteIRC?.send(message, replyId) ?: chatWriteWebSocket?.send(message, replyId)
+            val channelIdLong = kickChatChannelId
+            if (channelIdLong != null) {
+                val envelope = KickChatEnvelope.chatMessage(
+                    channelId = channelIdLong,
+                    content = message.toString(),
+                    replyParentId = replyId
+                )
+                if (!kickChatClient.send(envelope)) {
+                    onSendMessageError("kick", envelope.toString())
+                }
+            } else {
+                onSendMessageError("kick", message.toString())
+            }
         }
         val usedEmotes = hashSetOf<RecentEmote>()
         val currentTime = System.currentTimeMillis()

@@ -27,5 +27,19 @@ data class KickChatEnvelope(
                 ref = UUID.randomUUID().toString()
             )
         }
+
+        fun chatMessage(channelId: Long, content: String, replyParentId: String? = null): KickChatEnvelope {
+            return KickChatEnvelope(
+                event = "message",
+                topic = "chatrooms:$channelId",
+                payload = buildJsonObject {
+                    put("chatroom_id", channelId)
+                    put("content", content)
+                    put("type", if (replyParentId != null) "reply" else "message")
+                    replyParentId?.let { put("reply_to", it) }
+                },
+                ref = UUID.randomUUID().toString()
+            )
+        }
     }
 }
