@@ -45,6 +45,7 @@ import com.github.andreyasadchy.xtra.util.chat.RecentMessageUtils
 import com.github.andreyasadchy.xtra.util.chat.StvEventApiWebSocket
 import com.github.andreyasadchy.xtra.util.prefs
 import com.github.andreyasadchy.xtra.util.tokenPrefs
+import com.github.andreyasadchy.xtra.util.stripAuthPrefix
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -1162,14 +1163,6 @@ class ChatViewModel @Inject constructor(
                 startLiveChat(channelId, channelLogin)
             }
         }
-    }
-
-    private fun String?.stripAuthPrefix(): String? {
-        if (this.isNullOrBlank()) {
-            return null
-        }
-        val token = substringAfter(' ', this).trim()
-        return token.takeIf { it.isNotBlank() }
     }
 
     fun disconnect() {

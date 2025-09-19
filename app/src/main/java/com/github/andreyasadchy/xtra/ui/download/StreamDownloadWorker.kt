@@ -39,11 +39,12 @@ import com.github.andreyasadchy.xtra.ui.main.MainActivity
 import com.github.andreyasadchy.xtra.util.C
 import com.github.andreyasadchy.xtra.util.HttpEngineUtils
 import com.github.andreyasadchy.xtra.util.KickApiHelper
-import com.github.andreyasadchy.xtra.util.chat.ChatReadWebSocket
 import com.github.andreyasadchy.xtra.ui.chat.KickChatMessageMapper
+import com.github.andreyasadchy.xtra.util.chat.ChatReadWebSocket
 import com.github.andreyasadchy.xtra.util.getByteArrayCronetCallback
 import com.github.andreyasadchy.xtra.util.m3u8.PlaylistUtils
 import com.github.andreyasadchy.xtra.util.prefs
+import com.github.andreyasadchy.xtra.util.stripAuthPrefix
 import dagger.Lazy
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -1084,6 +1085,8 @@ class StreamDownloadWorker @AssistedInject constructor(
         val networkLibrary = context.prefs().getString(C.NETWORK_LIBRARY, "OkHttp")
         val gqlHeaders = KickApiHelper.getGQLHeaders(context, true)
         val helixHeaders = KickApiHelper.getHelixHeaders(context)
+        val chatToken = gqlHeaders[C.HEADER_TOKEN].stripAuthPrefix()
+            ?: helixHeaders[C.HEADER_TOKEN].stripAuthPrefix()
         val emoteQuality = context.prefs().getString(C.CHAT_IMAGE_QUALITY, "4") ?: "4"
         val useWebp = context.prefs().getBoolean(C.CHAT_USE_WEBP, true)
         val channelId = offlineVideo.channelId
@@ -1142,6 +1145,9 @@ class StreamDownloadWorker @AssistedInject constructor(
                 webSocketListener = object : WebSocketListener() {
                     override fun onOpen(webSocket: WebSocket, response: Response) {
                         chatReadWebSocket?.apply {
+                            chatToken?.let { token ->
+                                write("PASS oauth:$token")
+                            }
                             write("CAP REQ :kick.com/tags kick.com/commands")
                             write("NICK justinfan${Random().nextInt(((9999 - 1000) + 1)) + 1000}") //random number between 1000 and 9999
                             write("JOIN $hashChannelName")
