@@ -15,13 +15,19 @@ import javax.inject.Singleton
 
 @Singleton
 class KickTokenStore internal constructor(
-    private val preferences: SharedPreferences
+    private val securePreferences: SecurePreferences
 ) : KickTokenProvider {
+
+    private val preferences: SharedPreferences = securePreferences.preferences
+
+    init {
+        securePreferences.ensureMigrationComplete()
+    }
 
     @Inject
     constructor(
         @ApplicationContext context: Context
-    ) : this(createPreferences(context))
+    ) : this(AndroidSecurePreferences(context))
 
     override val accessToken: String?
         get() = preferences.getString(KEY_ACCESS_TOKEN, null)
@@ -84,38 +90,62 @@ class KickTokenStore internal constructor(
         expiresAtMillis = expiresAtMillis
     )
 
-    internal companion object {
-        private fun createPreferences(context: Context): SharedPreferences {
-            val legacyPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+    internal interface SecurePreferences {
+        val preferences: SharedPreferences
+        fun ensureMigrationComplete()
+    }
+
+    private class AndroidSecurePreferences(
+        context: Context
+    ) : SecurePreferences {
+
+        private val legacyPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        private val encryptedPreferences: SharedPreferences
+        private var migrationSource: SharedPreferences?
+
+        init {
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-                return legacyPreferences
+                encryptedPreferences = legacyPreferences
+                migrationSource = null
+            } else {
+                val encrypted = try {
+                    val masterKey = MasterKey.Builder(context)
+                        .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+                        .build()
+
+                    EncryptedSharedPreferences.create(
+                        context,
+                        PREFS_NAME_ENCRYPTED,
+                        masterKey,
+                        EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                        EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+                    )
+                } catch (error: GeneralSecurityException) {
+                    legacyPreferences
+                } catch (error: IOException) {
+                    legacyPreferences
+                }
+
+                encryptedPreferences = encrypted
+                migrationSource = if (encrypted === legacyPreferences) {
+                    null
+                } else {
+                    legacyPreferences
+                }
             }
-
-            val encryptedPreferences = try {
-                val masterKey = MasterKey.Builder(context)
-                    .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-                    .build()
-
-                EncryptedSharedPreferences.create(
-                    context,
-                    PREFS_NAME_ENCRYPTED,
-                    masterKey,
-                    EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                    EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-                )
-            } catch (error: GeneralSecurityException) {
-                legacyPreferences
-            } catch (error: IOException) {
-                legacyPreferences
-            }
-
-            if (encryptedPreferences !== legacyPreferences) {
-                migrateLegacyTokensIfNeeded(legacyPreferences, encryptedPreferences)
-            }
-
-            return encryptedPreferences
         }
 
+        override val preferences: SharedPreferences
+            get() = encryptedPreferences
+
+        override fun ensureMigrationComplete() {
+            val source = migrationSource ?: return
+            migrateLegacyTokensIfNeeded(source, encryptedPreferences)
+            migrationSource = null
+        }
+    }
+
+    internal companion object {
         internal fun migrateLegacyTokensIfNeeded(
             legacyPreferences: SharedPreferences,
             encryptedPreferences: SharedPreferences
