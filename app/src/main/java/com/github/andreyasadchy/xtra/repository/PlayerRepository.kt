@@ -7,6 +7,7 @@ import android.os.Build
 import android.os.ext.SdkExtensions
 import android.util.Base64
 import com.github.andreyasadchy.xtra.BuildConfig
+import com.github.andreyasadchy.xtra.kick.config.KickEnvironment
 import com.github.andreyasadchy.xtra.db.RecentEmotesDao
 import com.github.andreyasadchy.xtra.db.VideoPositionsDao
 import com.github.andreyasadchy.xtra.model.VideoPosition
@@ -71,7 +72,10 @@ class PlayerRepository @Inject constructor(
     private val helixRepository: HelixRepository,
     private val recentEmotes: RecentEmotesDao,
     private val videoPositions: VideoPositionsDao,
+    private val environment: KickEnvironment,
 ) {
+    private val graphQlEndpoint = environment.normalizedApiBaseUrl + "/graphql"
+    private val kickSiteBaseUrl = "https://kick.com"
 
     suspend fun loadStreamPlaylistUrl(networkLibrary: String?, gqlHeaders: Map<String, String>, channelLogin: String, randomDeviceId: Boolean?, xDeviceId: String?, playerType: String?, supportedCodecs: String?, proxyPlaybackAccessToken: Boolean, proxyHost: String?, proxyPort: Int?, proxyUser: String?, proxyPassword: String?, enableIntegrity: Boolean): String = withContext(Dispatchers.IO) {
         val accessToken = loadStreamPlaybackAccessToken(networkLibrary, gqlHeaders, channelLogin, randomDeviceId, xDeviceId, playerType, proxyPlaybackAccessToken, proxyHost, proxyPort, proxyUser, proxyPassword, enableIntegrity)?.data?.streamPlaybackAccessToken?.let { token ->
@@ -91,7 +95,7 @@ class PlayerRepository @Inject constructor(
             supportedCodecs?.let { put("supported_codecs", it) }
             accessToken?.value?.let { put("token", it) }
         }.map { "${it.key}=${URLEncoder.encode(it.value, Charsets.UTF_8.name())}" }.joinToString("&", "?")
-        "https://usher.ttvnw.net/api/channel/hls/${channelLogin}.m3u8${query}"
+        "https://stream.kick.com/hls/${channelLogin}.m3u8${query}"
     }
 
     suspend fun loadStreamPlaylist(networkLibrary: String?, gqlHeaders: Map<String, String>, channelLogin: String, randomDeviceId: Boolean?, xDeviceId: String?, playerType: String?, supportedCodecs: String?, enableIntegrity: Boolean): String? = withContext(Dispatchers.IO) {
@@ -145,7 +149,7 @@ class PlayerRepository @Inject constructor(
                     }
                 }
             }.build().newCall(Request.Builder().apply {
-                url("https://gql.twitch.tv/gql/")
+                url(graphQlEndpoint)
                 post(graphQLRepository.getPlaybackAccessTokenRequestBody(channelLogin, "", playerType).toRequestBody())
                 accessTokenHeaders.filterKeys { it == C.HEADER_CLIENT_ID || it == "X-Device-Id" }.forEach {
                     addHeader(it.key, it.value)
@@ -211,7 +215,7 @@ class PlayerRepository @Inject constructor(
             supportedCodecs?.let { put("supported_codecs", it) }
             accessToken?.value?.let { put("token", it) }
         }.map { "${it.key}=${URLEncoder.encode(it.value, Charsets.UTF_8.name())}" }.joinToString("&", "?")
-        "https://usher.ttvnw.net/vod/${videoId}.m3u8${query}" to backupQualities
+        "https://stream.kick.com/vod/${videoId}.m3u8${query}" to backupQualities
     }
 
     suspend fun loadVideoPlaylist(networkLibrary: String?, gqlHeaders: Map<String, String>, videoId: String?, playerType: String?, supportedCodecs: String?, enableIntegrity: Boolean): Pair<String?, List<String>> = withContext(Dispatchers.IO) {
@@ -298,31 +302,31 @@ class PlayerRepository @Inject constructor(
             when {
                 networkLibrary == "HttpEngine" && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && SdkExtensions.getExtensionVersion(Build.VERSION_CODES.S) >= 7 && httpEngine != null -> {
                     val response = suspendCoroutine<Pair<UrlResponseInfo, ByteArray>> { continuation ->
-                        httpEngine.get().newUrlRequestBuilder("https://www.twitch.tv/${channelLogin}", cronetExecutor, HttpEngineUtils.byteArrayUrlCallback(continuation)).build().start()
+                        httpEngine.get().newUrlRequestBuilder("${kickSiteBaseUrl}/${channelLogin}", cronetExecutor, HttpEngineUtils.byteArrayUrlCallback(continuation)).build().start()
                     }
                     String(response.second)
                 }
                 networkLibrary == "Cronet" && cronetEngine != null -> {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                         val request = UrlRequestCallbacks.forStringBody(RedirectHandlers.alwaysFollow())
-                        cronetEngine.get().newUrlRequestBuilder("https://www.twitch.tv/${channelLogin}", request.callback, cronetExecutor).build().start()
+                        cronetEngine.get().newUrlRequestBuilder("${kickSiteBaseUrl}/${channelLogin}", request.callback, cronetExecutor).build().start()
                         request.future.get().responseBody as String
                     } else {
                         val response = suspendCoroutine<Pair<org.chromium.net.UrlResponseInfo, ByteArray>> { continuation ->
-                            cronetEngine.get().newUrlRequestBuilder("https://www.twitch.tv/${channelLogin}", getByteArrayCronetCallback(continuation), cronetExecutor).build().start()
+                            cronetEngine.get().newUrlRequestBuilder("${kickSiteBaseUrl}/${channelLogin}", getByteArrayCronetCallback(continuation), cronetExecutor).build().start()
                         }
                         String(response.second)
                     }
                 }
                 else -> {
-                    okHttpClient.newCall(Request.Builder().url("https://www.twitch.tv/${channelLogin}").build()).execute().use { response ->
+                    okHttpClient.newCall(Request.Builder().url("${kickSiteBaseUrl}/${channelLogin}").build()).execute().use { response ->
                         response.body.string()
                     }
                 }
             }
         }
         if (!pageResponse.isNullOrBlank()) {
-            val settingsRegex = Regex("(https://assets.twitch.tv/config/settings.*?.js|https://static.twitchcdn.net/config/settings.*?js)")
+            val settingsRegex = Regex("(https://assets.kickcdn.com/config/settings.*?.js|https://static.kickcdn.com/config/settings.*?js)")
             val settingsUrl = settingsRegex.find(pageResponse)?.value
             val settingsResponse = settingsUrl?.let {
                 when {
@@ -485,7 +489,7 @@ class PlayerRepository @Inject constructor(
         val response = when {
             networkLibrary == "HttpEngine" && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && SdkExtensions.getExtensionVersion(Build.VERSION_CODES.S) >= 7 && httpEngine != null -> {
                 val response = suspendCoroutine<Pair<UrlResponseInfo, ByteArray>> { continuation ->
-                    httpEngine.get().newUrlRequestBuilder("https://7tv.io/v3/users/twitch/${channelId}", cronetExecutor, HttpEngineUtils.byteArrayUrlCallback(continuation)).apply {
+                    httpEngine.get().newUrlRequestBuilder("https://7tv.io/v3/users/kick/${channelId}", cronetExecutor, HttpEngineUtils.byteArrayUrlCallback(continuation)).apply {
                         addHeader("User-Agent", "Xtra/" + BuildConfig.VERSION_NAME)
                     }.build().start()
                 }
@@ -494,14 +498,14 @@ class PlayerRepository @Inject constructor(
             networkLibrary == "Cronet" && cronetEngine != null -> {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                     val request = UrlRequestCallbacks.forStringBody(RedirectHandlers.alwaysFollow())
-                    cronetEngine.get().newUrlRequestBuilder("https://7tv.io/v3/users/twitch/${channelId}", request.callback, cronetExecutor).apply {
+                    cronetEngine.get().newUrlRequestBuilder("https://7tv.io/v3/users/kick/${channelId}", request.callback, cronetExecutor).apply {
                         addHeader("User-Agent", "Xtra/" + BuildConfig.VERSION_NAME)
                     }.build().start()
                     val response = request.future.get().responseBody as String
                     json.decodeFromString<StvChannelResponse>(response)
                 } else {
                     val response = suspendCoroutine<Pair<org.chromium.net.UrlResponseInfo, ByteArray>> { continuation ->
-                        cronetEngine.get().newUrlRequestBuilder("https://7tv.io/v3/users/twitch/${channelId}", getByteArrayCronetCallback(continuation), cronetExecutor).apply {
+                        cronetEngine.get().newUrlRequestBuilder("https://7tv.io/v3/users/kick/${channelId}", getByteArrayCronetCallback(continuation), cronetExecutor).apply {
                             addHeader("User-Agent", "Xtra/" + BuildConfig.VERSION_NAME)
                         }.build().start()
                     }
@@ -510,7 +514,7 @@ class PlayerRepository @Inject constructor(
             }
             else -> {
                 okHttpClient.newCall(Request.Builder().apply {
-                    url("https://7tv.io/v3/users/twitch/${channelId}")
+                    url("https://7tv.io/v3/users/kick/${channelId}")
                     header("User-Agent", "Xtra/" + BuildConfig.VERSION_NAME)
                 }.build()).execute().use { response ->
                     json.decodeFromString<StvChannelResponse>(response.body.string())
@@ -560,7 +564,7 @@ class PlayerRepository @Inject constructor(
         val response = when {
             networkLibrary == "HttpEngine" && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && SdkExtensions.getExtensionVersion(Build.VERSION_CODES.S) >= 7 && httpEngine != null -> {
                 val response = suspendCoroutine<Pair<UrlResponseInfo, ByteArray>> { continuation ->
-                    httpEngine.get().newUrlRequestBuilder("https://7tv.io/v3/users/twitch/${userId}", cronetExecutor, HttpEngineUtils.byteArrayUrlCallback(continuation)).apply {
+                    httpEngine.get().newUrlRequestBuilder("https://7tv.io/v3/users/kick/${userId}", cronetExecutor, HttpEngineUtils.byteArrayUrlCallback(continuation)).apply {
                         addHeader("User-Agent", "Xtra/" + BuildConfig.VERSION_NAME)
                     }.build().start()
                 }
@@ -569,13 +573,13 @@ class PlayerRepository @Inject constructor(
             networkLibrary == "Cronet" && cronetEngine != null -> {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                     val request = UrlRequestCallbacks.forStringBody(RedirectHandlers.alwaysFollow())
-                    cronetEngine.get().newUrlRequestBuilder("https://7tv.io/v3/users/twitch/${userId}", request.callback, cronetExecutor).apply {
+                    cronetEngine.get().newUrlRequestBuilder("https://7tv.io/v3/users/kick/${userId}", request.callback, cronetExecutor).apply {
                         addHeader("User-Agent", "Xtra/" + BuildConfig.VERSION_NAME)
                     }.build().start()
                     request.future.get().responseBody as String
                 } else {
                     val response = suspendCoroutine<Pair<org.chromium.net.UrlResponseInfo, ByteArray>> { continuation ->
-                        cronetEngine.get().newUrlRequestBuilder("https://7tv.io/v3/users/twitch/${userId}", getByteArrayCronetCallback(continuation), cronetExecutor).apply {
+                        cronetEngine.get().newUrlRequestBuilder("https://7tv.io/v3/users/kick/${userId}", getByteArrayCronetCallback(continuation), cronetExecutor).apply {
                             addHeader("User-Agent", "Xtra/" + BuildConfig.VERSION_NAME)
                         }.build().start()
                     }
@@ -584,7 +588,7 @@ class PlayerRepository @Inject constructor(
             }
             else -> {
                 okHttpClient.newCall(Request.Builder().apply {
-                    url("https://7tv.io/v3/users/twitch/${userId}")
+                    url("https://7tv.io/v3/users/kick/${userId}")
                     header("User-Agent", "Xtra/" + BuildConfig.VERSION_NAME)
                 }.build()).execute().use { response ->
                     response.body.string()
@@ -687,7 +691,7 @@ class PlayerRepository @Inject constructor(
         val response = when {
             networkLibrary == "HttpEngine" && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && SdkExtensions.getExtensionVersion(Build.VERSION_CODES.S) >= 7 && httpEngine != null -> {
                 val response = suspendCoroutine<Pair<UrlResponseInfo, ByteArray>> { continuation ->
-                    httpEngine.get().newUrlRequestBuilder("https://api.betterttv.net/3/cached/users/twitch/${channelId}", cronetExecutor, HttpEngineUtils.byteArrayUrlCallback(continuation)).apply {
+                    httpEngine.get().newUrlRequestBuilder("https://api.betterttv.net/3/cached/users/kick/${channelId}", cronetExecutor, HttpEngineUtils.byteArrayUrlCallback(continuation)).apply {
                         addHeader("User-Agent", "Xtra/" + BuildConfig.VERSION_NAME)
                     }.build().start()
                 }
@@ -696,14 +700,14 @@ class PlayerRepository @Inject constructor(
             networkLibrary == "Cronet" && cronetEngine != null -> {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                     val request = UrlRequestCallbacks.forStringBody(RedirectHandlers.alwaysFollow())
-                    cronetEngine.get().newUrlRequestBuilder("https://api.betterttv.net/3/cached/users/twitch/${channelId}", request.callback, cronetExecutor).apply {
+                    cronetEngine.get().newUrlRequestBuilder("https://api.betterttv.net/3/cached/users/kick/${channelId}", request.callback, cronetExecutor).apply {
                         addHeader("User-Agent", "Xtra/" + BuildConfig.VERSION_NAME)
                     }.build().start()
                     val response = request.future.get().responseBody as String
                     json.decodeFromString<Map<String, JsonElement>>(response)
                 } else {
                     val response = suspendCoroutine<Pair<org.chromium.net.UrlResponseInfo, ByteArray>> { continuation ->
-                        cronetEngine.get().newUrlRequestBuilder("https://api.betterttv.net/3/cached/users/twitch/${channelId}", getByteArrayCronetCallback(continuation), cronetExecutor).apply {
+                        cronetEngine.get().newUrlRequestBuilder("https://api.betterttv.net/3/cached/users/kick/${channelId}", getByteArrayCronetCallback(continuation), cronetExecutor).apply {
                             addHeader("User-Agent", "Xtra/" + BuildConfig.VERSION_NAME)
                         }.build().start()
                     }
@@ -712,7 +716,7 @@ class PlayerRepository @Inject constructor(
             }
             else -> {
                 okHttpClient.newCall(Request.Builder().apply {
-                    url("https://api.betterttv.net/3/cached/users/twitch/${channelId}")
+                    url("https://api.betterttv.net/3/cached/users/kick/${channelId}")
                     header("User-Agent", "Xtra/" + BuildConfig.VERSION_NAME)
                 }.build()).execute().use { response ->
                     json.decodeFromString<Map<String, JsonElement>>(response.body.string())

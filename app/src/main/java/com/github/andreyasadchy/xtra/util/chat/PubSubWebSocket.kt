@@ -38,7 +38,7 @@ class PubSubWebSocket(
 
     fun connect() {
         socket = client.newWebSocket(
-            Request.Builder().url("wss://pubsub-edge.twitch.tv").build(),
+            Request.Builder().url("wss://pubsub.kick.com").build(),
             PubSubWebSocketListener()
         )
     }

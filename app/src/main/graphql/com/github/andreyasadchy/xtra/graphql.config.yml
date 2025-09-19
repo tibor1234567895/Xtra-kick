@@ -2,7 +2,7 @@ schema: schema.graphqls
 extensions:
   endpoints:
     Default GraphQL Endpoint:
-      url: https://gql.twitch.tv/gql/
+      url: https://api.kick.com/public/v1/graphql
       headers:
-        Client-ID: kimne78kx3ncx6brgo4mv6wki5h1ko
+        Client-ID: kick-public-client
       introspect: false

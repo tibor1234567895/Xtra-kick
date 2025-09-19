@@ -150,7 +150,7 @@ class PlayerViewModel @Inject constructor(
                 segment.title?.let { it.contains("Amazon") || it.contains("Adform") || it.contains("DCM") } == true ||
                         segment.programDateTime?.let { KickApiHelper.parseIso8601DateUTC(it) }?.let { segmentStartTime ->
                             playlist.dateRanges.find { dateRange ->
-                                (dateRange.id.startsWith("stitched-ad-") || dateRange.rangeClass == "twitch-stitched-ad" || dateRange.ad) &&
+                                (dateRange.id.startsWith("stitched-ad-") || dateRange.rangeClass == "kick-stitched-ad" || dateRange.ad) &&
                                         dateRange.endDate?.let { KickApiHelper.parseIso8601DateUTC(it) }?.let { endTime ->
                                             segmentStartTime < endTime
                                         } == true ||

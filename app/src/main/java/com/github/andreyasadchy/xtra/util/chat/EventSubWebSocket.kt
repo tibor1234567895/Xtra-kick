@@ -27,7 +27,7 @@ class EventSubWebSocket(
 
     fun connect(reconnectUrl: String? = null) {
         socket = client.newWebSocket(
-            Request.Builder().url(reconnectUrl ?: "wss://eventsub.wss.twitch.tv/ws").build(),
+            Request.Builder().url(reconnectUrl ?: "wss://eventsub.kick.com/ws").build(),
             EventSubWebSocketListener()
         )
     }

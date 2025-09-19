@@ -48,7 +48,7 @@ class HermesWebSocket(
 
     fun connect() {
         socket = client.newWebSocket(
-            Request.Builder().url("wss://hermes.twitch.tv/v1?clientId=kimne78kx3ncx6brgo4mv6wki5h1ko").build(),
+            Request.Builder().url("wss://hermes.kick.com/v1?clientId=kick-public-client").build(),
             HermesWebSocketListener()
         )
     }

@@ -30,7 +30,7 @@ class ChatReadWebSocket(
 
     fun connect() {
         socket = client.newWebSocket(
-            Request.Builder().url("wss://irc-ws.chat.twitch.tv").build(),
+            Request.Builder().url("wss://irc.chat.kick.com").build(),
             webSocketListener ?: ChatReadWebSocketListener()
         )
     }
@@ -70,7 +70,7 @@ class ChatReadWebSocket(
 
     private inner class ChatReadWebSocketListener : WebSocketListener() {
         override fun onOpen(webSocket: WebSocket, response: Response) {
-            write("CAP REQ :twitch.tv/tags twitch.tv/commands")
+            write("CAP REQ :kick.com/tags kick.com/commands")
             write("NICK justinfan${Random().nextInt(((9999 - 1000) + 1)) + 1000}") //random number between 1000 and 9999
             write("JOIN $hashChannelName")
             onConnect?.invoke()

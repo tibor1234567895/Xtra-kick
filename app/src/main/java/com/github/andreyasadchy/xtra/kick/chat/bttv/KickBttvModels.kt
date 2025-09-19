@@ -52,7 +52,6 @@ sealed class KickBttvIdentifier protected constructor(
     internal val segments: List<String>
 ) {
     class KickChannelSlug(slug: String) : KickBttvIdentifier(listOf("kick", slug))
-    class TwitchUserId(userId: String) : KickBttvIdentifier(listOf("twitch", userId))
     class Custom(platform: String, vararg extraSegments: String) :
         KickBttvIdentifier(listOf(platform) + extraSegments.filter { it.isNotBlank() })
 

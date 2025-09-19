@@ -35,7 +35,7 @@ class ChatReadIRC(
     override fun run() {
 
         fun handlePing(writer: BufferedWriter) {
-            write("PONG :tmi.twitch.tv", writer)
+            write("PONG :chat.kick.com", writer)
             writer.flush()
         }
 
@@ -78,15 +78,15 @@ class ChatReadIRC(
         Log.d(TAG, "Connecting to Kick IRC - SSL $useSSL")
         try {
             socketIn = if (useSSL) {
-                SSLSocketFactory.getDefault().createSocket("irc.twitch.tv", 6697)
+                SSLSocketFactory.getDefault().createSocket("irc.kick.com", 6697)
             } else {
-                Socket("irc.twitch.tv", 6667)
+                Socket("irc.kick.com", 6667)
             }.apply {
                 readerIn = BufferedReader(InputStreamReader(getInputStream()))
                 writerIn = BufferedWriter(OutputStreamWriter(getOutputStream()))
             }
             write("NICK justinfan${Random().nextInt(((9999 - 1000) + 1)) + 1000}", writerIn) //random number between 1000 and 9999
-            write("CAP REQ :twitch.tv/tags twitch.tv/commands", writerIn)
+            write("CAP REQ :kick.com/tags kick.com/commands", writerIn)
             write("JOIN $hashChannelName", writerIn)
             writerIn.flush()
             Log.d(TAG, "Successfully connected to - $hashChannelName")

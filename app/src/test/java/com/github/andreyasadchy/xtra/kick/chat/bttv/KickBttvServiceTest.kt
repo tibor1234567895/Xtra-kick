@@ -72,7 +72,7 @@ class KickBttvServiceTest {
 
         val identifiers = listOf(
             KickBttvIdentifier.KickChannelSlug("kick-slug"),
-            KickBttvIdentifier.TwitchUserId("12345")
+            KickBttvIdentifier.Custom("legacy", "12345")
         )
 
         val emotes = service.getChannelEmotes(identifiers, preferWebp = true)
@@ -94,7 +94,7 @@ class KickBttvServiceTest {
         val firstRequest = mockWebServer.takeRequest()
         val secondRequest = mockWebServer.takeRequest()
         assertEquals("/3/cached/users/kick/kick-slug", firstRequest.path)
-        assertEquals("/3/cached/users/twitch/12345", secondRequest.path)
+        assertEquals("/3/cached/users/legacy/12345", secondRequest.path)
     }
 
     @Test

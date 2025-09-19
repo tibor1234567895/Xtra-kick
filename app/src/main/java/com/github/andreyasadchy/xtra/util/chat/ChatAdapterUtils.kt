@@ -47,7 +47,7 @@ import kotlin.math.pow
 
 object ChatAdapterUtils {
 
-    private val twitchColors = intArrayOf(-65536, -16776961, -16744448, -5103070, -32944, -6632142, -47872, -13726889, -2448096, -2987746, -10510688, -14774017, -38476, -7722014, -16711809)
+    private val kickColors = intArrayOf(-65536, -16776961, -16744448, -5103070, -32944, -6632142, -47872, -13726889, -2448096, -2987746, -10510688, -14774017, -38476, -7722014, -16711809)
     private const val RED_HUE_DEGREES = 0f
     private const val GREEN_HUE_DEGREES = 120f
     private const val BLUE_HUE_DEGREES = 240f
@@ -253,7 +253,7 @@ object ChatAdapterUtils {
                     getSavedColor(chatMessage.color, savedColors, useReadableColors, isLightTheme)
                 } else {
                     userColors[chatMessage.userName] ?: if (useRandomColors) {
-                        twitchColors[random.nextInt(twitchColors.size)]
+                        kickColors[random.nextInt(kickColors.size)]
                     } else {
                         -10066329
                     }.let { newColor ->
@@ -416,7 +416,7 @@ object ChatAdapterUtils {
             var builderIndex = startIndex
             val split = builder.substring(builderIndex).split(" ")
             var previousImage: Image? = null
-            val twitchEmotes = chatMessage.emotes?.map {
+            val kickEmotes = chatMessage.emotes?.map {
                 val realBegin = message.offsetByCodePoints(0, it.begin)
                 val realEnd = if (it.begin == realBegin) {
                     it.end
@@ -474,9 +474,9 @@ object ChatAdapterUtils {
                             if (!emote.color.isNullOrBlank()) {
                                 builder.setSpan(ForegroundColorSpan(getSavedColor(emote.color, savedColors, useReadableColors, isLightTheme)), builderIndex, builderIndex + bitsCount.length, SPAN_EXCLUSIVE_EXCLUSIVE)
                             }
-                            if (!twitchEmotes.isNullOrEmpty()) {
+                            if (!kickEmotes.isNullOrEmpty()) {
                                 val removed = bitsName.length - 1
-                                twitchEmotes.forEach {
+                                kickEmotes.forEach {
                                     it.begin -= removed
                                     it.end -= removed
                                 }
@@ -512,9 +512,9 @@ object ChatAdapterUtils {
                             start = previousImage.start,
                             end = previousImage.end
                         )
-                        if (!twitchEmotes.isNullOrEmpty()) {
+                        if (!kickEmotes.isNullOrEmpty()) {
                             val removed = value.length + 1
-                            twitchEmotes.forEach {
+                            kickEmotes.forEach {
                                 it.begin -= removed
                                 it.end -= removed
                             }
@@ -548,9 +548,9 @@ object ChatAdapterUtils {
                             end = builderIndex + 1
                         )
                         images.add(image)
-                        if (!twitchEmotes.isNullOrEmpty()) {
+                        if (!kickEmotes.isNullOrEmpty()) {
                             val removed = value.length - 1
-                            twitchEmotes.forEach {
+                            kickEmotes.forEach {
                                 it.begin -= removed
                                 it.end -= removed
                             }
@@ -560,22 +560,22 @@ object ChatAdapterUtils {
                         continue
                     }
                 }
-                val twitchEmote = twitchEmotes?.firstOrNull()?.let { first ->
+                val kickEmote = kickEmotes?.firstOrNull()?.let { first ->
                     val messageIndex = builderIndex - startIndex
                     when {
                         first.begin == messageIndex -> first
                         first.begin < messageIndex -> {
-                            twitchEmotes.remove(first)
-                            twitchEmotes.firstOrNull()?.takeIf { it.begin == messageIndex }
+                            kickEmotes.remove(first)
+                            kickEmotes.firstOrNull()?.takeIf { it.begin == messageIndex }
                         }
                         else -> null
                     }
                 }
-                if (twitchEmote != null) {
-                    twitchEmotes.remove(twitchEmote)
+                if (kickEmote != null) {
+                    kickEmotes.remove(kickEmote)
                     builder.replace(builderIndex, builderIndex + value.length, ".")
                     builder.setSpan(ForegroundColorSpan(Color.TRANSPARENT), builderIndex, builderIndex + 1, SPAN_EXCLUSIVE_EXCLUSIVE)
-                    val emote = localKickEmotes?.find { emote -> emote.id == twitchEmote.id }?.let { emote ->
+                    val emote = localKickEmotes?.find { emote -> emote.id == kickEmote.id }?.let { emote ->
                         KickEmote(
                             id = emote.id,
                             name = emote.name,
@@ -587,7 +587,7 @@ object ChatAdapterUtils {
                             setId = emote.setId,
                             ownerId = emote.ownerId
                         )
-                    } ?: KickEmote(id = twitchEmote.id)
+                    } ?: KickEmote(id = kickEmote.id)
                     if (imageClick != null) {
                         builder.setSpan(object : ClickableSpan() {
                             override fun onClick(widget: View) {
@@ -610,9 +610,9 @@ object ChatAdapterUtils {
                         end = builderIndex + 1
                     )
                     images.add(image)
-                    if (twitchEmotes.isNotEmpty()) {
+                    if (kickEmotes.isNotEmpty()) {
                         val removed = value.length - 1
-                        twitchEmotes.forEach {
+                        kickEmotes.forEach {
                             it.begin -= removed
                             it.end -= removed
                         }
