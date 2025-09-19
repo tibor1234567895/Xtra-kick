@@ -199,28 +199,49 @@ object ChatAdapterUtils {
                     }
                 }
                 chatMessage.badges?.forEach { chatBadge ->
-                    val badge = channelBadges?.find { it.setId == chatBadge.setId && it.version == chatBadge.version } ?: globalBadges?.find { it.setId == chatBadge.setId && it.version == chatBadge.version }
-                    if (badge != null) {
-                        builder.append(". ")
-                        builder.setSpan(ForegroundColorSpan(Color.TRANSPARENT), builderIndex, builderIndex + 1, SPAN_EXCLUSIVE_EXCLUSIVE)
-                        if (imageClick != null) {
-                            builder.setSpan(object : ClickableSpan() {
-                                override fun onClick(widget: View) {
-                                    imageClick(badge.url4x ?: badge.url3x ?: badge.url2x ?: badge.url1x, badge.title, null, null, null, null, null)
-                                }
-
-                                override fun updateDrawState(ds: TextPaint) {}
-                            }, builderIndex, builderIndex + 1, SPAN_EXCLUSIVE_EXCLUSIVE)
+                    val resolvedBadge = when {
+                        !chatBadge.url1x.isNullOrBlank() || !chatBadge.url2x.isNullOrBlank() ||
+                                !chatBadge.url3x.isNullOrBlank() || !chatBadge.url4x.isNullOrBlank() ||
+                                chatBadge.localData != null -> chatBadge
+                        else -> {
+                            val setId = chatBadge.setId
+                            val version = chatBadge.version
+                            if (!setId.isNullOrBlank() && !version.isNullOrBlank()) {
+                                channelBadges?.find { it.setId == setId && it.version == version }
+                                    ?: globalBadges?.find { it.setId == setId && it.version == version }
+                            } else {
+                                null
+                            }
                         }
-                        images.add(Image(
-                            localData = badge.localData?.let { getLocalBadgeData(badge.setId + badge.version, it, savedLocalBadges, chatUrl, getEmoteBytes) },
-                            url1x = badge.url1x,
-                            url2x = badge.url2x,
-                            url3x = badge.url3x,
-                            url4x = badge.url4x,
-                            start = builderIndex++,
-                            end = builderIndex++
-                        ))
+                    }
+                    if (resolvedBadge != null) {
+                        val cacheKey = resolvedBadge.cacheKey()
+                        if (resolvedBadge.localData != null || !resolvedBadge.url1x.isNullOrBlank() || !resolvedBadge.url2x.isNullOrBlank() ||
+                            !resolvedBadge.url3x.isNullOrBlank() || !resolvedBadge.url4x.isNullOrBlank()
+                        ) {
+                            builder.append(". ")
+                            builder.setSpan(ForegroundColorSpan(Color.TRANSPARENT), builderIndex, builderIndex + 1, SPAN_EXCLUSIVE_EXCLUSIVE)
+                            if (imageClick != null) {
+                                builder.setSpan(object : ClickableSpan() {
+                                    override fun onClick(widget: View) {
+                                        imageClick(resolvedBadge.url4x ?: resolvedBadge.url3x ?: resolvedBadge.url2x ?: resolvedBadge.url1x, resolvedBadge.title, null, resolvedBadge.format, resolvedBadge.isAnimated, null, null)
+                                    }
+
+                                    override fun updateDrawState(ds: TextPaint) {}
+                                }, builderIndex, builderIndex + 1, SPAN_EXCLUSIVE_EXCLUSIVE)
+                            }
+                            images.add(Image(
+                                localData = resolvedBadge.localData?.let { data -> cacheKey?.let { key -> getLocalBadgeData(key, data, savedLocalBadges, chatUrl, getEmoteBytes) } },
+                                url1x = resolvedBadge.url1x,
+                                url2x = resolvedBadge.url2x,
+                                url3x = resolvedBadge.url3x,
+                                url4x = resolvedBadge.url4x,
+                                format = resolvedBadge.format,
+                                isAnimated = resolvedBadge.isAnimated,
+                                start = builderIndex++,
+                                end = builderIndex++
+                            ))
+                        }
                     }
                 }
                 if (showStvBadges && !chatMessage.userId.isNullOrBlank()) {
@@ -416,26 +437,21 @@ object ChatAdapterUtils {
             var builderIndex = startIndex
             val split = builder.substring(builderIndex).split(" ")
             var previousImage: Image? = null
-            val kickEmotes = chatMessage.emotes?.map {
-                val realBegin = message.offsetByCodePoints(0, it.begin)
-                val realEnd = if (it.begin == realBegin) {
-                    it.end
+            val kickEmotes = chatMessage.emotes?.map { emote ->
+                val realBegin = message.offsetByCodePoints(0, emote.begin)
+                val realEnd = if (emote.begin == realBegin) {
+                    emote.end
                 } else {
-                    it.end + realBegin - it.begin
+                    emote.end + realBegin - emote.begin
                 }
-                localKickEmotes?.find { emote -> emote.id == it.id }?.let { emote ->
-                    KickEmote(
-                        id = emote.id,
-                        name = emote.name,
-                        localData = emote.localData,
-                        format = emote.format,
-                        isAnimated = emote.isAnimated,
-                        begin = realBegin,
-                        end = realEnd,
-                        setId = emote.setId,
-                        ownerId = emote.ownerId
-                    )
-                } ?: KickEmote(id = it.id, begin = realBegin, end = realEnd)
+                when {
+                    emote.url1x.isNullOrBlank() && emote.url2x.isNullOrBlank() &&
+                            emote.url3x.isNullOrBlank() && emote.url4x.isNullOrBlank() &&
+                            emote.localData == null && emote.format.isNullOrBlank() && !emote.isAnimated -> {
+                        localKickEmotes?.find { it.id == emote.id }?.copy(begin = realBegin, end = realEnd)
+                    }
+                    else -> emote.copy(begin = realBegin, end = realEnd)
+                } ?: emote.copy(id = emote.id, begin = realBegin, end = realEnd)
             }?.sortedBy { it.begin }?.toMutableList()
             val personalEmotes = if (showPersonalEmotes && !chatMessage.userId.isNullOrBlank()) {
                 personalEmoteSetUsers?.get(chatMessage.userId)?.let { setId -> personalEmoteSets?.entries?.find { it.key == setId } }?.value
@@ -575,36 +591,35 @@ object ChatAdapterUtils {
                     kickEmotes.remove(kickEmote)
                     builder.replace(builderIndex, builderIndex + value.length, ".")
                     builder.setSpan(ForegroundColorSpan(Color.TRANSPARENT), builderIndex, builderIndex + 1, SPAN_EXCLUSIVE_EXCLUSIVE)
-                    val emote = localKickEmotes?.find { emote -> emote.id == kickEmote.id }?.let { emote ->
-                        KickEmote(
-                            id = emote.id,
-                            name = emote.name,
-                            localData = emote.localData,
-                            format = emote.format,
-                            isAnimated = emote.isAnimated,
-                            begin = builderIndex,
-                            end = builderIndex + 1,
-                            setId = emote.setId,
-                            ownerId = emote.ownerId
-                        )
-                    } ?: KickEmote(id = kickEmote.id)
+                    val resolvedEmote = when {
+                        kickEmote.url1x.isNullOrBlank() && kickEmote.url2x.isNullOrBlank() &&
+                                kickEmote.url3x.isNullOrBlank() && kickEmote.url4x.isNullOrBlank() &&
+                                kickEmote.localData == null && kickEmote.format.isNullOrBlank() && !kickEmote.isAnimated -> {
+                            localKickEmotes?.find { it.id == kickEmote.id }?.copy(
+                                begin = builderIndex,
+                                end = builderIndex + 1,
+                            )
+                        }
+                        else -> kickEmote.copy(begin = builderIndex, end = builderIndex + 1)
+                    } ?: kickEmote.copy(begin = builderIndex, end = builderIndex + 1)
                     if (imageClick != null) {
                         builder.setSpan(object : ClickableSpan() {
                             override fun onClick(widget: View) {
-                                imageClick(emote.url4x ?: emote.url3x ?: emote.url2x ?: emote.url1x, value, null, emote.format, emote.isAnimated, null, emote.id)
+                                imageClick(resolvedEmote.url4x ?: resolvedEmote.url3x ?: resolvedEmote.url2x ?: resolvedEmote.url1x, value, null, resolvedEmote.format, resolvedEmote.isAnimated, null, resolvedEmote.id)
                             }
 
                             override fun updateDrawState(ds: TextPaint) {}
                         }, builderIndex, builderIndex + 1, SPAN_EXCLUSIVE_EXCLUSIVE)
                     }
+                    val emoteKey = resolvedEmote.id ?: resolvedEmote.name
                     val image = Image(
-                        localData = emote.localData?.let { getLocalKickEmoteData(emote.id!!, it, savedLocalKickEmotes, chatUrl, getEmoteBytes) },
-                        url1x = emote.url1x,
-                        url2x = emote.url2x,
-                        url3x = emote.url3x,
-                        url4x = emote.url4x,
-                        format = emote.format,
-                        isAnimated = emote.isAnimated,
+                        localData = resolvedEmote.localData?.let { data -> emoteKey?.let { key -> getLocalKickEmoteData(key, data, savedLocalKickEmotes, chatUrl, getEmoteBytes) } },
+                        url1x = resolvedEmote.url1x,
+                        url2x = resolvedEmote.url2x,
+                        url3x = resolvedEmote.url3x,
+                        url4x = resolvedEmote.url4x,
+                        format = resolvedEmote.format,
+                        isAnimated = resolvedEmote.isAnimated,
                         isEmote = true,
                         start = builderIndex,
                         end = builderIndex + 1
@@ -648,27 +663,36 @@ object ChatAdapterUtils {
         return wasMentioned
     }
 
-    private fun getLocalKickEmoteData(name: String, data: Pair<Long, Int>, savedLocalKickEmotes: MutableMap<String, ByteArray>, chatUrl: String?, getEmoteBytes: ((String, Pair<Long, Int>) -> ByteArray?)?): ByteArray? {
-        return savedLocalKickEmotes[name] ?: chatUrl?.let{ url ->
+    private fun getLocalKickEmoteData(key: String, data: Pair<Long, Int>, savedLocalKickEmotes: MutableMap<String, ByteArray>, chatUrl: String?, getEmoteBytes: ((String, Pair<Long, Int>) -> ByteArray?)?): ByteArray? {
+        return savedLocalKickEmotes[key] ?: chatUrl?.let{ url ->
             getEmoteBytes?.let { get ->
                 get(url, data)?.also {
                     if (savedLocalKickEmotes.size >= 100) {
                         savedLocalKickEmotes.remove(savedLocalKickEmotes.keys.first())
                     }
-                    savedLocalKickEmotes[name] = it
+                    savedLocalKickEmotes[key] = it
                 }
             }
         }
     }
 
-    private fun getLocalBadgeData(name: String, data: Pair<Long, Int>, savedLocalBadges: MutableMap<String, ByteArray>, chatUrl: String?, getEmoteBytes: ((String, Pair<Long, Int>) -> ByteArray?)?): ByteArray? {
-        return savedLocalBadges[name] ?: chatUrl?.let{ url ->
+    private fun KickBadge.cacheKey(): String? {
+        return id?.takeIf { it.isNotBlank() }
+            ?: when {
+                !setId.isNullOrBlank() && !version.isNullOrBlank() -> "$setId:$version"
+                !setId.isNullOrBlank() -> setId
+                else -> null
+            }
+    }
+
+    private fun getLocalBadgeData(key: String, data: Pair<Long, Int>, savedLocalBadges: MutableMap<String, ByteArray>, chatUrl: String?, getEmoteBytes: ((String, Pair<Long, Int>) -> ByteArray?)?): ByteArray? {
+        return savedLocalBadges[key] ?: chatUrl?.let{ url ->
             getEmoteBytes?.let { get ->
                 get(url, data)?.also {
                     if (savedLocalBadges.size >= 100) {
                         savedLocalBadges.remove(savedLocalBadges.keys.first())
                     }
-                    savedLocalBadges[name] = it
+                    savedLocalBadges[key] = it
                 }
             }
         }

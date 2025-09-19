@@ -25,7 +25,6 @@ import androidx.work.ForegroundInfo
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.github.andreyasadchy.xtra.R
-import com.github.andreyasadchy.xtra.model.chat.Badge
 import com.github.andreyasadchy.xtra.model.chat.CheerEmote
 import com.github.andreyasadchy.xtra.model.chat.Emote
 import com.github.andreyasadchy.xtra.model.chat.KickBadge
@@ -1104,7 +1103,7 @@ class VideoDownloadWorker @AssistedInject constructor(
                             if (downloadEmotes) {
                                 val words = mutableListOf<String>()
                                 val emoteIds = mutableListOf<String>()
-                                val badges = mutableListOf<Badge>()
+                                val badges = mutableListOf<KickBadge>()
                                 data.edges.mapNotNull { comment ->
                                     comment.node.let { item ->
                                         item.message?.let { message ->
@@ -1117,7 +1116,7 @@ class VideoDownloadWorker @AssistedInject constructor(
                                             message.userBadges?.mapNotNull { badge ->
                                                 badge.setID?.let { setId ->
                                                     badge.version?.let { version ->
-                                                        Badge(
+                                                        KickBadge(
                                                             setId = setId,
                                                             version = version,
                                                         )
@@ -1143,12 +1142,16 @@ class VideoDownloadWorker @AssistedInject constructor(
                                     }
                                 }
                                 badges.forEach {
-                                    val pair = Pair(it.setId, it.version)
-                                    if (!savedBadges.contains(pair)) {
-                                        savedBadges.add(pair)
-                                        val badge = badgeList.find { badge -> badge.setId == it.setId && badge.version == it.version }
-                                        if (badge != null) {
-                                            kickBadges.add(badge)
+                                    val setId = it.setId
+                                    val version = it.version
+                                    if (!setId.isNullOrBlank() && !version.isNullOrBlank()) {
+                                        val pair = Pair(setId, version)
+                                        if (!savedBadges.contains(pair)) {
+                                            savedBadges.add(pair)
+                                            val badge = badgeList.find { badge -> badge.setId == setId && badge.version == version }
+                                            if (badge != null) {
+                                                kickBadges.add(badge)
+                                            }
                                         }
                                     }
                                 }
@@ -1452,7 +1455,7 @@ class VideoDownloadWorker @AssistedInject constructor(
         var userName: String? = null
         var color: String? = null
         val emotesList = mutableListOf<KickEmote>()
-        val badgesList = mutableListOf<Badge>()
+        val badgesList = mutableListOf<KickBadge>()
         while (reader.hasNext()) {
             when (reader.nextName()) {
                 "id" -> id = reader.nextString()
@@ -1532,7 +1535,7 @@ class VideoDownloadWorker @AssistedInject constructor(
                                     }
                                     if (!set.isNullOrBlank() && !version.isNullOrBlank()) {
                                         badgesList.add(
-                                            Badge(set, version)
+                                            KickBadge(setId = set, version = version)
                                         )
                                     }
                                     reader.endObject()

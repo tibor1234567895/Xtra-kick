@@ -9,6 +9,6 @@ class VideoChatMessage(
     val message: String?,
     val color: String?,
     val emotes: List<KickEmote>?,
-    val badges: List<Badge>?,
+    val badges: List<KickBadge>?,
     val fullMsg: String?,
 )

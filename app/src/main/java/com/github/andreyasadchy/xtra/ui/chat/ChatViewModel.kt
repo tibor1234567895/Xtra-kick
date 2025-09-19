@@ -11,7 +11,6 @@ import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.andreyasadchy.xtra.R
-import com.github.andreyasadchy.xtra.model.chat.Badge
 import com.github.andreyasadchy.xtra.model.chat.ChannelPointReward
 import com.github.andreyasadchy.xtra.model.chat.ChatMessage
 import com.github.andreyasadchy.xtra.model.chat.Chatter
@@ -2143,7 +2142,7 @@ class ChatViewModel @Inject constructor(
                                                             var userName: String? = null
                                                             var color: String? = null
                                                             val emotesList = mutableListOf<KickEmote>()
-                                                            val badgesList = mutableListOf<Badge>()
+                                                            val badgesList = mutableListOf<KickBadge>()
                                                             while (reader.hasNext()) {
                                                                 when (reader.nextName().also { position += it.length + 3 }) {
                                                                     "id" -> id = reader.nextString().also { position += it.length + 2 }
@@ -2232,7 +2231,7 @@ class ChatViewModel @Inject constructor(
                                                                                             }
                                                                                         }
                                                                                         if (!set.isNullOrBlank() && !version.isNullOrBlank()) {
-                                                                                            badgesList.add(Badge(set, version))
+                                                                                            badgesList.add(KickBadge(setId = set, version = version))
                                                                                         }
                                                                                         reader.endObject().also { position += 1 }
                                                                                         if (reader.peek() != JsonToken.END_ARRAY) {

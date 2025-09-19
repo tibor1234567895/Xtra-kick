@@ -1207,12 +1207,16 @@ class StreamDownloadWorker @AssistedInject constructor(
                                             }
                                         }
                                         chatMessage.badges?.forEach {
-                                            val pair = Pair(it.setId, it.version)
-                                            if (!savedBadges.contains(pair)) {
-                                                savedBadges.add(pair)
-                                                val badge = badgeList.find { badge -> badge.setId == it.setId && badge.version == it.version }
-                                                if (badge != null) {
-                                                    kickBadges.add(badge)
+                                            val setId = it.setId
+                                            val version = it.version
+                                            if (!setId.isNullOrBlank() && !version.isNullOrBlank()) {
+                                                val pair = Pair(setId, version)
+                                                if (!savedBadges.contains(pair)) {
+                                                    savedBadges.add(pair)
+                                                    val badge = badgeList.find { badge -> badge.setId == setId && badge.version == version }
+                                                    if (badge != null) {
+                                                        kickBadges.add(badge)
+                                                    }
                                                 }
                                             }
                                         }

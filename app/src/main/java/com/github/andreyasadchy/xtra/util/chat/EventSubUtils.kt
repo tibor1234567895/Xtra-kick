@@ -3,11 +3,11 @@ package com.github.andreyasadchy.xtra.util.chat
 import android.content.Context
 import androidx.core.content.ContextCompat
 import com.github.andreyasadchy.xtra.R
-import com.github.andreyasadchy.xtra.model.chat.Badge
 import com.github.andreyasadchy.xtra.model.chat.ChannelPointReward
 import com.github.andreyasadchy.xtra.model.chat.ChatMessage
 import com.github.andreyasadchy.xtra.model.chat.RoomState
 import com.github.andreyasadchy.xtra.model.chat.KickEmote
+import com.github.andreyasadchy.xtra.model.chat.KickBadge
 import com.github.andreyasadchy.xtra.util.KickApiHelper
 import org.json.JSONObject
 
@@ -41,7 +41,7 @@ object EventSubUtils {
                 }
             }
         }
-        val badgesList = mutableListOf<Badge>()
+        val badgesList = mutableListOf<KickBadge>()
         val badges = json.optJSONArray("badges")
         if (badges != null) {
             for (i in 0 until badges.length()) {
@@ -49,7 +49,7 @@ object EventSubUtils {
                 val set = if (badge?.isNull("set_id") == false) badge.optString("set_id").takeIf { it.isNotBlank() } else null
                 val id = if (badge?.isNull("id") == false) badge.optString("id").takeIf { it.isNotBlank() } else null
                 if (!set.isNullOrBlank() && !id.isNullOrBlank()) {
-                    badgesList.add(Badge(set, id))
+                    badgesList.add(KickBadge(setId = set, version = id))
                 }
             }
         }
@@ -102,7 +102,7 @@ object EventSubUtils {
                     }
                 }
             }
-            val badgesList = mutableListOf<Badge>()
+            val badgesList = mutableListOf<KickBadge>()
             val badges = json.optJSONArray("badges")
             if (badges != null) {
                 for (i in 0 until badges.length()) {
@@ -110,7 +110,7 @@ object EventSubUtils {
                     val set = if (badge?.isNull("set_id") == false) badge.optString("set_id").takeIf { it.isNotBlank() } else null
                     val id = if (badge?.isNull("id") == false) badge.optString("id").takeIf { it.isNotBlank() } else null
                     if (!set.isNullOrBlank() && !id.isNullOrBlank()) {
-                        badgesList.add(Badge(set, id))
+                        badgesList.add(KickBadge(setId = set, version = id))
                     }
                 }
             }
