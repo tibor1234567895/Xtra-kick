@@ -1,5 +1,8 @@
 package com.github.andreyasadchy.xtra.model.chat
 
+import com.github.andreyasadchy.xtra.kick.chat.KickChatEmoteChannel
+import com.github.andreyasadchy.xtra.kick.chat.KickChatEmoteImage
+
 data class KickEmote(
     val id: String? = null,
     val name: String? = null,
@@ -14,4 +17,11 @@ data class KickEmote(
     var end: Int = 0,
     val setId: String? = null,
     val ownerId: String? = null,
+    val type: String? = null,
+    val source: String? = null,
+    val code: String? = null,
+    val url: String? = null,
+    val slug: String? = null,
+    val image: KickChatEmoteImage? = null,
+    val channel: KickChatEmoteChannel? = null,
 )

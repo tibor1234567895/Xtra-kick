@@ -24,22 +24,18 @@ import com.github.andreyasadchy.xtra.model.chat.Raid
 import com.github.andreyasadchy.xtra.model.chat.RecentEmote
 import com.github.andreyasadchy.xtra.model.chat.RoomState
 import com.github.andreyasadchy.xtra.model.chat.StvBadge
-import com.github.andreyasadchy.xtra.model.chat.KickBadge
-import com.github.andreyasadchy.xtra.model.chat.KickEmote
-import com.github.andreyasadchy.xtra.kick.chat.KickChatBadge
 import com.github.andreyasadchy.xtra.kick.chat.KickChatClient
-import com.github.andreyasadchy.xtra.kick.chat.KickChatEmote
 import com.github.andreyasadchy.xtra.kick.chat.KickChatEnvelope
 import com.github.andreyasadchy.xtra.kick.chat.KickChatEvent
 import com.github.andreyasadchy.xtra.kick.chat.KickChatMessage
-import com.github.andreyasadchy.xtra.kick.chat.KickChatReply
+import com.github.andreyasadchy.xtra.model.chat.KickBadge
+import com.github.andreyasadchy.xtra.model.chat.KickEmote
 import com.github.andreyasadchy.xtra.repository.GraphQLRepository
 import com.github.andreyasadchy.xtra.repository.HelixRepository
 import com.github.andreyasadchy.xtra.repository.PlayerRepository
 import com.github.andreyasadchy.xtra.repository.TranslateAllMessagesUsersRepository
 import com.github.andreyasadchy.xtra.util.C
 import com.github.andreyasadchy.xtra.util.KickApiHelper
-import com.github.andreyasadchy.xtra.util.chat.ChatUtils
 import com.github.andreyasadchy.xtra.util.chat.EventSubUtils
 import com.github.andreyasadchy.xtra.util.chat.EventSubWebSocket
 import com.github.andreyasadchy.xtra.util.chat.HermesWebSocket
@@ -1102,7 +1098,7 @@ class ChatViewModel @Inject constructor(
         accountId: String?,
         channelId: String?,
     ) {
-        val chatMessage = message.toChatMessage()
+        val chatMessage = KickChatMessageMapper.fromKickMessage(message)
         if (chatMessage.reply != null) {
             onMessage(
                 ChatMessage(
@@ -1168,91 +1164,6 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    private fun KickChatMessage.toChatMessage(): ChatMessage {
-        val isAction = type.equals("action", true)
-        val isSystem = type.equals("system", true)
-        val replyMessage = reply?.toReply()
-        val badges = (metadata?.badges.orEmpty() + sender.identity?.badges.orEmpty())
-            .mapNotNull { it.toBadge() }
-            .distinctBy { it.setId to it.version }
-        val emotes = metadata?.emotes?.mapNotNull { it.toKickEmote() }
-        return ChatMessage(
-            id = id,
-            userId = sender.id.toString(),
-            userLogin = sender.username,
-            userName = sender.username,
-            message = if (isSystem) null else content,
-            color = sender.identity?.color,
-            emotes = emotes,
-            badges = badges,
-            isAction = isAction,
-            isFirst = false,
-            systemMsg = if (isSystem) content else null,
-            reply = replyMessage,
-            isReply = replyMessage != null,
-            timestamp = KickApiHelper.parseIso8601DateUTC(createdAt),
-            fullMsg = content,
-        )
-    }
-
-    private fun KickChatBadge.toBadge(): Badge? {
-        val setId = type.takeIf { it.isNotBlank() } ?: return null
-        val version = when {
-            !text.isNullOrBlank() -> text!!
-            count != null -> count.toString()
-            !source.isNullOrBlank() -> source!!
-            else -> "1"
-        }
-        return Badge(setId, version)
-    }
-
-    private fun KickChatReply.toReply(): Reply {
-        return Reply(
-            threadParentId = id,
-            userLogin = username ?: displayName,
-            userName = displayName ?: username,
-            message = text,
-        )
-    }
-
-    private fun KickChatEmote.toKickEmote(): KickEmote? {
-        val name = code ?: this.name ?: return null
-        val urls = parseSrcSet(image?.srcSet ?: image?.srcset)
-        val baseUrl = image?.src ?: url
-        val url1x = urls["1x"] ?: baseUrl
-        val url2x = urls["2x"] ?: url1x
-        val url3x = urls["3x"] ?: url2x
-        val url4x = urls["4x"] ?: url3x
-        val format = type ?: if ((url1x ?: url4x)?.endsWith(".gif", true) == true) "gif" else null
-        val animated = format?.contains("gif", true) == true
-        return KickEmote(
-            id = id ?: slug ?: name,
-            name = name,
-            url1x = url1x,
-            url2x = url2x,
-            url3x = url3x,
-            url4x = url4x,
-            format = format,
-            isAnimated = animated,
-        )
-    }
-
-    private fun parseSrcSet(srcSet: String?): Map<String, String> {
-        if (srcSet.isNullOrBlank()) {
-            return emptyMap()
-        }
-        return srcSet.split(',')
-            .mapNotNull { entry ->
-                val parts = entry.trim().split(" ")
-                if (parts.size >= 2) {
-                    parts[1] to parts[0]
-                } else {
-                    null
-                }
-            }
-            .toMap()
-    }
-
     private fun String?.stripAuthPrefix(): String? {
         if (this.isNullOrBlank()) {
             return null
@@ -1309,7 +1220,7 @@ class ChatViewModel @Inject constructor(
 
     private fun onChatMessage(message: String, userNotice: Boolean, showUserNotice: Boolean, usePubSub: Boolean, networkLibrary: String?, isLoggedIn: Boolean, accountId: String?, channelId: String?) {
         if (!userNotice || showUserNotice) {
-            val chatMessage = ChatUtils.parseChatMessage(message, userNotice)
+            val chatMessage = KickChatMessageMapper.fromRawMessage(message, userNotice)
             if (chatMessage.reply?.message != null) {
                 onMessage(ChatMessage(
                     reply = chatMessage.reply,
@@ -1326,7 +1237,7 @@ class ChatViewModel @Inject constructor(
     }
 
     private fun onClearMessage(message: String, nameDisplay: String?) {
-        val pair = ChatUtils.parseClearMessage(message)
+        val pair = KickChatMessageMapper.parseClearMessage(message)
         val deletedMessage = try {
             pair.second?.let { targetId -> _chatMessages.value.toList().find { it.id == targetId } }
         } catch (e: NullPointerException) {
@@ -1336,11 +1247,11 @@ class ChatViewModel @Inject constructor(
     }
 
     private fun onClearChat(message: String) {
-        onMessage(ChatUtils.parseClearChat(applicationContext, message))
+        onMessage(KickChatMessageMapper.parseClearChat(applicationContext, message))
     }
 
     private fun onNotice(message: String) {
-        val result = ChatUtils.parseNotice(applicationContext, message)
+        val result = KickChatMessageMapper.parseNotice(applicationContext, message)
         onMessage(result.first)
         if (result.second) {
             if (!hideRaid.value) {
@@ -1350,11 +1261,11 @@ class ChatViewModel @Inject constructor(
     }
 
     private fun onRoomState(message: String) {
-        roomState.value = ChatUtils.parseRoomState(message)
+        roomState.value = KickChatMessageMapper.parseRoomState(message)
     }
 
     private fun onUserState(message: String, channelId: String?) {
-        val emoteSets = ChatUtils.parseEmoteSets(message)
+        val emoteSets = KickChatMessageMapper.parseEmoteSets(message)
         if (emoteSets != null && savedEmoteSets != emoteSets) {
             savedEmoteSets = emoteSets
             if (!loadedUserEmotes) {
@@ -1409,6 +1320,8 @@ class ChatViewModel @Inject constructor(
                     color = message.color ?: item.color,
                     emotes = message.emotes ?: item.emotes,
                     badges = message.badges ?: item.badges,
+                    kickBadges = message.kickBadges ?: item.kickBadges,
+                    kickEmotesRaw = message.kickEmotesRaw ?: item.kickEmotesRaw,
                     isAction = message.isAction || item.isAction,
                     isFirst = message.isFirst || item.isFirst,
                     bits = message.bits ?: item.bits,
@@ -2300,7 +2213,7 @@ class ChatViewModel @Inject constructor(
                                                             val message = reader.nextString().also { position += it.length + 2 + it.count { c -> c == '"' || c == '\\' } }
                                                             when {
                                                                 message.contains("PRIVMSG") -> {
-                                                                    val chatMessage = ChatUtils.parseChatMessage(message, false)
+                                                                    val chatMessage = KickChatMessageMapper.fromBackfillMessage(message, false)
                                                                     if (chatMessage.reply?.message != null) {
                                                                         messages.add(ChatMessage(
                                                                             reply = chatMessage.reply,
@@ -2311,7 +2224,7 @@ class ChatViewModel @Inject constructor(
                                                                     messages.add(chatMessage)
                                                                 }
                                                                 message.contains("USERNOTICE") -> {
-                                                                    val chatMessage = ChatUtils.parseChatMessage(message, true)
+                                                                    val chatMessage = KickChatMessageMapper.fromBackfillMessage(message, true)
                                                                     if (chatMessage.reply?.message != null) {
                                                                         messages.add(ChatMessage(
                                                                             reply = chatMessage.reply,
@@ -2322,11 +2235,11 @@ class ChatViewModel @Inject constructor(
                                                                     messages.add(chatMessage)
                                                                 }
                                                                 message.contains("CLEARMSG") -> {
-                                                                    val pair = ChatUtils.parseClearMessage(message)
+                                                                    val pair = KickChatMessageMapper.parseClearMessage(message, backfill = true)
                                                                     val deletedMessage = pair.second?.let { targetId -> messages.find { it.id == targetId } }
                                                                     messages.add(getClearMessage(pair.first, deletedMessage, nameDisplay))
                                                                 }
-                                                                message.contains("CLEARCHAT") -> messages.add(ChatUtils.parseClearChat(applicationContext, message))
+                                                                message.contains("CLEARCHAT") -> messages.add(KickChatMessageMapper.parseClearChat(applicationContext, message, backfill = true))
                                                             }
                                                             if (reader.peek() != JsonToken.END_ARRAY) {
                                                                 position += 1

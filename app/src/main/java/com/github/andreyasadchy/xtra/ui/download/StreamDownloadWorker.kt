@@ -40,7 +40,7 @@ import com.github.andreyasadchy.xtra.util.C
 import com.github.andreyasadchy.xtra.util.HttpEngineUtils
 import com.github.andreyasadchy.xtra.util.KickApiHelper
 import com.github.andreyasadchy.xtra.util.chat.ChatReadWebSocket
-import com.github.andreyasadchy.xtra.util.chat.ChatUtils
+import com.github.andreyasadchy.xtra.ui.chat.KickChatMessageMapper
 import com.github.andreyasadchy.xtra.util.getByteArrayCronetCallback
 import com.github.andreyasadchy.xtra.util.m3u8.PlaylistUtils
 import com.github.andreyasadchy.xtra.util.prefs
@@ -1195,7 +1195,7 @@ class StreamDownloadWorker @AssistedInject constructor(
                                         else -> null
                                     }
                                     if (userNotice != null) {
-                                        val chatMessage = ChatUtils.parseChatMessage(message, userNotice)
+                                        val chatMessage = KickChatMessageMapper.fromBackfillMessage(message, userNotice)
                                         val kickEmotes = mutableListOf<KickEmote>()
                                         val kickBadges = mutableListOf<KickBadge>()
                                         val cheerEmotes = mutableListOf<CheerEmote>()
