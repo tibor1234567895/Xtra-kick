@@ -8,7 +8,7 @@ class ChatMessage(
     val message: String? = null,
     val color: String? = null,
     val emotes: List<KickEmote>? = null,
-    val badges: List<Badge>? = null,
+    val badges: List<KickBadge>? = null,
     val isAction: Boolean = false,
     val isFirst: Boolean = false,
     val bits: Int? = null,

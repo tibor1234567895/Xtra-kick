@@ -1,8 +1,8 @@
 package com.github.andreyasadchy.xtra.ui.chat
 
-import com.github.andreyasadchy.xtra.model.chat.Badge
 import com.github.andreyasadchy.xtra.model.chat.ChatMessage
 import com.github.andreyasadchy.xtra.model.chat.KickEmote
+import com.github.andreyasadchy.xtra.model.chat.KickBadge
 import com.github.andreyasadchy.xtra.model.chat.VideoChatMessage
 import com.github.andreyasadchy.xtra.repository.GraphQLRepository
 import kotlinx.coroutines.CoroutineScope
@@ -92,7 +92,7 @@ class ChatReplayManager @Inject constructor(
                             val badges = message.userBadges?.mapNotNull { badge ->
                                 badge.setID?.let { setId ->
                                     badge.version?.let { version ->
-                                        Badge(
+                                        KickBadge(
                                             setId = setId,
                                             version = version,
                                         )

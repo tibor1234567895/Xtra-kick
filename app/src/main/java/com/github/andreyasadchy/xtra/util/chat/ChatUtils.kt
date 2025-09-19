@@ -3,12 +3,12 @@ package com.github.andreyasadchy.xtra.util.chat
 import android.content.Context
 import androidx.core.content.ContextCompat
 import com.github.andreyasadchy.xtra.R
-import com.github.andreyasadchy.xtra.model.chat.Badge
 import com.github.andreyasadchy.xtra.model.chat.ChannelPointReward
 import com.github.andreyasadchy.xtra.model.chat.ChatMessage
 import com.github.andreyasadchy.xtra.model.chat.Reply
 import com.github.andreyasadchy.xtra.model.chat.RoomState
 import com.github.andreyasadchy.xtra.model.chat.KickEmote
+import com.github.andreyasadchy.xtra.model.chat.KickBadge
 import com.github.andreyasadchy.xtra.util.KickApiHelper
 import kotlin.collections.set
 
@@ -59,13 +59,13 @@ object ChatUtils {
                     }
                 }
             }
-            val badgesList = mutableListOf<Badge>()
+            val badgesList = mutableListOf<KickBadge>()
             val badges = prefixes["badges"]
             if (badges != null) {
                 val entries = splitAndMakeMap(badges, ",", "/").entries
                 entries.forEach {
                     it.value?.let { value ->
-                        badgesList.add(Badge(it.key, value))
+                        badgesList.add(KickBadge(setId = it.key, version = value))
                     }
                 }
             }
